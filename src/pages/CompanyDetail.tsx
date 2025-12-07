@@ -189,19 +189,6 @@ export default function CompanyDetail() {
                   )}
                 </div>
 
-                {company.website && (
-                  <a
-                    href={company.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="default" className="gap-2">
-                      <Globe className="h-4 w-4" />
-                      Visit Website
-                      <ExternalLink className="h-4 w-4" />
-                    </Button>
-                  </a>
-                )}
               </div>
             </div>
           </div>
@@ -300,6 +287,15 @@ export default function CompanyDetail() {
                   <CardTitle>Contact</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  {company.phone && (
+                    <a
+                      href={`tel:${company.phone}`}
+                      className="flex items-center gap-3 text-sm hover:text-accent transition-colors"
+                    >
+                      <Phone className="h-4 w-4 text-muted-foreground" />
+                      <span>{company.phone}</span>
+                    </a>
+                  )}
                   {company.website && (
                     <a
                       href={company.website}
@@ -310,15 +306,6 @@ export default function CompanyDetail() {
                       <Globe className="h-4 w-4 text-muted-foreground" />
                       <span className="truncate">{company.website.replace(/^https?:\/\//, "")}</span>
                       <ExternalLink className="h-3 w-3 shrink-0" />
-                    </a>
-                  )}
-                  {company.phone && (
-                    <a
-                      href={`tel:${company.phone}`}
-                      className="flex items-center gap-3 text-sm hover:text-accent transition-colors"
-                    >
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{company.phone}</span>
                     </a>
                   )}
                   {company.email && (
