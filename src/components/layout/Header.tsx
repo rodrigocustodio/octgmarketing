@@ -19,7 +19,7 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-background/98 backdrop-blur-md supports-[backdrop-filter]:bg-background/90 shadow-sm">
-      <div className="container flex h-16 items-center justify-between border-b-2 border-accent/30">
+      <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div>
             <span className="font-display text-xl font-bold tracking-tight">OCTG</span>
@@ -53,6 +53,9 @@ export function Header() {
           </Button>
         </div>
       </div>
+
+      {/* Full-width bronze divider */}
+      <div className="w-full border-b-2 border-accent/30" />
 
       {mobileMenuOpen && (
         <div className="lg:hidden border-t border-border bg-background p-4 animate-fade-in">
