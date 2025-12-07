@@ -157,6 +157,114 @@
 }
 
 @layer components {
+  /* Article Typography System */
+  .article-content {
+    @apply text-foreground/90;
+  }
+
+  /* Lead paragraph - distinctive opening */
+  .article-content .lead,
+  .article-content p:first-of-type {
+    @apply text-xl leading-relaxed text-foreground font-medium mb-8;
+  }
+
+  /* Section headers with accent underline */
+  .article-content h2 {
+    @apply text-2xl font-bold tracking-tight text-foreground mt-12 mb-5 pb-3 relative;
+  }
+  .article-content h2::after {
+    content: '';
+    @apply absolute bottom-0 left-0 w-16 h-0.5 bg-accent rounded-full;
+  }
+
+  .article-content h3 {
+    @apply text-xl font-semibold tracking-tight text-foreground mt-10 mb-4;
+  }
+
+  .article-content h4 {
+    @apply text-lg font-semibold text-foreground mt-8 mb-3;
+  }
+
+  /* Paragraphs - optimal reading */
+  .article-content p {
+    @apply text-base leading-[1.85] text-foreground/85 mb-6;
+  }
+
+  /* Blockquotes - editorial style */
+  .article-content blockquote {
+    @apply relative my-10 pl-8 pr-6 py-6 border-l-4 border-accent bg-muted/30 rounded-r-lg;
+  }
+  .article-content blockquote p {
+    @apply text-lg italic text-foreground/90 leading-relaxed mb-0;
+  }
+  .article-content blockquote cite {
+    @apply block mt-4 text-sm font-medium text-accent not-italic;
+  }
+
+  /* Lists with custom styling */
+  .article-content ul {
+    @apply my-6 space-y-3 pl-0;
+  }
+  .article-content ul li {
+    @apply relative pl-6 text-foreground/85 leading-relaxed;
+  }
+  .article-content ul li::before {
+    content: '';
+    @apply absolute left-0 top-[0.6em] w-2 h-2 bg-accent rounded-full;
+  }
+
+  .article-content ol {
+    @apply my-6 space-y-3 pl-0 list-none;
+    counter-reset: item;
+  }
+  .article-content ol li {
+    @apply relative pl-8 text-foreground/85 leading-relaxed;
+    counter-increment: item;
+  }
+  .article-content ol li::before {
+    content: counter(item);
+    @apply absolute left-0 top-0 w-6 h-6 flex items-center justify-center text-sm font-bold text-accent-foreground bg-accent rounded-full;
+  }
+
+  /* Links within article */
+  .article-content a {
+    @apply text-accent font-medium underline underline-offset-4 decoration-accent/40 hover:decoration-accent transition-colors;
+  }
+
+  /* Strong/emphasis */
+  .article-content strong {
+    @apply font-bold text-foreground;
+  }
+
+  .article-content em {
+    @apply italic text-foreground/90;
+  }
+
+  /* Horizontal rule / section break */
+  .article-content hr {
+    @apply my-12 border-0 h-px bg-gradient-to-r from-transparent via-border to-transparent;
+  }
+
+  /* Inline code */
+  .article-content code {
+    @apply px-1.5 py-0.5 bg-muted text-foreground rounded text-sm font-mono;
+  }
+
+  /* Images within article */
+  .article-content img {
+    @apply rounded-lg my-8 shadow-card;
+  }
+
+  .article-content figure {
+    @apply my-10;
+  }
+
+  .article-content figcaption {
+    @apply mt-3 text-sm text-muted-foreground text-center italic;
+  }
+}
+
+@layer components {
   /* Industrial texture overlay */
   .octg-texture {
     background-image: 
