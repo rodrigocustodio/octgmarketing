@@ -131,11 +131,6 @@ const Index = () => {
           </section>
         )}
 
-        {secondaryArticles.length > 0 && (
-          <div className="container">
-            <div className="octg-divider" />
-          </div>
-        )}
 
         {/* SECTION 1: Trending This Week */}
         {trendingFeatured && (
@@ -207,9 +202,6 @@ const Index = () => {
               </div>
             </section>
 
-            <div className="container">
-              <div className="octg-divider" />
-            </div>
           </>
         )}
 
@@ -237,9 +229,6 @@ const Index = () => {
           </div>
         </section>
 
-        <div className="container">
-          <div className="octg-divider" />
-        </div>
 
         {/* SECTION 2: Regional Spotlight */}
         {regions && regions.length > 0 && (
@@ -310,9 +299,6 @@ const Index = () => {
               )}
             </section>
 
-            <div className="container">
-              <div className="octg-divider" />
-            </div>
           </>
         )}
 
@@ -351,9 +337,6 @@ const Index = () => {
         {/* SECTION 3: Analysis & Reports */}
         {analysisArticles.length > 0 && (
           <>
-            <div className="container">
-              <div className="octg-divider" />
-            </div>
 
             <section className="container py-12">
               <div className="flex items-center justify-between mb-8">
