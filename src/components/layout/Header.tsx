@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Menu, X, Search } from "lucide-react";
 import { useState } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { PriceTicker } from "./PriceTicker";
 
 const regions = [
   { name: "Americas", slug: "americas" },
@@ -67,6 +68,8 @@ export function Header() {
           </nav>
         </div>
       )}
+
+      <PriceTicker />
     </header>
   );
 }

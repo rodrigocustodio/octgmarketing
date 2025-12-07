@@ -460,3 +460,35 @@
 .mapboxgl-popup-tip {
   @apply border-t-card !important;
 }
+
+/* Price Ticker Animation */
+.ticker-wrapper {
+  @apply flex overflow-hidden;
+  width: 100%;
+}
+
+.ticker-content {
+  @apply flex items-center;
+  animation: ticker-scroll 40s linear infinite;
+}
+
+.ticker-content:hover {
+  animation-play-state: paused;
+}
+
+@keyframes ticker-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Responsive ticker - no animation on larger screens */
+@media (min-width: 1280px) {
+  .ticker-content {
+    animation: none;
+    justify-content: center;
+  }
+}
