@@ -2,95 +2,97 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* OCTG Corporate Dark Theme */
+    --background: 222 47% 6%;
+    --foreground: 210 20% 95%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 222 47% 8%;
+    --card-foreground: 210 20% 95%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 20% 95%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Primary - Steel Blue */
+    --primary: 210 40% 45%;
+    --primary-foreground: 210 20% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Secondary - Dark Slate */
+    --secondary: 217 33% 15%;
+    --secondary-foreground: 210 20% 90%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Muted - Charcoal */
+    --muted: 220 20% 18%;
+    --muted-foreground: 215 15% 55%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Accent - Bronze/Copper */
+    --accent: 30 60% 45%;
+    --accent-foreground: 30 10% 98%;
 
-    --destructive: 0 84.2% 60.2%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 20% 18%;
+    --input: 220 20% 20%;
+    --ring: 210 40% 50%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 0 0% 98%;
+    /* Custom OCTG Colors */
+    --octg-bronze: 30 60% 45%;
+    --octg-copper: 25 70% 40%;
+    --octg-steel: 210 30% 50%;
+    --octg-slate: 222 47% 11%;
+    --octg-navy: 220 50% 15%;
+    --octg-charcoal: 220 20% 12%;
+    --octg-gold: 45 80% 50%;
 
-    --sidebar-foreground: 240 5.3% 26.1%;
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(222 47% 6%) 0%, hsl(220 50% 12%) 50%, hsl(30 40% 15%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(222 47% 8%) 100%);
+    --gradient-bronze: linear-gradient(135deg, hsl(30 60% 45%) 0%, hsl(25 70% 35%) 100%);
+    --gradient-steel: linear-gradient(135deg, hsl(210 30% 50%) 0%, hsl(210 40% 40%) 100%);
 
-    --sidebar-primary: 240 5.9% 10%;
+    /* Shadows */
+    --shadow-card: 0 4px 20px -4px hsl(222 47% 3% / 0.5);
+    --shadow-elevated: 0 10px 40px -10px hsl(222 47% 3% / 0.6);
+    --shadow-glow-bronze: 0 0 30px hsl(30 60% 45% / 0.3);
+    --shadow-glow-steel: 0 0 30px hsl(210 40% 45% / 0.3);
 
-    --sidebar-primary-foreground: 0 0% 98%;
-
-    --sidebar-accent: 240 4.8% 95.9%;
-
-    --sidebar-accent-foreground: 240 5.9% 10%;
-
-    --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    /* Sidebar */
+    --sidebar-background: 222 47% 8%;
+    --sidebar-foreground: 210 20% 90%;
+    --sidebar-primary: 210 40% 45%;
+    --sidebar-primary-foreground: 210 20% 98%;
+    --sidebar-accent: 220 20% 15%;
+    --sidebar-accent-foreground: 210 20% 90%;
+    --sidebar-border: 220 20% 18%;
+    --sidebar-ring: 210 40% 50%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
+    --background: 222 47% 6%;
+    --foreground: 210 20% 95%;
+    --card: 222 47% 8%;
+    --card-foreground: 210 20% 95%;
+    --popover: 222 47% 10%;
+    --popover-foreground: 210 20% 95%;
+    --primary: 210 40% 45%;
+    --primary-foreground: 210 20% 98%;
+    --secondary: 217 33% 15%;
+    --secondary-foreground: 210 20% 90%;
+    --muted: 220 20% 18%;
+    --muted-foreground: 215 15% 55%;
+    --accent: 30 60% 45%;
+    --accent-foreground: 30 10% 98%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 220 20% 18%;
+    --input: 220 20% 20%;
+    --ring: 210 40% 50%;
   }
 }
 
@@ -100,6 +102,204 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-sans antialiased;
+    font-family: 'Inter', system-ui, sans-serif;
   }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Bebas Neue', system-ui, sans-serif;
+    @apply tracking-wide;
+  }
+}
+
+@layer components {
+  /* Industrial texture overlay */
+  .octg-texture {
+    background-image: 
+      linear-gradient(90deg, hsl(220 20% 15% / 0.03) 1px, transparent 1px),
+      linear-gradient(hsl(220 20% 15% / 0.03) 1px, transparent 1px);
+    background-size: 20px 20px;
+  }
+
+  /* Steel pipe pattern */
+  .octg-pipe-pattern {
+    background-image: 
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 40px,
+        hsl(220 20% 18% / 0.5) 40px,
+        hsl(220 20% 18% / 0.5) 41px
+      );
+  }
+
+  /* Glowing border effect */
+  .octg-glow-border {
+    @apply relative;
+  }
+  .octg-glow-border::before {
+    content: '';
+    @apply absolute inset-0 rounded-lg;
+    background: linear-gradient(135deg, hsl(var(--accent) / 0.2), transparent 50%);
+    pointer-events: none;
+  }
+
+  /* Card hover animation */
+  .octg-card-hover {
+    @apply transition-all duration-300 ease-out;
+  }
+  .octg-card-hover:hover {
+    @apply -translate-y-1;
+    box-shadow: var(--shadow-elevated), var(--shadow-glow-bronze);
+  }
+
+  /* Badge styles */
+  .octg-badge-region {
+    @apply bg-primary/20 text-primary border border-primary/30 px-3 py-1 rounded-sm text-xs uppercase tracking-wider font-medium;
+  }
+  .octg-badge-topic {
+    @apply bg-accent/20 text-accent border border-accent/30 px-3 py-1 rounded-sm text-xs uppercase tracking-wider font-medium;
+  }
+
+  /* Link underline animation */
+  .octg-link {
+    @apply relative inline-block;
+  }
+  .octg-link::after {
+    content: '';
+    @apply absolute w-full h-0.5 bottom-0 left-0 bg-accent origin-bottom-right scale-x-0 transition-transform duration-300;
+  }
+  .octg-link:hover::after {
+    @apply origin-bottom-left scale-x-100;
+  }
+
+  /* Section divider */
+  .octg-divider {
+    @apply h-px bg-gradient-to-r from-transparent via-border to-transparent;
+  }
+
+  /* Featured article card */
+  .octg-featured-card {
+    @apply relative overflow-hidden rounded-lg;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-card);
+  }
+
+  /* Bronze accent bar */
+  .octg-accent-bar {
+    @apply h-1 bg-gradient-to-r from-accent via-accent/80 to-transparent rounded-full;
+  }
+
+  /* Map marker pulse */
+  .octg-marker-pulse {
+    @apply relative;
+  }
+  .octg-marker-pulse::after {
+    content: '';
+    @apply absolute inset-0 rounded-full bg-accent/30 animate-ping;
+  }
+}
+
+@layer utilities {
+  /* Fade animations */
+  .animate-fade-in {
+    animation: fade-in 0.5s ease-out forwards;
+  }
+  .animate-fade-in-up {
+    animation: fade-in-up 0.6s ease-out forwards;
+  }
+  .animate-fade-in-down {
+    animation: fade-in-down 0.6s ease-out forwards;
+  }
+
+  /* Slide animations */
+  .animate-slide-in-left {
+    animation: slide-in-left 0.5s ease-out forwards;
+  }
+  .animate-slide-in-right {
+    animation: slide-in-right 0.5s ease-out forwards;
+  }
+
+  /* Scale animation */
+  .animate-scale-in {
+    animation: scale-in 0.3s ease-out forwards;
+  }
+
+  /* Stagger delays */
+  .animation-delay-100 { animation-delay: 100ms; }
+  .animation-delay-200 { animation-delay: 200ms; }
+  .animation-delay-300 { animation-delay: 300ms; }
+  .animation-delay-400 { animation-delay: 400ms; }
+  .animation-delay-500 { animation-delay: 500ms; }
+}
+
+@keyframes fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fade-in-down {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in-left {
+  from {
+    opacity: 0;
+    transform: translateX(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Mapbox overrides */
+.mapboxgl-popup-content {
+  @apply bg-card text-card-foreground rounded-lg shadow-lg border border-border p-0 !important;
+}
+.mapboxgl-popup-close-button {
+  @apply text-muted-foreground hover:text-foreground text-xl p-2 !important;
+}
+.mapboxgl-popup-tip {
+  @apply border-t-card !important;
 }
