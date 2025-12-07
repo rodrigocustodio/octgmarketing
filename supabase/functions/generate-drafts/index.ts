@@ -12,22 +12,29 @@ const CRON_SECRET = Deno.env.get('CRON_SECRET');
 const SUPABASE_URL = Deno.env.get('SUPABASE_URL')!;
 const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
-// Region detection keywords
+// Region detection keywords - CRITICAL: Accurate region identification
 const REGION_KEYWORDS: Record<string, string[]> = {
-  'middle-east': ['saudi', 'arabia', 'uae', 'emirates', 'qatar', 'kuwait', 'oman', 'bahrain', 'iraq', 'iran', 'abu dhabi', 'dubai', 'doha', 'riyadh', 'jeddah', 'aramco', 'adnoc'],
-  'americas': ['usa', 'united states', 'texas', 'permian', 'gulf of mexico', 'canada', 'alberta', 'mexico', 'brazil', 'argentina', 'venezuela', 'colombia', 'houston', 'oklahoma', 'north dakota', 'bakken', 'eagle ford', 'marcellus'],
-  'europe': ['north sea', 'norway', 'uk', 'united kingdom', 'netherlands', 'germany', 'france', 'italy', 'spain', 'romania', 'poland', 'denmark', 'equinor', 'shell', 'bp'],
-  'asia-pacific': ['china', 'india', 'australia', 'indonesia', 'malaysia', 'vietnam', 'thailand', 'japan', 'south korea', 'singapore', 'brunei', 'papua new guinea', 'woodside', 'santos'],
-  'africa': ['nigeria', 'angola', 'libya', 'algeria', 'egypt', 'ghana', 'mozambique', 'tanzania', 'kenya', 'south africa', 'senegal', 'mauritania'],
-  'russia-cis': ['russia', 'kazakhstan', 'azerbaijan', 'turkmenistan', 'uzbekistan', 'gazprom', 'rosneft', 'lukoil', 'siberia', 'sakhalin']
+  'middle-east': ['saudi', 'arabia', 'uae', 'emirates', 'qatar', 'kuwait', 'oman', 'bahrain', 'iraq', 'iran', 'abu dhabi', 'dubai', 'doha', 'riyadh', 'jeddah', 'aramco', 'adnoc', 'muscat', 'manama', 'yemen', 'jordan', 'opec'],
+  'americas': ['usa', 'united states', 'texas', 'permian', 'gulf of mexico', 'canada', 'alberta', 'mexico', 'brazil', 'argentina', 'venezuela', 'colombia', 'houston', 'oklahoma', 'north dakota', 'bakken', 'eagle ford', 'marcellus', 'delaware basin', 'midland', 'guyana', 'suriname', 'ecuador', 'peru', 'trinidad', 'petrobras', 'pemex', 'ecopetrol'],
+  'europe': ['north sea', 'norway', 'uk', 'united kingdom', 'netherlands', 'germany', 'france', 'italy', 'spain', 'romania', 'poland', 'denmark', 'equinor', 'scottish', 'aberdeen', 'stavanger', 'totalenergies', 'eni'],
+  'asia-pacific': ['china', 'india', 'indonesia', 'malaysia', 'vietnam', 'thailand', 'japan', 'south korea', 'singapore', 'brunei', 'papua new guinea', 'philippines', 'taiwan', 'myanmar', 'cnpc', 'cnooc', 'sinopec', 'petrochina', 'reliance', 'petronas', 'pertamina', 'ongc'],
+  'africa': ['nigeria', 'angola', 'libya', 'algeria', 'egypt', 'ghana', 'mozambique', 'tanzania', 'kenya', 'south africa', 'senegal', 'mauritania', 'congo', 'cameroon', 'gabon', 'ivory coast', 'namibia', 'uganda', 'nnpc', 'sonatrach', 'sonangol'],
+  'australia': ['australia', 'queensland', 'western australia', 'northern territory', 'bass strait', 'perth', 'darwin', 'gladstone', 'woodside', 'santos', 'beach energy', 'origin energy', 'cooper basin', 'carnarvon basin', 'browse basin', 'gorgon', 'wheatstone', 'ichthys', 'prelude'],
+  'global': ['global', 'worldwide', 'international', 'multiple regions', 'cross-border']
 };
 
-// Topic detection keywords
+// Topic detection keywords - All 10 database topics
 const TOPIC_KEYWORDS: Record<string, string[]> = {
-  'mills-manufacturing': ['mill', 'manufacturing', 'production', 'capacity', 'steel', 'seamless', 'welded', 'pipe plant', 'factory', 'output', 'rolling', 'forge'],
-  'yards-supply-chain': ['yard', 'stockyard', 'inventory', 'supply chain', 'logistics', 'distribution', 'warehouse', 'storage', 'distributor', 'supplier'],
-  'pricing-market': ['price', 'pricing', 'market', 'tariff', 'import', 'export', 'trade', 'duty', 'cost', 'demand', 'forecast', 'analysis'],
-  'projects-contracts': ['project', 'contract', 'tender', 'award', 'drilling', 'well', 'field', 'development', 'exploration', 'offshore', 'onshore', 'rig']
+  'mills-manufacturing': ['mill', 'manufacturing', 'production', 'capacity', 'steel', 'seamless', 'welded', 'pipe plant', 'factory', 'output', 'rolling', 'forge', 'threading', 'heat treatment', 'casing', 'tubing'],
+  'yards-supply-chain': ['yard', 'stockyard', 'inventory', 'supply chain', 'logistics', 'distribution', 'warehouse', 'storage', 'distributor', 'supplier', 'delivery', 'procurement'],
+  'pricing-market': ['price', 'pricing', 'market', 'tariff', 'import', 'export', 'trade', 'duty', 'cost', 'demand', 'forecast', 'analysis', 'revenue', 'margin', 'profit', 'premium'],
+  'projects-contracts': ['project', 'contract', 'tender', 'award', 'development', 'exploration', 'field', 'greenfield', 'brownfield', 'fid', 'final investment', 'epc'],
+  'rigs-wellsite': ['rig', 'well', 'drilling', 'completion', 'workover', 'offshore', 'onshore', 'derrick', 'blowout', 'spud', 'perforation', 'jackup', 'drillship', 'semisubmersible'],
+  'careers-people': ['ceo', 'appointed', 'hire', 'executive', 'leadership', 'president', 'director', 'retirement', 'succession', 'board', 'management', 'chief'],
+  'companies-strategy': ['merger', 'acquisition', 'joint venture', 'partnership', 'investment', 'expansion', 'strategy', 'restructuring', 'divestment', 'ipo', 'buyout'],
+  'hse-regulations': ['safety', 'environment', 'regulation', 'compliance', 'emission', 'incident', 'inspection', 'audit', 'epa', 'api', 'standard', 'certification', 'carbon'],
+  'ports-terminals': ['port', 'terminal', 'harbor', 'berth', 'loading', 'unloading', 'freight', 'shipping', 'vessel', 'cargo', 'maritime'],
+  'technology-digitalization': ['digital', 'technology', 'automation', 'ai', 'artificial intelligence', 'iot', 'sensor', 'software', 'data', 'analytics', 'machine learning', 'innovation']
 };
 
 const SYSTEM_PROMPT = `You are a senior energy industry editor for OCTG Index, a leading corporate OCTG (Oil Country Tubular Goods) news portal. Your task is to rewrite source content into professional, authoritative ORIGINAL editorial content.
@@ -77,7 +84,20 @@ CONTENT STRUCTURE (each section should be substantive):
 ENTITY EXTRACTION:
 - Identify and list any OCTG manufacturers, operators, or service companies mentioned
 - List countries specifically mentioned in the article
-- Suggest relevant topic categories from: mills-manufacturing, yards-supply-chain, pricing-market, projects-contracts
+- Suggest relevant topic categories from: mills-manufacturing, yards-supply-chain, pricing-market, projects-contracts, rigs-wellsite, careers-people, companies-strategy, hse-regulations, ports-terminals, technology-digitalization
+
+GEOGRAPHIC REGION IDENTIFICATION - CRITICAL:
+- Carefully identify the PRIMARY geographic region of the news (where the main activity/event occurs)
+- Use one of: middle-east, americas, europe, asia-pacific, africa, australia, global
+- For news involving multiple regions, identify the PRIMARY focus
+- Use country/city/company mentions to determine region accurately
+- Return your region selection in the "primary_region" field
+
+OUTPUT must include:
+{
+  ...
+  "primary_region": "middle-east" // or americas, europe, asia-pacific, africa, australia, global
+}
 
 Always return valid JSON only, no additional text.`;
 
@@ -198,6 +218,15 @@ serve(async (req) => {
       console.error('Error fetching topics:', topicsError);
     }
 
+    // Fetch companies for matching
+    const { data: companies, error: companiesError } = await supabase
+      .from('companies')
+      .select('id, name');
+    
+    if (companiesError) {
+      console.error('Error fetching companies:', companiesError);
+    }
+
     // Fetch source articles with status='new' (limit 10 per run)
     const { data: sourceArticles, error: fetchError } = await supabase
       .from('source_articles')
@@ -281,12 +310,44 @@ serve(async (req) => {
         const timestamp = Date.now().toString(36);
         const slug = `${baseSlug}-${timestamp}`;
 
-        // Detect region from content
+        // Detect region from content - prioritize AI-suggested region
         const fullContent = `${source.title} ${source.raw_content || ''} ${parsed.body_markdown}`;
-        const regionId = detectRegion(fullContent, regions || []);
+        let regionId: string | null = null;
+        
+        // First, try to use AI-suggested primary_region
+        if (parsed.primary_region) {
+          const aiRegion = regions?.find(r => r.slug === parsed.primary_region);
+          if (aiRegion) {
+            regionId = aiRegion.id;
+            console.log(`Using AI-suggested region: ${parsed.primary_region}`);
+          }
+        }
+        
+        // Fallback to keyword detection if AI didn't provide valid region
+        if (!regionId) {
+          regionId = detectRegion(fullContent, regions || []);
+          console.log(`Using keyword-detected region: ${regionId}`);
+        }
         
         // Detect topics from content
         const suggestedTopicIds = detectTopics(fullContent, topics || []);
+        
+        // Match mentioned companies to database IDs
+        const matchedCompanyIds: string[] = [];
+        if (parsed.mentioned_companies && companies) {
+          const lowerContent = fullContent.toLowerCase();
+          for (const company of companies) {
+            const companyNameLower = company.name.toLowerCase();
+            // Check if company name appears in content or AI-extracted list
+            if (lowerContent.includes(companyNameLower) || 
+                parsed.mentioned_companies.some((m: string) => 
+                  m.toLowerCase().includes(companyNameLower) || 
+                  companyNameLower.includes(m.toLowerCase())
+                )) {
+              matchedCompanyIds.push(company.id);
+            }
+          }
+        }
 
         // Combine AI suggestions with detected entities
         const allTags = [
@@ -295,7 +356,7 @@ serve(async (req) => {
           ...(parsed.mentioned_countries || []),
         ];
 
-        // Insert draft article with enhanced metadata
+        // Insert draft article with enhanced metadata including suggested IDs
         const { data: draft, error: insertError } = await supabase
           .from('draft_articles')
           .insert({
@@ -307,7 +368,9 @@ serve(async (req) => {
             slug: slug,
             region_id: regionId,
             hero_image_url: source.image_url,
-            status: 'pending_review'
+            status: 'pending_review',
+            suggested_topic_ids: suggestedTopicIds,
+            suggested_company_ids: matchedCompanyIds
           })
           .select('id')
           .single();
@@ -320,8 +383,10 @@ serve(async (req) => {
         console.log(`Draft ${draft.id} metadata:`, {
           regionId,
           suggestedTopicIds,
+          matchedCompanyIds,
           mentionedCompanies: parsed.mentioned_companies,
-          mentionedCountries: parsed.mentioned_countries
+          mentionedCountries: parsed.mentioned_countries,
+          primaryRegion: parsed.primary_region
         });
 
         // Update source article status

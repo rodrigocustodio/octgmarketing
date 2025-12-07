@@ -39,6 +39,8 @@ interface DraftArticle {
   status: "pending_review" | "approved" | "rejected";
   editor_notes: string | null;
   created_at: string;
+  suggested_topic_ids: string[] | null;
+  suggested_company_ids: string[] | null;
   region?: { name: string } | null;
   source_article?: {
     title: string;
@@ -107,6 +109,10 @@ const DraftDetail = () => {
         setSelectedRegionId(data.region_id || "");
         setCurrentImageUrl(data.hero_image_url || null);
         setImageSource(data.hero_image_url ? "original" : null);
+        
+        // Auto-populate AI-suggested topics and companies
+        setSelectedTopicIds(data.suggested_topic_ids || []);
+        setSelectedCompanyIds(data.suggested_company_ids || []);
       } catch (error) {
         console.error("Error fetching draft:", error);
         toast({
