@@ -6,7 +6,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { Link } from "react-router-dom";
-import { ArrowRight, MapPin, TrendingUp, Factory, Anchor } from "lucide-react";
+import { ArrowRight, MapPin, TrendingUp, Factory, Anchor, Flame, Globe, FileText } from "lucide-react";
+import { useState } from "react";
 import heroImage from "@/assets/hero-octg.jpg";
 
 const featuredArticle = {
@@ -49,6 +50,150 @@ const secondaryArticles = [
   },
 ];
 
+const trendingArticles = {
+  featured: {
+    title: "Asian Steel Mills Announce Q1 2025 Production Targets",
+    subtitle: "Major producers in China and Japan outline aggressive expansion plans amid rising global demand",
+    imageUrl: "https://images.unsplash.com/photo-1565793298595-6a879b1d9492?w=800",
+    region: "Asia-Pacific",
+    topic: "Production",
+    date: "December 6, 2024",
+    slug: "asian-steel-mills-q1-2025",
+  },
+  list: [
+    {
+      title: "Spot Prices Rally on Tight Supply Conditions",
+      topic: "Pricing",
+      date: "December 5, 2024",
+      slug: "spot-prices-rally",
+    },
+    {
+      title: "U.S. Distributors Report Record Inventory Turnover",
+      topic: "Supply Chain",
+      date: "December 4, 2024",
+      slug: "us-distributors-inventory",
+    },
+    {
+      title: "Premium Connections Demand Outpaces Standard Grade",
+      topic: "Market Trends",
+      date: "December 3, 2024",
+      slug: "premium-connections-demand",
+    },
+  ],
+};
+
+const regionalArticles = {
+  "Americas": [
+    {
+      title: "Permian Basin Operators Signal Record OCTG Orders",
+      subtitle: "Leading E&P companies prepare for intensified drilling campaigns in 2025",
+      imageUrl: "https://images.unsplash.com/photo-1497435334941-8c899ee9e8e9?w=800",
+      topic: "Drilling",
+      date: "December 5, 2024",
+      slug: "permian-basin-octg-orders",
+    },
+    {
+      title: "Canadian Pipeline Projects Boost Linepipe Demand",
+      subtitle: "Trans Mountain expansion drives new orders from domestic mills",
+      imageUrl: "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=800",
+      topic: "Infrastructure",
+      date: "December 3, 2024",
+      slug: "canadian-pipeline-linepipe",
+    },
+  ],
+  "Europe": [
+    {
+      title: "Norwegian Offshore Projects Drive Premium Pipe Demand",
+      subtitle: "North Sea developments require specialized corrosion-resistant tubulars",
+      imageUrl: "https://images.unsplash.com/photo-1544724107-6d5c4caaff30?w=800",
+      topic: "Offshore",
+      date: "December 4, 2024",
+      slug: "norwegian-offshore-premium",
+    },
+    {
+      title: "European Mills Invest in Green Steel Technology",
+      subtitle: "Sustainability initiatives reshape continental production landscape",
+      imageUrl: "https://images.unsplash.com/photo-1611273426858-450d8e3c9fce?w=800",
+      topic: "Sustainability",
+      date: "December 2, 2024",
+      slug: "european-green-steel",
+    },
+  ],
+  "Middle East": [
+    {
+      title: "UAE Expands Downstream Integration Strategy",
+      subtitle: "ADNOC accelerates plans for domestic pipe manufacturing capacity",
+      imageUrl: "https://images.unsplash.com/photo-1518623001395-125242310d0c?w=800",
+      topic: "Manufacturing",
+      date: "December 5, 2024",
+      slug: "uae-downstream-integration",
+    },
+    {
+      title: "Saudi Vision 2030 Fuels Energy Sector Investment",
+      subtitle: "Kingdom targets increased domestic content in OCTG procurement",
+      imageUrl: "https://images.unsplash.com/photo-1466611653911-95081537e5b7?w=800",
+      topic: "Policy",
+      date: "December 1, 2024",
+      slug: "saudi-vision-2030-octg",
+    },
+  ],
+  "Asia-Pacific": [
+    {
+      title: "Australian LNG Projects Resume OCTG Procurement",
+      subtitle: "Major operators restart purchasing after extended delays",
+      imageUrl: "https://images.unsplash.com/photo-1559827291-72ee739d0d9a?w=800",
+      topic: "LNG",
+      date: "December 4, 2024",
+      slug: "australian-lng-octg",
+    },
+    {
+      title: "Southeast Asian Offshore Exploration Accelerates",
+      subtitle: "Vietnam and Indonesia lead regional drilling activity growth",
+      imageUrl: "https://images.unsplash.com/photo-1516937941344-00b4e0337589?w=800",
+      topic: "Exploration",
+      date: "December 2, 2024",
+      slug: "southeast-asia-offshore",
+    },
+  ],
+};
+
+const analysisArticles = {
+  featured: {
+    title: "2024 OCTG Market Annual Review",
+    subtitle: "Comprehensive analysis of global tubular market dynamics, pricing trends, and regional developments shaping the industry",
+    imageUrl: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800",
+    topic: "Annual Report",
+    date: "December 1, 2024",
+    slug: "2024-octg-annual-review",
+  },
+  grid: [
+    {
+      title: "Q4 Pricing Outlook: Americas Focus",
+      topic: "Price Analysis",
+      date: "November 28, 2024",
+      slug: "q4-pricing-americas",
+    },
+    {
+      title: "Seamless vs. ERW Market Share Trends",
+      topic: "Market Research",
+      date: "November 25, 2024",
+      slug: "seamless-erw-trends",
+    },
+    {
+      title: "Trade Policy Impact Assessment",
+      topic: "Regulatory Analysis",
+      date: "November 20, 2024",
+      slug: "trade-policy-impact",
+    },
+    {
+      title: "Rig Count Correlation Study",
+      topic: "Data Analysis",
+      date: "November 15, 2024",
+      slug: "rig-count-correlation",
+    },
+  ],
+};
+
 const topics = [
   { name: "Mills & Manufacturing", slug: "mills-manufacturing", icon: Factory },
   { name: "Yards & Supply Chain", slug: "yards-supply-chain", icon: Anchor },
@@ -56,7 +201,11 @@ const topics = [
   { name: "Projects & Contracts", slug: "projects-contracts", icon: MapPin },
 ];
 
+const regions = ["Americas", "Europe", "Middle East", "Asia-Pacific"] as const;
+
 const Index = () => {
+  const [activeRegion, setActiveRegion] = useState<typeof regions[number]>("Americas");
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
@@ -113,6 +262,71 @@ const Index = () => {
           <div className="octg-divider" />
         </div>
 
+        {/* SECTION 1: Trending This Week */}
+        <section className="container py-12">
+          <div className="flex items-center gap-3 mb-8">
+            <div className="p-2 rounded-lg bg-accent/10">
+              <Flame className="h-5 w-5 text-accent" />
+            </div>
+            <h2 className="font-display text-2xl font-bold tracking-tight">Trending This Week</h2>
+          </div>
+          
+          <div className="grid lg:grid-cols-5 gap-6">
+            {/* Featured Large Card */}
+            <div className="lg:col-span-3">
+              <Link to={`/article/${trendingArticles.featured.slug}`}>
+                <Card variant="article" className="h-full overflow-hidden group">
+                  <div className="relative h-64 lg:h-full min-h-[300px]">
+                    <img 
+                      src={trendingArticles.featured.imageUrl} 
+                      alt={trendingArticles.featured.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <div className="flex gap-2 mb-3">
+                        <Badge variant="region">{trendingArticles.featured.region}</Badge>
+                        <Badge variant="topic">{trendingArticles.featured.topic}</Badge>
+                      </div>
+                      <h3 className="font-display text-xl lg:text-2xl font-bold mb-2 group-hover:text-accent transition-colors">
+                        {trendingArticles.featured.title}
+                      </h3>
+                      <p className="text-muted-foreground line-clamp-2">
+                        {trendingArticles.featured.subtitle}
+                      </p>
+                      <p className="text-sm text-muted-foreground/70 mt-3">{trendingArticles.featured.date}</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            </div>
+
+            {/* Stacked List */}
+            <div className="lg:col-span-2 flex flex-col gap-4">
+              {trendingArticles.list.map((article, index) => (
+                <Link key={article.slug} to={`/article/${article.slug}`}>
+                  <Card variant="interactive" className="p-4 h-full">
+                    <CardContent className="p-0">
+                      <Badge variant="topic" className="mb-2 text-xs">{article.topic}</Badge>
+                      <h4 className="font-display font-semibold mb-2 line-clamp-2 group-hover:text-accent transition-colors">
+                        {article.title}
+                      </h4>
+                      <p className="text-sm text-muted-foreground">{article.date}</p>
+                    </CardContent>
+                    {index < trendingArticles.list.length - 1 && (
+                      <div className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
+                    )}
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <div className="container">
+          <div className="octg-divider" />
+        </div>
+
         {/* Topics Grid */}
         <section className="container py-12">
           <div className="flex items-center justify-between mb-8">
@@ -131,6 +345,67 @@ const Index = () => {
                     </div>
                     <span className="font-display text-base font-semibold tracking-tight">{topic.name}</span>
                   </CardContent>
+                </Card>
+              </Link>
+            ))}
+          </div>
+        </section>
+
+        <div className="container">
+          <div className="octg-divider" />
+        </div>
+
+        {/* SECTION 2: Regional Spotlight */}
+        <section className="container py-12">
+          <div className="flex items-center gap-3 mb-6">
+            <div className="p-2 rounded-lg bg-primary/10">
+              <Globe className="h-5 w-5 text-primary" />
+            </div>
+            <h2 className="font-display text-2xl font-bold tracking-tight">Regional Spotlight</h2>
+          </div>
+
+          {/* Region Tabs */}
+          <div className="flex flex-wrap gap-2 mb-8">
+            {regions.map((region) => (
+              <Button
+                key={region}
+                variant={activeRegion === region ? "steel" : "outline"}
+                size="sm"
+                onClick={() => setActiveRegion(region)}
+                className="transition-all duration-200"
+              >
+                {region}
+              </Button>
+            ))}
+          </div>
+
+          {/* Regional Cards */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {regionalArticles[activeRegion].map((article, index) => (
+              <Link key={article.slug} to={`/article/${article.slug}`}>
+                <Card 
+                  variant="interactive" 
+                  className="overflow-hidden group h-full animate-fade-in"
+                >
+                  <div className="flex flex-col sm:flex-row h-full">
+                    <div className="sm:w-2/5 h-48 sm:h-auto relative overflow-hidden">
+                      <img 
+                        src={article.imageUrl} 
+                        alt={article.title}
+                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+                    </div>
+                    <div className="sm:w-3/5 p-5 flex flex-col justify-center">
+                      <Badge variant="topic" className="w-fit mb-3">{article.topic}</Badge>
+                      <h3 className="font-display text-lg font-bold mb-2 group-hover:text-accent transition-colors line-clamp-2">
+                        {article.title}
+                      </h3>
+                      <p className="text-sm text-muted-foreground line-clamp-2 mb-3">
+                        {article.subtitle}
+                      </p>
+                      <p className="text-xs text-muted-foreground/70">{article.date}</p>
+                    </div>
+                  </div>
                 </Card>
               </Link>
             ))}
@@ -176,6 +451,73 @@ const Index = () => {
               </div>
             </div>
           </Card>
+        </section>
+
+        <div className="container">
+          <div className="octg-divider" />
+        </div>
+
+        {/* SECTION 3: Analysis & Reports */}
+        <section className="container py-12">
+          <div className="flex items-center justify-between mb-8">
+            <div className="flex items-center gap-3">
+              <div className="p-2 rounded-lg bg-muted">
+                <FileText className="h-5 w-5 text-foreground" />
+              </div>
+              <h2 className="font-display text-2xl font-bold tracking-tight">Analysis & Reports</h2>
+            </div>
+            <Link to="/reports">
+              <Button variant="ghost">View All Reports <ArrowRight className="ml-2 h-4 w-4" /></Button>
+            </Link>
+          </div>
+
+          <div className="grid lg:grid-cols-3 gap-6">
+            {/* Featured Report - Tall Card */}
+            <div className="lg:row-span-2">
+              <Link to={`/article/${analysisArticles.featured.slug}`}>
+                <Card variant="article" className="h-full overflow-hidden group min-h-[400px]">
+                  <div className="relative h-full">
+                    <img 
+                      src={analysisArticles.featured.imageUrl} 
+                      alt={analysisArticles.featured.title}
+                      className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-background via-background/70 to-background/20" />
+                    <div className="absolute bottom-0 left-0 right-0 p-6">
+                      <Badge variant="featured" className="mb-3">{analysisArticles.featured.topic}</Badge>
+                      <h3 className="font-display text-xl lg:text-2xl font-bold mb-3 group-hover:text-accent transition-colors">
+                        {analysisArticles.featured.title}
+                      </h3>
+                      <p className="text-muted-foreground text-sm line-clamp-3 mb-3">
+                        {analysisArticles.featured.subtitle}
+                      </p>
+                      <p className="text-xs text-muted-foreground/70">{analysisArticles.featured.date}</p>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
+            </div>
+
+            {/* Grid of 4 smaller reports */}
+            <div className="lg:col-span-2 grid sm:grid-cols-2 gap-4">
+              {analysisArticles.grid.map((article) => (
+                <Link key={article.slug} to={`/article/${article.slug}`}>
+                  <Card variant="interactive" className="p-5 h-full group">
+                    <CardContent className="p-0 flex flex-col h-full">
+                      <div className="flex items-start justify-between mb-3">
+                        <Badge variant="outline" className="text-xs">{article.topic}</Badge>
+                        <FileText className="h-4 w-4 text-muted-foreground" />
+                      </div>
+                      <h4 className="font-display font-semibold mb-auto group-hover:text-accent transition-colors">
+                        {article.title}
+                      </h4>
+                      <p className="text-sm text-muted-foreground mt-4">{article.date}</p>
+                    </CardContent>
+                  </Card>
+                </Link>
+              ))}
+            </div>
+          </div>
         </section>
 
         {/* Newsletter */}
