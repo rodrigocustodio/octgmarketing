@@ -17,11 +17,12 @@ const Pipeline = () => {
   const scrapeOctg = useScrapeOctg();
   const generateDrafts = useGenerateDrafts();
 
+  const isRefreshing = sourceCounts.isFetching || draftCounts.isFetching;
+
   const refreshAll = () => {
     sourceCounts.refetch();
     draftCounts.refetch();
   };
-
   return (
     <>
       <Helmet>
@@ -36,9 +37,9 @@ const Pipeline = () => {
                 Scrape sources and generate AI drafts
               </p>
             </div>
-            <Button variant="outline" size="sm" onClick={refreshAll}>
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
+            <Button variant="outline" size="sm" onClick={refreshAll} disabled={isRefreshing}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? 'animate-spin' : ''}`} />
+              {isRefreshing ? 'Refreshing...' : 'Refresh'}
             </Button>
           </div>
 
