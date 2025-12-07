@@ -6,7 +6,8 @@ import {
   FileEdit, 
   Settings, 
   LogOut,
-  ChevronLeft
+  ChevronLeft,
+  Workflow
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,11 @@ const navItems = [
     title: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Pipeline",
+    href: "/admin/pipeline",
+    icon: Workflow,
   },
   {
     title: "Source Queue",
