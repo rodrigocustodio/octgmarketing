@@ -44,7 +44,7 @@ export function NewsletterSignup() {
         <p className="text-muted-foreground mb-6">
           Get the latest OCTG industry news, market analysis, and insights delivered to your inbox.
         </p>
-        <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-md mx-auto">
           <Input
             type="email"
             placeholder="Enter your email"
@@ -52,10 +52,9 @@ export function NewsletterSignup() {
             onChange={(e) => setEmail(e.target.value)}
             variant="bronze"
             inputSize="lg"
-            className="flex-1"
             required
           />
-          <Button type="submit" variant="bronze" size="lg" disabled={loading}>
+          <Button type="submit" variant="bronze" size="lg" className="w-full" disabled={loading}>
             {loading ? "Subscribing..." : "Subscribe"}
           </Button>
         </form>
