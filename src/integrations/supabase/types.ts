@@ -397,6 +397,54 @@ export type Database = {
         }
         Relationships: []
       }
+      scrape_sources: {
+        Row: {
+          articles_found: number | null
+          category: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          last_scraped_at: string | null
+          name: string
+          priority: number | null
+          region: string
+          scrape_config: Json | null
+          source_type: string | null
+          updated_at: string | null
+          url: string
+        }
+        Insert: {
+          articles_found?: number | null
+          category: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_scraped_at?: string | null
+          name: string
+          priority?: number | null
+          region?: string
+          scrape_config?: Json | null
+          source_type?: string | null
+          updated_at?: string | null
+          url: string
+        }
+        Update: {
+          articles_found?: number | null
+          category?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          last_scraped_at?: string | null
+          name?: string
+          priority?: number | null
+          region?: string
+          scrape_config?: Json | null
+          source_type?: string | null
+          updated_at?: string | null
+          url?: string
+        }
+        Relationships: []
+      }
       source_articles: {
         Row: {
           created_at: string
