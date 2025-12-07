@@ -23,6 +23,7 @@ const secondaryArticles = [
   {
     title: "Tenaris Expands U.S. Manufacturing Capacity",
     subtitle: "New seamless pipe mill to serve Permian Basin operators",
+    imageUrl: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=800",
     region: "Americas",
     topic: "Mills",
     date: "December 6, 2024",
@@ -31,6 +32,7 @@ const secondaryArticles = [
   {
     title: "Middle East Rig Count Reaches Five-Year High",
     subtitle: "Saudi Aramco leads regional drilling surge",
+    imageUrl: "https://images.unsplash.com/photo-1513828583688-c52646db42da?w=800",
     region: "Middle East",
     topic: "Rigs",
     date: "December 5, 2024",
@@ -39,6 +41,7 @@ const secondaryArticles = [
   {
     title: "EU Carbon Regulations Impact Steel Pricing",
     subtitle: "OCTG manufacturers adjust strategies amid new environmental policies",
+    imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800",
     region: "Europe",
     topic: "Regulations",
     date: "December 4, 2024",
@@ -61,13 +64,13 @@ const Index = () => {
       <main>
         {/* Hero Section */}
         <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-background via-background/80 to-background z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent z-10" />
           <div 
-            className="absolute inset-0 opacity-30"
+            className="absolute inset-0 opacity-60"
             style={{
               backgroundImage: `url(${heroImage})`,
               backgroundSize: 'cover',
-              backgroundPosition: 'center',
+              backgroundPosition: 'center right',
             }}
           />
           <div className="container relative z-20 py-16 sm:py-24">
