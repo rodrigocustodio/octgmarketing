@@ -38,7 +38,7 @@ export function NewsletterSignup() {
   return (
     <section className="bg-gradient-card border border-border rounded-lg p-8 sm:p-12">
       <div className="max-w-2xl mx-auto text-center">
-        <h2 className="font-display text-3xl sm:text-4xl tracking-wider mb-4">
+        <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight mb-4">
           Stay Informed
         </h2>
         <p className="text-muted-foreground mb-6">

@@ -33,7 +33,7 @@ export function Footer() {
       <div className="container py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
           <div>
-            <h4 className="font-display text-lg tracking-wide mb-4 text-accent">Regions</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Regions</h4>
             <ul className="space-y-2">
               {footerLinks.regions.map((link) => (
                 <li key={link.href}>
@@ -45,7 +45,7 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-lg tracking-wide mb-4 text-accent">Topics</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Topics</h4>
             <ul className="space-y-2">
               {footerLinks.topics.map((link) => (
                 <li key={link.href}>
@@ -57,7 +57,7 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-lg tracking-wide mb-4 text-accent">Company</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Company</h4>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.href}>
@@ -69,7 +69,7 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-lg tracking-wide mb-4 text-accent">Legal</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Legal</h4>
             <ul className="space-y-2">
               {footerLinks.legal.map((link) => (
                 <li key={link.href}>
@@ -84,9 +84,9 @@ export function Footer() {
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded bg-accent">
-              <span className="font-display text-sm text-accent-foreground">O</span>
+              <span className="font-display text-sm font-black text-accent-foreground">O</span>
             </div>
-            <span className="font-display tracking-wider">OCTG Marketing</span>
+            <span className="font-display font-bold tracking-tight">OCTG Marketing</span>
           </div>
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} OCTG Marketing. All rights reserved.

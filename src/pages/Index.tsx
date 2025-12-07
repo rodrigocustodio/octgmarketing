@@ -76,7 +76,7 @@ const Index = () => {
           <div className="container relative z-20 py-16 sm:py-24">
             <div className="max-w-4xl animate-fade-in-up">
               <Badge variant="featured" className="mb-4">Featured Story</Badge>
-              <h1 className="font-display text-4xl sm:text-5xl lg:text-6xl tracking-wider mb-4">
+              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">
                 {featuredArticle.title}
               </h1>
               <p className="text-xl text-muted-foreground mb-6 max-w-2xl">
@@ -116,7 +116,7 @@ const Index = () => {
         {/* Topics Grid */}
         <section className="container py-12">
           <div className="flex items-center justify-between mb-8">
-            <h2 className="font-display text-3xl tracking-wider">Browse by Topic</h2>
+            <h2 className="font-display text-2xl font-bold tracking-tight">Browse by Topic</h2>
             <Link to="/topics">
               <Button variant="ghost">View All <ArrowRight className="ml-2 h-4 w-4" /></Button>
             </Link>
@@ -129,7 +129,7 @@ const Index = () => {
                     <div className="p-3 rounded-lg bg-accent/10">
                       <topic.icon className="h-6 w-6 text-accent" />
                     </div>
-                    <span className="font-display text-lg tracking-wide">{topic.name}</span>
+                    <span className="font-display text-base font-semibold tracking-tight">{topic.name}</span>
                   </CardContent>
                 </Card>
               </Link>
@@ -143,7 +143,7 @@ const Index = () => {
             <div className="grid md:grid-cols-2 gap-8 items-center">
               <div>
                 <Badge variant="asset" className="mb-4">Data & Analytics</Badge>
-                <h2 className="font-display text-3xl sm:text-4xl tracking-wider mb-4">
+                <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight mb-4">
                   Interactive Asset Map
                 </h2>
                 <p className="text-muted-foreground mb-6">
@@ -158,19 +158,19 @@ const Index = () => {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <Card className="p-4 text-center">
-                  <p className="font-display text-3xl text-accent">150+</p>
+                  <p className="font-display text-2xl font-bold text-accent">150+</p>
                   <p className="text-sm text-muted-foreground">Mills Tracked</p>
                 </Card>
                 <Card className="p-4 text-center">
-                  <p className="font-display text-3xl text-primary">500+</p>
+                  <p className="font-display text-2xl font-bold text-primary">500+</p>
                   <p className="text-sm text-muted-foreground">Pipe Yards</p>
                 </Card>
                 <Card className="p-4 text-center">
-                  <p className="font-display text-3xl text-accent">2,000+</p>
+                  <p className="font-display text-2xl font-bold text-accent">2,000+</p>
                   <p className="text-sm text-muted-foreground">Active Rigs</p>
                 </Card>
                 <Card className="p-4 text-center">
-                  <p className="font-display text-3xl text-primary">75+</p>
+                  <p className="font-display text-2xl font-bold text-primary">75+</p>
                   <p className="text-sm text-muted-foreground">Port Terminals</p>
                 </Card>
               </div>

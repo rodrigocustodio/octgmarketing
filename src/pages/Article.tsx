@@ -201,7 +201,7 @@ const Article = () => {
               </div>
 
               {/* Title */}
-              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl tracking-wider mb-4 max-w-4xl">
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight mb-4 max-w-4xl">
                 {sampleArticle.title}
               </h1>
 
@@ -242,7 +242,7 @@ const Article = () => {
               <div className="lg:col-span-2">
                 <article 
                   className="prose prose-invert prose-lg max-w-none
-                    prose-headings:font-display prose-headings:tracking-wider prose-headings:text-foreground
+                    prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground
                     prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
                     prose-p:text-foreground/85 prose-p:leading-relaxed
                     prose-p.lead:text-xl prose-p.lead:text-foreground/90 prose-p.lead:font-medium
@@ -259,7 +259,7 @@ const Article = () => {
                 {/* Companies Mentioned */}
                 {sampleArticle.companies.length > 0 && (
                   <div className="mt-12 pt-8 border-t border-border">
-                    <h3 className="font-display text-lg tracking-wider mb-4 text-muted-foreground">
+                    <h3 className="font-display text-base font-semibold tracking-tight mb-4 text-muted-foreground">
                       Companies Mentioned
                     </h3>
                     <div className="flex flex-wrap gap-2">
@@ -299,7 +299,7 @@ const Article = () => {
           {/* More from Region */}
           <section className="border-t border-border">
             <div className="container py-12">
-              <h2 className="font-display text-2xl sm:text-3xl tracking-wider mb-8">
+              <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight mb-8">
                 More from {sampleArticle.region}
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -314,7 +314,7 @@ const Article = () => {
           <section className="bg-card border-t border-border">
             <div className="container py-12 sm:py-16">
               <div className="max-w-2xl mx-auto text-center">
-                <h2 className="font-display text-2xl sm:text-3xl tracking-wider mb-4">
+                <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight mb-4">
                   Stay Informed
                 </h2>
                 <p className="text-muted-foreground mb-8">
