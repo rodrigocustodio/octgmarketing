@@ -169,24 +169,28 @@ const analysisArticles = {
   grid: [
     {
       title: "Q4 Pricing Outlook: Americas Focus",
+      excerpt: "Regional pricing analysis covering seamless and ERW products across North and South American markets.",
       topic: "Price Analysis",
       date: "November 28, 2024",
       slug: "q4-pricing-americas",
     },
     {
       title: "Seamless vs. ERW Market Share Trends",
+      excerpt: "Comparative study examining shifting market dynamics between seamless and welded pipe segments.",
       topic: "Market Research",
       date: "November 25, 2024",
       slug: "seamless-erw-trends",
     },
     {
       title: "Trade Policy Impact Assessment",
+      excerpt: "Analysis of recent tariff adjustments and their projected effects on global OCTG trade flows.",
       topic: "Regulatory Analysis",
       date: "November 20, 2024",
       slug: "trade-policy-impact",
     },
     {
       title: "Rig Count Correlation Study",
+      excerpt: "Statistical analysis linking rig activity trends to OCTG demand patterns across key basins.",
       topic: "Data Analysis",
       date: "November 15, 2024",
       slug: "rig-count-correlation",
@@ -508,10 +512,13 @@ const Index = () => {
                         <Badge variant="outline" className="text-xs">{article.topic}</Badge>
                         <FileText className="h-4 w-4 text-muted-foreground" />
                       </div>
-                      <h4 className="font-display font-semibold mb-auto group-hover:text-accent transition-colors">
+                      <h4 className="font-display font-semibold group-hover:text-accent transition-colors">
                         {article.title}
                       </h4>
-                      <p className="text-sm text-muted-foreground mt-4">{article.date}</p>
+                      <p className="text-sm text-muted-foreground mt-2 line-clamp-2">
+                        {article.excerpt}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-auto pt-3">{article.date}</p>
                     </CardContent>
                   </Card>
                 </Link>
