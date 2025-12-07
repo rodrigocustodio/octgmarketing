@@ -22,6 +22,14 @@ const REGION_KEYWORDS: Record<string, string[]> = {
   'russia-cis': ['russia', 'kazakhstan', 'azerbaijan', 'turkmenistan', 'uzbekistan', 'gazprom', 'rosneft', 'lukoil', 'siberia', 'sakhalin']
 };
 
+// Topic detection keywords
+const TOPIC_KEYWORDS: Record<string, string[]> = {
+  'mills-manufacturing': ['mill', 'manufacturing', 'production', 'capacity', 'steel', 'seamless', 'welded', 'pipe plant', 'factory', 'output', 'rolling', 'forge'],
+  'yards-supply-chain': ['yard', 'stockyard', 'inventory', 'supply chain', 'logistics', 'distribution', 'warehouse', 'storage', 'distributor', 'supplier'],
+  'pricing-market': ['price', 'pricing', 'market', 'tariff', 'import', 'export', 'trade', 'duty', 'cost', 'demand', 'forecast', 'analysis'],
+  'projects-contracts': ['project', 'contract', 'tender', 'award', 'drilling', 'well', 'field', 'development', 'exploration', 'offshore', 'onshore', 'rig']
+};
+
 const SYSTEM_PROMPT = `You are a senior energy industry editor for a corporate OCTG (Oil Country Tubular Goods) news portal. Your task is to rewrite source articles into professional, authoritative corporate content.
 
 EDITORIAL GUIDELINES:
@@ -38,7 +46,10 @@ OUTPUT FORMAT (JSON):
   "title": "Compelling headline under 100 characters",
   "excerpt": "2-3 sentence summary highlighting key business impact (max 200 characters)",
   "body_markdown": "Full article in Markdown with ## headers for sections",
-  "tags": ["array", "of", "relevant", "tags"]
+  "tags": ["array", "of", "relevant", "tags"],
+  "suggested_topics": ["mills-manufacturing", "pricing-market"],
+  "mentioned_companies": ["Company Name 1", "Company Name 2"],
+  "mentioned_countries": ["Country1", "Country2"]
 }
 
 CONTENT STRUCTURE:
@@ -47,6 +58,11 @@ CONTENT STRUCTURE:
 3. Details section: Specifics, quotes, figures
 4. Implications section: What this means for the industry
 5. Outlook (if applicable): Future expectations
+
+ENTITY EXTRACTION:
+- Identify and list any OCTG manufacturers, operators, or service companies mentioned
+- List countries specifically mentioned in the article
+- Suggest relevant topic categories from: mills-manufacturing, yards-supply-chain, pricing-market, projects-contracts
 
 Always return valid JSON only, no additional text.`;
 
@@ -75,6 +91,25 @@ function detectRegion(content: string, regions: Array<{ id: string; slug: string
   }
   
   return null;
+}
+
+function detectTopics(content: string, topics: Array<{ id: string; slug: string }>): string[] {
+  const lowerContent = content.toLowerCase();
+  const detectedTopicIds: string[] = [];
+  
+  for (const [topicSlug, keywords] of Object.entries(TOPIC_KEYWORDS)) {
+    for (const keyword of keywords) {
+      if (lowerContent.includes(keyword)) {
+        const topic = topics.find(t => t.slug === topicSlug);
+        if (topic && !detectedTopicIds.includes(topic.id)) {
+          detectedTopicIds.push(topic.id);
+        }
+        break;
+      }
+    }
+  }
+  
+  return detectedTopicIds;
 }
 
 serve(async (req) => {
@@ -137,6 +172,15 @@ serve(async (req) => {
     
     if (regionsError) {
       console.error('Error fetching regions:', regionsError);
+    }
+
+    // Fetch topics for detection
+    const { data: topics, error: topicsError } = await supabase
+      .from('topics')
+      .select('id, slug');
+    
+    if (topicsError) {
+      console.error('Error fetching topics:', topicsError);
     }
 
     // Fetch source articles with status='new' (limit 10 per run)
@@ -225,8 +269,18 @@ serve(async (req) => {
         // Detect region from content
         const fullContent = `${source.title} ${source.raw_content || ''} ${parsed.body_markdown}`;
         const regionId = detectRegion(fullContent, regions || []);
+        
+        // Detect topics from content
+        const suggestedTopicIds = detectTopics(fullContent, topics || []);
 
-        // Insert draft article
+        // Combine AI suggestions with detected entities
+        const allTags = [
+          ...(parsed.tags || []),
+          ...(parsed.mentioned_companies || []),
+          ...(parsed.mentioned_countries || []),
+        ];
+
+        // Insert draft article with enhanced metadata
         const { data: draft, error: insertError } = await supabase
           .from('draft_articles')
           .insert({
@@ -234,7 +288,7 @@ serve(async (req) => {
             title: parsed.title,
             excerpt: parsed.excerpt,
             body_markdown: parsed.body_markdown,
-            tags: parsed.tags || [],
+            tags: allTags,
             slug: slug,
             region_id: regionId,
             hero_image_url: source.image_url,
@@ -246,6 +300,14 @@ serve(async (req) => {
         if (insertError) {
           throw new Error(`Failed to insert draft: ${insertError.message}`);
         }
+
+        // Log extracted metadata
+        console.log(`Draft ${draft.id} metadata:`, {
+          regionId,
+          suggestedTopicIds,
+          mentionedCompanies: parsed.mentioned_companies,
+          mentionedCountries: parsed.mentioned_countries
+        });
 
         // Update source article status
         const { error: updateError } = await supabase

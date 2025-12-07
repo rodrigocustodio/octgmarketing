@@ -10,6 +10,8 @@ import ProtectedRoute from "@/components/auth/ProtectedRoute";
 import ScrollRestoration from "@/components/ScrollRestoration";
 import Index from "./pages/Index";
 import Article from "./pages/Article";
+import Region from "./pages/Region";
+import Topic from "./pages/Topic";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/admin/Dashboard";
 import Pipeline from "./pages/admin/Pipeline";
@@ -34,6 +36,8 @@ const App = () => (
               <Routes>
                 <Route path="/" element={<Index />} />
                 <Route path="/article/:slug" element={<Article />} />
+                <Route path="/region/:slug" element={<Region />} />
+                <Route path="/topic/:slug" element={<Topic />} />
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Admin Routes */}

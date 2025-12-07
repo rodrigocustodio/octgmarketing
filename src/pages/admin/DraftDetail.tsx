@@ -7,13 +7,20 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
+import { useRegions, useTopics, useCompanies } from "@/hooks/useArticles";
 import { 
   Loader2, 
   ArrowLeft, 
   CheckCircle, 
   XCircle, 
-  ExternalLink 
+  ExternalLink,
+  Globe,
+  Tag,
+  Building2,
+  Search
 } from "lucide-react";
 
 interface DraftArticle {
@@ -53,6 +60,16 @@ const DraftDetail = () => {
   const [loading, setLoading] = useState(true);
   const [editorNotes, setEditorNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
+  
+  // Metadata state
+  const [selectedRegionId, setSelectedRegionId] = useState<string>("");
+  const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
+  const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([]);
+  
+  // Fetch regions, topics, companies
+  const { data: regions } = useRegions();
+  const { data: topics } = useTopics();
+  const { data: companies } = useCompanies();
 
   useEffect(() => {
     const fetchDraft = async () => {
@@ -78,6 +95,7 @@ const DraftDetail = () => {
 
         setDraft(data as DraftArticle);
         setEditorNotes(data.editor_notes || "");
+        setSelectedRegionId(data.region_id || "");
       } catch (error) {
         console.error("Error fetching draft:", error);
         toast({
@@ -93,8 +111,33 @@ const DraftDetail = () => {
     fetchDraft();
   }, [id, toast]);
 
+  const handleTopicToggle = (topicId: string) => {
+    setSelectedTopicIds((prev) =>
+      prev.includes(topicId)
+        ? prev.filter((id) => id !== topicId)
+        : [...prev, topicId]
+    );
+  };
+
+  const handleCompanyToggle = (companyId: string) => {
+    setSelectedCompanyIds((prev) =>
+      prev.includes(companyId)
+        ? prev.filter((id) => id !== companyId)
+        : [...prev, companyId]
+    );
+  };
+
   const handleApprove = async () => {
     if (!draft) return;
+    
+    if (!selectedRegionId) {
+      toast({
+        title: "Region Required",
+        description: "Please select a region before approving.",
+        variant: "destructive",
+      });
+      return;
+    }
     
     setSubmitting(true);
     try {
@@ -104,13 +147,14 @@ const DraftDetail = () => {
         .update({
           status: "approved",
           editor_notes: editorNotes || null,
+          region_id: selectedRegionId,
         })
         .eq("id", draft.id);
 
       if (draftError) throw draftError;
 
       // Create new article in main articles table
-      const { error: articleError } = await supabase
+      const { data: newArticle, error: articleError } = await supabase
         .from("articles")
         .insert({
           title: draft.title,
@@ -118,16 +162,50 @@ const DraftDetail = () => {
           subtitle: draft.excerpt,
           body: draft.body_markdown,
           hero_image_url: draft.hero_image_url,
-          region_id: draft.region_id,
+          region_id: selectedRegionId,
           status: "published",
           publish_date: new Date().toISOString(),
-        });
+        })
+        .select("id")
+        .single();
 
       if (articleError) throw articleError;
 
+      // Insert article_topics links
+      if (selectedTopicIds.length > 0 && newArticle) {
+        const topicLinks = selectedTopicIds.map((topicId) => ({
+          article_id: newArticle.id,
+          topic_id: topicId,
+        }));
+        
+        const { error: topicsError } = await supabase
+          .from("article_topics")
+          .insert(topicLinks);
+        
+        if (topicsError) {
+          console.error("Error linking topics:", topicsError);
+        }
+      }
+
+      // Insert article_companies links
+      if (selectedCompanyIds.length > 0 && newArticle) {
+        const companyLinks = selectedCompanyIds.map((companyId) => ({
+          article_id: newArticle.id,
+          company_id: companyId,
+        }));
+        
+        const { error: companiesError } = await supabase
+          .from("article_companies")
+          .insert(companyLinks);
+        
+        if (companiesError) {
+          console.error("Error linking companies:", companiesError);
+        }
+      }
+
       toast({
         title: "Article Approved",
-        description: "The draft has been approved and added to articles.",
+        description: "The draft has been approved and published with metadata.",
       });
 
       navigate("/admin/drafts");
@@ -297,7 +375,7 @@ const DraftDetail = () => {
               {draft.tags && Array.isArray(draft.tags) && draft.tags.length > 0 && (
                 <div>
                   <Label className="text-muted-foreground text-xs uppercase tracking-wide">
-                    Tags
+                    AI-Suggested Tags
                   </Label>
                   <div className="flex flex-wrap gap-2 mt-2">
                     {draft.tags.map((tag, i) => (
@@ -327,6 +405,125 @@ const DraftDetail = () => {
           </Card>
         </div>
 
+        {/* Metadata Editor - Only show for pending drafts */}
+        {draft.status === "pending_review" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Article Metadata & SEO
+              </CardTitle>
+              <CardDescription>
+                Set region, topics, and companies for categorization and SEO
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-6">
+              {/* Region Selector */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Globe className="h-4 w-4" />
+                  Region <span className="text-destructive">*</span>
+                </Label>
+                <Select
+                  value={selectedRegionId}
+                  onValueChange={setSelectedRegionId}
+                >
+                  <SelectTrigger className="w-full max-w-sm">
+                    <SelectValue placeholder="Select a region" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {regions?.map((region) => (
+                      <SelectItem key={region.id} value={region.id}>
+                        {region.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Topics Multi-select */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Tag className="h-4 w-4" />
+                  Topics
+                </Label>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                  {topics?.map((topic) => (
+                    <div
+                      key={topic.id}
+                      className="flex items-center space-x-2"
+                    >
+                      <Checkbox
+                        id={`topic-${topic.id}`}
+                        checked={selectedTopicIds.includes(topic.id)}
+                        onCheckedChange={() => handleTopicToggle(topic.id)}
+                      />
+                      <label
+                        htmlFor={`topic-${topic.id}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {topic.name}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Companies Multi-select */}
+              <div className="space-y-2">
+                <Label className="flex items-center gap-2">
+                  <Building2 className="h-4 w-4" />
+                  Companies Mentioned
+                </Label>
+                {companies && companies.length > 0 ? (
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-3 max-h-40 overflow-y-auto p-2 bg-muted/50 rounded-lg">
+                    {companies.map((company) => (
+                      <div
+                        key={company.id}
+                        className="flex items-center space-x-2"
+                      >
+                        <Checkbox
+                          id={`company-${company.id}`}
+                          checked={selectedCompanyIds.includes(company.id)}
+                          onCheckedChange={() => handleCompanyToggle(company.id)}
+                        />
+                        <label
+                          htmlFor={`company-${company.id}`}
+                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                        >
+                          {company.name}
+                        </label>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-sm text-muted-foreground">
+                    No companies in database yet. Add companies via the database.
+                  </p>
+                )}
+              </div>
+
+              {/* SEO Preview */}
+              <div className="space-y-2">
+                <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                  SEO Preview
+                </Label>
+                <div className="p-4 bg-muted rounded-lg space-y-2">
+                  <p className="text-primary font-medium text-lg truncate">
+                    {draft.title} | OCTG Marketing
+                  </p>
+                  <p className="text-sm text-muted-foreground line-clamp-2">
+                    {draft.excerpt || "No excerpt provided"}
+                  </p>
+                  <p className="text-xs text-green-600 dark:text-green-400">
+                    octgmarketing.com/article/{draft.slug}
+                  </p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Editor Notes & Actions */}
         {draft.status === "pending_review" && (
           <Card>
@@ -352,7 +549,7 @@ const DraftDetail = () => {
               <div className="flex items-center gap-4">
                 <Button
                   onClick={handleApprove}
-                  disabled={submitting}
+                  disabled={submitting || !selectedRegionId}
                   className="bg-green-600 hover:bg-green-700"
                 >
                   {submitting ? (
