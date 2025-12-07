@@ -412,8 +412,8 @@ const Index = () => {
           </>
         )}
 
-        {/* Newsletter CTA */}
-        <section className="bg-card border-t border-b border-border">
+      {/* Newsletter CTA */}
+      <section className="bg-card">
           <div className="container py-12 sm:py-16">
             <div className="max-w-2xl mx-auto text-center">
               <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight mb-4">
