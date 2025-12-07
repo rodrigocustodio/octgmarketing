@@ -19,10 +19,7 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-10 w-10 items-center justify-center rounded bg-accent">
-            <span className="font-display text-xl font-black text-accent-foreground">O</span>
-          </div>
-          <div className="hidden sm:block">
+          <div>
             <span className="font-display text-xl font-bold tracking-tight">OCTG</span>
             <span className="ml-1 text-sm text-muted-foreground">Marketing</span>
           </div>
