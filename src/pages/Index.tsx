@@ -200,10 +200,7 @@ const Index = () => {
                           <p className="text-sm text-muted-foreground">
                             {formatArticleDate(article.publish_date)}
                           </p>
-                        </CardContent>
-                        {index < trendingList.length - 1 && (
-                          <div className="absolute bottom-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-accent/30 to-transparent" />
-                        )}
+                      </CardContent>
                       </Card>
                     </Link>
                   ))}
