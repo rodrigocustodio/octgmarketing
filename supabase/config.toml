@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.generate-drafts]
 verify_jwt = false
+
+[functions.generate-featured-image]
+verify_jwt = false
