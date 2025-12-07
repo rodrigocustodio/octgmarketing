@@ -1,3 +1,4 @@
+import { useState } from "react";
 import { Helmet } from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
@@ -5,13 +6,32 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Download, Sparkles, RefreshCw } from "lucide-react";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   useSourceArticleCounts,
   useDraftArticleCounts,
   useScrapeOctg,
   useGenerateDrafts,
 } from "@/hooks/usePipeline";
 
+const REGION_OPTIONS = [
+  { value: "all", label: "All Regions" },
+  { value: "Global", label: "Global" },
+  { value: "Americas", label: "Americas" },
+  { value: "Europe", label: "Europe" },
+  { value: "Asia-Pacific", label: "Asia-Pacific" },
+  { value: "Middle East", label: "Middle East" },
+  { value: "Africa", label: "Africa" },
+  { value: "Australia", label: "Australia" },
+];
+
 const Pipeline = () => {
+  const [selectedRegion, setSelectedRegion] = useState<string>("all");
   const sourceCounts = useSourceArticleCounts();
   const draftCounts = useDraftArticleCounts();
   const scrapeOctg = useScrapeOctg();
@@ -56,15 +76,27 @@ const Pipeline = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent className="space-y-4">
+                <Select value={selectedRegion} onValueChange={setSelectedRegion}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Select region to scrape" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {REGION_OPTIONS.map((option) => (
+                      <SelectItem key={option.value} value={option.value}>
+                        {option.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 <Button
-                  onClick={() => scrapeOctg.mutate()}
+                  onClick={() => scrapeOctg.mutate(selectedRegion === "all" ? undefined : selectedRegion)}
                   disabled={scrapeOctg.isPending}
                   className="w-full"
                 >
                   {scrapeOctg.isPending ? (
                     <>
                       <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                      Scraping...
+                      Scraping {selectedRegion === "all" ? "All Regions" : selectedRegion}...
                     </>
                   ) : (
                     <>
