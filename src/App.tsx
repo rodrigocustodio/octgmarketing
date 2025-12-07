@@ -7,6 +7,7 @@ import { HelmetProvider } from "react-helmet-async";
 import { ThemeProvider } from "next-themes";
 import { AuthProvider } from "@/hooks/useAuth";
 import ProtectedRoute from "@/components/auth/ProtectedRoute";
+import ScrollRestoration from "@/components/ScrollRestoration";
 import Index from "./pages/Index";
 import Article from "./pages/Article";
 import Auth from "./pages/Auth";
@@ -26,6 +27,7 @@ const App = () => (
       <QueryClientProvider client={queryClient}>
         <AuthProvider>
           <BrowserRouter>
+            <ScrollRestoration />
             <TooltipProvider>
               <Toaster />
               <Sonner />
