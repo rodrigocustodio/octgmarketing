@@ -286,7 +286,8 @@ const ArticleEdit = () => {
       const { data, error } = await supabase.functions.invoke("generate-featured-image", {
         body: {
           title: formData.title,
-          content: formData.body.substring(0, 2000),
+          body: formData.body.substring(0, 2000),
+          draftId: id || "new-article",
         },
       });
 
