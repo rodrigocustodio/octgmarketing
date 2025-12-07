@@ -18,8 +18,8 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
+    <header className="sticky top-0 z-50 w-full bg-background/98 backdrop-blur-md supports-[backdrop-filter]:bg-background/90 shadow-sm">
+      <div className="container flex h-16 items-center justify-between border-b-2 border-accent/30">
         <Link to="/" className="flex items-center gap-2">
           <div>
             <span className="font-display text-xl font-bold tracking-tight">OCTG</span>
