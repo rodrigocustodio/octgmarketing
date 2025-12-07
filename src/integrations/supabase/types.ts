@@ -501,6 +501,48 @@ export type Database = {
           },
         ]
       }
+      steel_prices: {
+        Row: {
+          category: string
+          change: number | null
+          change_percent: number | null
+          created_at: string
+          currency: string | null
+          id: string
+          name: string
+          price: number
+          region: string | null
+          symbol: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string
+          change?: number | null
+          change_percent?: number | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          name: string
+          price: number
+          region?: string | null
+          symbol: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string
+          change?: number | null
+          change_percent?: number | null
+          created_at?: string
+          currency?: string | null
+          id?: string
+          name?: string
+          price?: number
+          region?: string | null
+          symbol?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       topics: {
         Row: {
           created_at: string
