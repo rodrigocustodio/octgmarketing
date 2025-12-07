@@ -19,10 +19,10 @@ export function Header() {
       <div className="container flex h-16 items-center justify-between">
         <Link to="/" className="flex items-center gap-2">
           <div className="flex h-10 w-10 items-center justify-center rounded bg-accent">
-            <span className="font-display text-xl text-accent-foreground">O</span>
+            <span className="font-display text-xl font-black text-accent-foreground">O</span>
           </div>
           <div className="hidden sm:block">
-            <span className="font-display text-xl tracking-wider">OCTG</span>
+            <span className="font-display text-xl font-bold tracking-tight">OCTG</span>
             <span className="ml-1 text-sm text-muted-foreground">Marketing</span>
           </div>
         </Link>

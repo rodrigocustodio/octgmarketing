@@ -31,7 +31,7 @@ export function ArticleCard({ title, subtitle, imageUrl, region, topic, date, sl
             {region && <Badge variant="region">{region}</Badge>}
             {topic && <Badge variant="topic">{topic}</Badge>}
           </div>
-          <h3 className="font-display text-xl sm:text-2xl tracking-wide mb-2 line-clamp-2">{title}</h3>
+          <h3 className="font-display text-lg sm:text-xl font-bold tracking-tight mb-2 line-clamp-2">{title}</h3>
           {subtitle && (
             <p className="text-muted-foreground text-sm line-clamp-2 mb-3">{subtitle}</p>
           )}
