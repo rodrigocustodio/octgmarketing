@@ -188,27 +188,6 @@ export default function Directory() {
                 )}
               </div>
 
-              {/* Region Filter */}
-              <div>
-                <h3 className="text-sm font-medium mb-3 text-muted-foreground">By Region</h3>
-                <div className="flex flex-wrap gap-2">
-                  {regions?.map((region) => (
-                    <Badge
-                      key={region.slug}
-                      variant={selectedRegion === region.slug ? "default" : "outline"}
-                      className="cursor-pointer hover:bg-accent/20 transition-colors"
-                      onClick={() => setSelectedRegion(selectedRegion === region.slug ? null : region.slug)}
-                    >
-                      {region.name}
-                      {stats?.regionCounts && (
-                        <span className="ml-1 opacity-60">
-                          ({stats.regionCounts[region.id] || 0})
-                        </span>
-                      )}
-                    </Badge>
-                  ))}
-                </div>
-              </div>
 
               {/* Category Filter */}
               <div>
