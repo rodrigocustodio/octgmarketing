@@ -264,22 +264,24 @@ const Article = () => {
 
               {/* Sidebar */}
               <aside className="space-y-6">
-                {/* Share Buttons */}
-                <ShareButtons 
-                  url={currentUrl}
-                  title={sampleArticle.title}
-                  subtitle={sampleArticle.subtitle}
-                />
-
                 {/* Related Articles */}
                 <RelatedArticles 
                   articles={relatedArticles}
                   currentRegion={sampleArticle.region}
                 />
 
-                {/* Newsletter Mini */}
+                {/* Newsletter - Stay Informed */}
                 <div className="hidden lg:block">
                   <NewsletterSignup />
+                </div>
+
+                {/* Share Buttons - below newsletter, sticky for visibility */}
+                <div className="sticky top-24">
+                  <ShareButtons 
+                    url={currentUrl}
+                    title={sampleArticle.title}
+                    subtitle={sampleArticle.subtitle}
+                  />
                 </div>
               </aside>
             </div>
