@@ -5,8 +5,76 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
+  /* Light Mode - Clean Professional */
   :root {
-    /* OCTG Corporate Dark Theme */
+    --background: 210 20% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    /* Primary - Steel Blue */
+    --primary: 210 50% 40%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Secondary - Light Slate */
+    --secondary: 214 20% 92%;
+    --secondary-foreground: 222 47% 20%;
+
+    /* Muted - Light Gray */
+    --muted: 210 15% 93%;
+    --muted-foreground: 215 15% 45%;
+
+    /* Accent - Bronze/Copper */
+    --accent: 30 65% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 72% 51%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 20% 88%;
+    --input: 214 20% 85%;
+    --ring: 210 50% 45%;
+
+    --radius: 0.5rem;
+
+    /* Custom OCTG Colors - Light Mode */
+    --octg-bronze: 30 65% 42%;
+    --octg-copper: 25 70% 38%;
+    --octg-steel: 210 40% 45%;
+    --octg-slate: 220 15% 92%;
+    --octg-navy: 220 50% 30%;
+    --octg-charcoal: 220 15% 25%;
+    --octg-gold: 45 85% 45%;
+
+    /* Gradients - Light Mode */
+    --gradient-hero: linear-gradient(135deg, hsl(210 20% 98%) 0%, hsl(214 25% 95%) 50%, hsl(30 20% 95%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
+    --gradient-bronze: linear-gradient(135deg, hsl(30 65% 42%) 0%, hsl(25 70% 35%) 100%);
+    --gradient-steel: linear-gradient(135deg, hsl(210 40% 45%) 0%, hsl(210 50% 38%) 100%);
+
+    /* Shadows - Light Mode */
+    --shadow-card: 0 4px 20px -4px hsl(222 20% 80% / 0.4);
+    --shadow-elevated: 0 10px 40px -10px hsl(222 20% 70% / 0.3);
+    --shadow-glow-bronze: 0 0 30px hsl(30 65% 42% / 0.2);
+    --shadow-glow-steel: 0 0 30px hsl(210 50% 45% / 0.2);
+
+    /* Sidebar - Light Mode */
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 15%;
+    --sidebar-primary: 210 50% 40%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 214 20% 95%;
+    --sidebar-accent-foreground: 222 47% 15%;
+    --sidebar-border: 214 20% 88%;
+    --sidebar-ring: 210 50% 45%;
+  }
+
+  /* Dark Mode - Corporate Industrial */
+  .dark {
     --background: 222 47% 6%;
     --foreground: 210 20% 95%;
 
@@ -32,16 +100,14 @@
     --accent: 30 60% 45%;
     --accent-foreground: 30 10% 98%;
 
-    --destructive: 0 72% 51%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 220 20% 18%;
     --input: 220 20% 20%;
     --ring: 210 40% 50%;
 
-    --radius: 0.5rem;
-
-    /* Custom OCTG Colors */
+    /* Custom OCTG Colors - Dark Mode */
     --octg-bronze: 30 60% 45%;
     --octg-copper: 25 70% 40%;
     --octg-steel: 210 30% 50%;
@@ -50,19 +116,19 @@
     --octg-charcoal: 220 20% 12%;
     --octg-gold: 45 80% 50%;
 
-    /* Gradients */
+    /* Gradients - Dark Mode */
     --gradient-hero: linear-gradient(135deg, hsl(222 47% 6%) 0%, hsl(220 50% 12%) 50%, hsl(30 40% 15%) 100%);
     --gradient-card: linear-gradient(180deg, hsl(222 47% 10%) 0%, hsl(222 47% 8%) 100%);
     --gradient-bronze: linear-gradient(135deg, hsl(30 60% 45%) 0%, hsl(25 70% 35%) 100%);
     --gradient-steel: linear-gradient(135deg, hsl(210 30% 50%) 0%, hsl(210 40% 40%) 100%);
 
-    /* Shadows */
+    /* Shadows - Dark Mode */
     --shadow-card: 0 4px 20px -4px hsl(222 47% 3% / 0.5);
     --shadow-elevated: 0 10px 40px -10px hsl(222 47% 3% / 0.6);
     --shadow-glow-bronze: 0 0 30px hsl(30 60% 45% / 0.3);
     --shadow-glow-steel: 0 0 30px hsl(210 40% 45% / 0.3);
 
-    /* Sidebar */
+    /* Sidebar - Dark Mode */
     --sidebar-background: 222 47% 8%;
     --sidebar-foreground: 210 20% 90%;
     --sidebar-primary: 210 40% 45%;
@@ -71,28 +137,6 @@
     --sidebar-accent-foreground: 210 20% 90%;
     --sidebar-border: 220 20% 18%;
     --sidebar-ring: 210 40% 50%;
-  }
-
-  .dark {
-    --background: 222 47% 6%;
-    --foreground: 210 20% 95%;
-    --card: 222 47% 8%;
-    --card-foreground: 210 20% 95%;
-    --popover: 222 47% 10%;
-    --popover-foreground: 210 20% 95%;
-    --primary: 210 40% 45%;
-    --primary-foreground: 210 20% 98%;
-    --secondary: 217 33% 15%;
-    --secondary-foreground: 210 20% 90%;
-    --muted: 220 20% 18%;
-    --muted-foreground: 215 15% 55%;
-    --accent: 30 60% 45%;
-    --accent-foreground: 30 10% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-    --border: 220 20% 18%;
-    --input: 220 20% 20%;
-    --ring: 210 40% 50%;
   }
 }
 
@@ -116,8 +160,8 @@
   /* Industrial texture overlay */
   .octg-texture {
     background-image: 
-      linear-gradient(90deg, hsl(220 20% 15% / 0.03) 1px, transparent 1px),
-      linear-gradient(hsl(220 20% 15% / 0.03) 1px, transparent 1px);
+      linear-gradient(90deg, hsl(var(--border) / 0.3) 1px, transparent 1px),
+      linear-gradient(hsl(var(--border) / 0.3) 1px, transparent 1px);
     background-size: 20px 20px;
   }
 
@@ -128,8 +172,8 @@
         0deg,
         transparent,
         transparent 40px,
-        hsl(220 20% 18% / 0.5) 40px,
-        hsl(220 20% 18% / 0.5) 41px
+        hsl(var(--border) / 0.5) 40px,
+        hsl(var(--border) / 0.5) 41px
       );
   }
 
