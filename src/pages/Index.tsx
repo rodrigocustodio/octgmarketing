@@ -14,6 +14,7 @@ import { BreakingNewsRow } from "@/components/home/BreakingNewsRow";
 import { IndustryFocusMasonry } from "@/components/home/IndustryFocusMasonry";
 import { TopicRows } from "@/components/home/TopicRows";
 import { QuickReadsGrid } from "@/components/home/QuickReadsGrid";
+import { AnalysisReportsSection } from "@/components/home/AnalysisReportsSection";
 
 function formatArticleDate(dateString: string | null): string {
   if (!dateString) return "";
@@ -32,7 +33,8 @@ const Index = () => {
   const secondaryArticles = articles?.slice(1, 4) || [];
   const breakingNewsArticles = articles?.slice(4, 7) || [];
   const industryFocusArticles = articles?.slice(7, 12) || [];
-  const quickReadsArticles = articles?.slice(12, 16) || [];
+  const analysisArticles = articles?.slice(12, 17) || [];
+  const quickReadsArticles = articles?.slice(17, 21) || [];
 
   return (
     <div className="min-h-screen bg-background">
@@ -137,7 +139,10 @@ const Index = () => {
         {/* SECTION 3: By Topic Rows */}
         <TopicRows />
 
-        {/* SECTION 4: Quick Reads Grid */}
+        {/* SECTION 4: Analysis & Reports */}
+        <AnalysisReportsSection articles={analysisArticles} />
+
+        {/* SECTION 5: Quick Reads Grid */}
         <QuickReadsGrid articles={quickReadsArticles} />
 
         {/* Newsletter CTA */}
