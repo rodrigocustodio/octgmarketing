@@ -96,7 +96,7 @@ const Index = () => {
               <div className="max-w-4xl">
                 <Badge variant="featured" className="mb-4">Coming Soon</Badge>
                 <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">
-                  OCTG Marketing Intelligence
+                  OCTG Index Intelligence
                 </h1>
                 <p className="text-xl text-muted-foreground mb-6 max-w-2xl">
                   Your source for Oil Country Tubular Goods industry news and analysis

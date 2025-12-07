@@ -87,10 +87,10 @@ export function Footer() {
             <div className="flex h-8 w-8 items-center justify-center rounded bg-accent">
               <span className="font-display text-sm font-black text-accent-foreground">O</span>
             </div>
-            <span className="font-display font-bold tracking-tight">OCTG Marketing</span>
+            <span className="font-display font-bold tracking-tight">OCTG Index</span>
           </div>
           <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} OCTG Marketing. All rights reserved.
+            © {new Date().getFullYear()} OCTG Index. All rights reserved.
           </p>
         </div>
       </div>

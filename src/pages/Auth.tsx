@@ -150,7 +150,7 @@ const Auth = () => {
         <div className="text-center mb-8">
           <h1 className="font-display text-3xl font-bold tracking-tight">
             <span>OCTG</span>
-            <span className="ml-2 text-muted-foreground">Marketing</span>
+            <span className="ml-2 text-muted-foreground">Index</span>
           </h1>
           <p className="text-muted-foreground mt-2">Admin Portal</p>
         </div>
@@ -279,7 +279,7 @@ const Auth = () => {
 
         <p className="text-center text-sm text-muted-foreground mt-6">
           <a href="/" className="hover:text-foreground transition-colors">
-            ← Back to OCTG Marketing
+            ← Back to OCTG Index
           </a>
         </p>
       </div>

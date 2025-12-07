@@ -92,15 +92,15 @@ const Region = () => {
   return (
     <>
       <Helmet>
-        <title>{region.name} OCTG News & Analysis | OCTG Marketing</title>
+        <title>{region.name} OCTG News & Analysis | OCTG Index</title>
         <meta name="description" content={description} />
         <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:title" content={`${region.name} OCTG News & Analysis | OCTG Marketing`} />
+        <meta property="og:title" content={`${region.name} OCTG News & Analysis | OCTG Index`} />
         <meta property="og:description" content={description} />
         <meta property="og:image" content={heroImage} />
         <meta property="og:url" content={canonicalUrl} />
         <meta property="og:type" content="website" />
-        <meta property="og:site_name" content="OCTG Marketing" />
+        <meta property="og:site_name" content="OCTG Index" />
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={`${region.name} OCTG News & Analysis`} />
         <meta name="twitter:description" content={description} />
