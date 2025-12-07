@@ -297,6 +297,8 @@ export type Database = {
           slug: string
           source_article_id: string | null
           status: Database["public"]["Enums"]["draft_article_status"]
+          suggested_company_ids: string[] | null
+          suggested_topic_ids: string[] | null
           tags: Json | null
           title: string
           updated_at: string
@@ -312,6 +314,8 @@ export type Database = {
           slug: string
           source_article_id?: string | null
           status?: Database["public"]["Enums"]["draft_article_status"]
+          suggested_company_ids?: string[] | null
+          suggested_topic_ids?: string[] | null
           tags?: Json | null
           title: string
           updated_at?: string
@@ -327,6 +331,8 @@ export type Database = {
           slug?: string
           source_article_id?: string | null
           status?: Database["public"]["Enums"]["draft_article_status"]
+          suggested_company_ids?: string[] | null
+          suggested_topic_ids?: string[] | null
           tags?: Json | null
           title?: string
           updated_at?: string
