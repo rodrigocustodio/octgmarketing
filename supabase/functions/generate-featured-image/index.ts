@@ -2,7 +2,7 @@ import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const googleApiKey = Deno.env.get("GOOGLE_AI_API_KEY");
+const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
 const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
 
@@ -42,106 +42,62 @@ serve(async (req) => {
     console.log(`Generating featured image for draft: ${draftId}`);
     console.log(`Article title: ${title}`);
 
-    // Step 1: Use Gemini to analyze article and create a photorealistic prompt
-    const analysisPrompt = `You are a professional photo editor for an oil & gas industry news publication (OCTG Index).
+    // Create a detailed image prompt based on the article content
+    const imagePrompt = `Professional editorial photograph for an oil and gas industry news article titled "${title}". 
+${excerpt ? `Context: ${excerpt}` : ""}
 
-Analyze this article and create a highly detailed image generation prompt for a REALISTIC, EDITORIAL-STYLE photograph to illustrate it.
+Requirements:
+- Photorealistic industrial photography style
+- Professional news/editorial quality like Reuters or Bloomberg
+- Relevant to OCTG (Oil Country Tubular Goods) industry
+- Show realistic equipment like drilling rigs, steel pipes, offshore platforms, refineries, or industrial facilities
+- Natural lighting with cinematic composition
+- Wide 16:9 aspect ratio
+- No text, logos, or watermarks
+- No cartoons or illustrations`;
 
-The image MUST look like a real photograph that could appear in Reuters, Bloomberg, World Oil, or Offshore Technology publications.
+    console.log(`Image prompt: ${imagePrompt}`);
 
-REQUIREMENTS:
-- The image must be photorealistic, NOT a digital illustration or 3D render
-- Use real-world lighting (natural sunlight, industrial lighting, sunset/sunrise)
-- Include realistic equipment: drilling rigs, OCTG pipes, steel mills, offshore platforms, pipe yards
-- Specify the camera angle and composition (wide shot, close-up, aerial view)
-- Mention the setting (offshore, desert, industrial facility, port)
-- Include human elements when appropriate (workers, engineers) but not as the focus
-
-DO NOT create prompts for:
-- Conceptual or abstract images
-- Illustrations, graphics, or infographics
-- Stock photo clichés with fake smiles
-- Logos or text overlays
-
-Article Title: ${title}
-${excerpt ? `Article Excerpt: ${excerpt}` : ""}
-Article Body (first 1000 chars): ${body.substring(0, 1000)}
-
-Return ONLY the image generation prompt, nothing else. Make it 2-4 sentences maximum, extremely specific about location, equipment, lighting, and photographic style.`;
-
-    console.log("Calling Gemini API for prompt analysis...");
+    // Use OpenAI gpt-image-1 for image generation
+    console.log("Calling OpenAI Image API...");
     
-    const geminiResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${googleApiKey}`,
+    const openaiResponse = await fetch(
+      "https://api.openai.com/v1/images/generations",
       {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${openaiApiKey}`,
+        },
         body: JSON.stringify({
-          contents: [{ parts: [{ text: analysisPrompt }] }],
-          generationConfig: {
-            maxOutputTokens: 256,
-            temperature: 0.7,
-          },
+          model: "gpt-image-1",
+          prompt: imagePrompt,
+          n: 1,
+          size: "1536x1024",
+          quality: "high",
         }),
       }
     );
 
-    if (!geminiResponse.ok) {
-      const errorText = await geminiResponse.text();
-      console.error("Gemini API error:", errorText);
-      throw new Error(`Gemini API error: ${geminiResponse.status}`);
+    if (!openaiResponse.ok) {
+      const errorText = await openaiResponse.text();
+      console.error("OpenAI API error:", errorText);
+      console.error("OpenAI API status:", openaiResponse.status);
+      throw new Error(`OpenAI API error: ${openaiResponse.status} - ${errorText}`);
     }
 
-    const geminiData = await geminiResponse.json();
-    const imagePrompt = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+    const openaiData = await openaiResponse.json();
+    console.log("OpenAI response received");
 
-    if (!imagePrompt) {
-      throw new Error("Failed to generate image prompt from Gemini");
+    // Extract the image data - gpt-image-1 returns base64
+    const imageData = openaiData.data?.[0];
+    if (!imageData?.b64_json) {
+      console.error("No image data in response:", JSON.stringify(openaiData, null, 2));
+      throw new Error("No image data in OpenAI response");
     }
 
-    console.log(`Generated image prompt: ${imagePrompt}`);
-
-    // Step 2: Use Gemini Imagen 3 to generate the image
-    console.log("Calling Gemini Imagen 3 API for image generation...");
-    
-    const imagenResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${googleApiKey}`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          instances: [
-            {
-              prompt: `Photorealistic editorial photograph: ${imagePrompt}. Style: professional news photography, high resolution, cinematic lighting.`,
-            },
-          ],
-          parameters: {
-            sampleCount: 1,
-            aspectRatio: "16:9",
-          },
-        }),
-      }
-    );
-
-    if (!imagenResponse.ok) {
-      const errorText = await imagenResponse.text();
-      console.error("Imagen API error:", errorText);
-      console.error("Imagen API status:", imagenResponse.status);
-      throw new Error(`Imagen API error: ${imagenResponse.status} - ${errorText}`);
-    }
-
-    const imagenData = await imagenResponse.json();
-    console.log("Imagen response received:", JSON.stringify(imagenData, null, 2).substring(0, 500));
-
-    // Extract the image data from the Imagen 3 response
-    const predictions = imagenData.predictions;
-    if (!predictions || predictions.length === 0 || !predictions[0].bytesBase64Encoded) {
-      console.error("No image data in response:", JSON.stringify(imagenData, null, 2));
-      throw new Error("No image data in Imagen response");
-    }
-
-    const imageBase64 = predictions[0].bytesBase64Encoded;
-    const mimeType = predictions[0].mimeType || "image/png";
+    const imageBase64 = imageData.b64_json;
+    const mimeType = "image/png";
     
     // Convert base64 to Uint8Array
     const binaryString = atob(imageBase64);
@@ -150,8 +106,8 @@ Return ONLY the image generation prompt, nothing else. Make it 2-4 sentences max
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    // Step 3: Upload to Supabase Storage
-    const fileName = `${draftId}-${Date.now()}.${mimeType.split("/")[1] || "png"}`;
+    // Upload to Supabase Storage
+    const fileName = `${draftId}-${Date.now()}.png`;
     const filePath = `generated/${fileName}`;
 
     console.log(`Uploading image to storage: ${filePath}`);
