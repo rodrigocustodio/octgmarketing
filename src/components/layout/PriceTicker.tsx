@@ -13,16 +13,20 @@ function PriceItem({ symbol, price, change, changePercent, currency }: {
   const isNegative = change < 0;
   const isNeutral = change === 0;
 
-  const formatPrice = (p: number) => {
-    if (p >= 100) return p.toFixed(0);
-    return p.toFixed(2);
+  const formatPrice = (p: number, curr: string) => {
+    const num = p >= 100 ? p.toFixed(0) : p.toFixed(2);
+    const symbols: Record<string, string> = {
+      USD: '$', EUR: '€', JPY: '¥', GBP: '£', INR: '₹', TWD: 'NT$'
+    };
+    const symbol = symbols[curr] || `${curr} `;
+    return `${symbol}${num}`;
   };
 
   return (
     <div className="flex items-center gap-1.5 px-3 py-1 whitespace-nowrap">
-      <span className="font-semibold text-foreground">{symbol}</span>
-      <span className="text-muted-foreground">
-        {currency === 'USD' ? '$' : currency}{formatPrice(price)}
+      <span className="font-medium text-foreground/80">{symbol}</span>
+      <span className="text-muted-foreground/90">
+        {formatPrice(price, currency)}
       </span>
       <span className={cn(
         "flex items-center gap-0.5 text-xs font-medium",
