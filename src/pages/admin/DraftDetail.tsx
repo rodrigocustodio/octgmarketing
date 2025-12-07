@@ -119,7 +119,8 @@ const DraftDetail = () => {
           body: draft.body_markdown,
           hero_image_url: draft.hero_image_url,
           region_id: draft.region_id,
-          status: "draft", // Published manually after review
+          status: "published",
+          publish_date: new Date().toISOString(),
         });
 
       if (articleError) throw articleError;
