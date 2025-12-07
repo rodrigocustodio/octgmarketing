@@ -469,7 +469,7 @@
 
 .ticker-content {
   @apply flex items-center gap-1;
-  animation: ticker-scroll 60s linear infinite;
+  animation: ticker-scroll 120s linear infinite;
 }
 
 .ticker-content:hover {
@@ -488,19 +488,19 @@
 /* Responsive ticker speed adjustments */
 @media (max-width: 768px) {
   .ticker-content {
-    animation-duration: 35s;
+    animation-duration: 70s;
   }
 }
 
 @media (min-width: 769px) and (max-width: 1279px) {
   .ticker-content {
-    animation-duration: 45s;
+    animation-duration: 90s;
   }
 }
 
 /* Large screens - slower for readability with more content */
 @media (min-width: 1280px) {
   .ticker-content {
-    animation-duration: 60s;
+    animation-duration: 120s;
   }
 }
