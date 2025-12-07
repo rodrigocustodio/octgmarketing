@@ -181,12 +181,6 @@ const Article = () => {
                       </Link>
                     </BreadcrumbLink>
                   </BreadcrumbItem>
-                  <BreadcrumbSeparator />
-                  <BreadcrumbItem>
-                    <BreadcrumbPage className="text-foreground/70 truncate max-w-[200px] sm:max-w-none">
-                      {sampleArticle.title}
-                    </BreadcrumbPage>
-                  </BreadcrumbItem>
                 </BreadcrumbList>
               </Breadcrumb>
 
@@ -211,7 +205,7 @@ const Article = () => {
               </p>
 
               {/* Author & Meta */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                 <div className="flex items-center gap-2">
                   <img 
                     src={sampleArticle.author.avatar} 
@@ -223,13 +217,15 @@ const Article = () => {
                     <p className="text-xs">{sampleArticle.author.role}</p>
                   </div>
                 </div>
-                <div className="flex items-center gap-1">
-                  <Calendar className="h-4 w-4" />
-                  <span>{sampleArticle.publishDate}</span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="h-4 w-4" />
-                  <span>{sampleArticle.readingTime}</span>
+                <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>{sampleArticle.publishDate}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{sampleArticle.readingTime}</span>
+                  </div>
                 </div>
               </div>
             </div>
