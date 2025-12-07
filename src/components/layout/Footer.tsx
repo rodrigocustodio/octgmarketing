@@ -83,17 +83,15 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex flex-col items-center sm:items-start gap-1">
-            <div className="flex items-center gap-2">
-              <div className="flex h-8 w-8 items-center justify-center rounded bg-accent">
-                <span className="font-display text-sm font-black text-accent-foreground">O</span>
-              </div>
-              <span className="font-display font-bold tracking-tight">OCTG Index</span>
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded bg-accent">
+              <span className="font-display text-sm font-black text-accent-foreground">O</span>
             </div>
-            <p className="text-xs text-muted-foreground">
-              Part of OCTG Marketing Group
-            </p>
+            <span className="font-display font-bold tracking-tight">OCTG Index</span>
           </div>
+          <p className="text-xs text-muted-foreground">
+            Part of OCTG Marketing Group
+          </p>
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} OCTG Index. All rights reserved.
           </p>
