@@ -7,6 +7,15 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// ===== 60-DAY FRESHNESS FILTER =====
+const MAX_ARTICLE_AGE_DAYS = 60;
+const CUTOFF_DATE = new Date();
+CUTOFF_DATE.setDate(CUTOFF_DATE.getDate() - MAX_ARTICLE_AGE_DAYS);
+
+// Current year for URL filtering
+const CURRENT_YEAR = new Date().getFullYear();
+const MIN_ALLOWED_YEAR = CURRENT_YEAR - 1; // Allow current and previous year in URLs
+
 // Region name to UUID mapping
 const REGION_MAP: Record<string, string | null> = {
   "Global": null,
@@ -43,9 +52,124 @@ interface FirecrawlScrapeResponse {
       title?: string;
       description?: string;
       ogImage?: string;
+      publishedTime?: string;
+      'article:published_time'?: string;
+      datePublished?: string;
+      modifiedTime?: string;
+      'og:article:published_time'?: string;
     };
   };
   error?: string;
+}
+
+// Extract publication date from metadata, URL, or content
+function extractPublishDate(metadata: Record<string, unknown> | undefined, url: string, content: string): Date | null {
+  // Priority 1: Check metadata for published time
+  if (metadata) {
+    const metadataDateFields = [
+      'publishedTime',
+      'article:published_time',
+      'og:article:published_time',
+      'datePublished',
+      'date',
+      'pubDate',
+      'published',
+      'created',
+    ];
+    
+    for (const field of metadataDateFields) {
+      const value = metadata[field];
+      if (value && typeof value === 'string') {
+        const parsed = new Date(value);
+        if (!isNaN(parsed.getTime())) {
+          console.log(`  📅 Date from metadata.${field}: ${parsed.toISOString()}`);
+          return parsed;
+        }
+      }
+    }
+  }
+  
+  // Priority 2: Extract date from URL pattern (e.g., /2024/12/05/ or /2024-12-05/)
+  const urlDatePatterns = [
+    /\/(\d{4})\/(\d{1,2})\/(\d{1,2})\//,  // /2024/12/05/
+    /\/(\d{4})-(\d{1,2})-(\d{1,2})\//,     // /2024-12-05/
+    /\/(\d{4})\/(\d{1,2})\//,              // /2024/12/
+    /[/-](\d{4})(\d{2})(\d{2})[/-]/,       // /20241205/ or -20241205-
+  ];
+  
+  for (const pattern of urlDatePatterns) {
+    const match = url.match(pattern);
+    if (match) {
+      const year = parseInt(match[1]);
+      const month = parseInt(match[2]) - 1;
+      const day = match[3] ? parseInt(match[3]) : 1;
+      const parsed = new Date(year, month, day);
+      if (!isNaN(parsed.getTime()) && year >= 2000 && year <= CURRENT_YEAR) {
+        console.log(`  📅 Date from URL pattern: ${parsed.toISOString()}`);
+        return parsed;
+      }
+    }
+  }
+  
+  // Priority 3: Look for date patterns in first 1000 chars of content
+  const contentStart = content.substring(0, 1000);
+  
+  // Common date patterns in articles
+  const contentDatePatterns = [
+    // "December 5, 2024" or "Dec 5, 2024"
+    /(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[.\s]+(\d{1,2})(?:st|nd|rd|th)?[,\s]+(\d{4})/i,
+    // "5 December 2024" or "5 Dec 2024"
+    /(\d{1,2})(?:st|nd|rd|th)?\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[.\s]+(\d{4})/i,
+    // "Published: 2024-12-05" or "Date: 12/05/2024"
+    /(?:Published|Posted|Date|Updated)[:.\s]+(\d{4})[/-](\d{1,2})[/-](\d{1,2})/i,
+    /(?:Published|Posted|Date|Updated)[:.\s]+(\d{1,2})[/-](\d{1,2})[/-](\d{4})/i,
+  ];
+  
+  for (const pattern of contentDatePatterns) {
+    const match = contentStart.match(pattern);
+    if (match) {
+      try {
+        // Try parsing the full match
+        const fullMatch = match[0];
+        // Clean up the match for parsing
+        const cleanedMatch = fullMatch.replace(/(?:Published|Posted|Date|Updated)[:.\s]+/i, '').trim();
+        const parsed = new Date(cleanedMatch);
+        if (!isNaN(parsed.getTime()) && parsed.getFullYear() >= 2000 && parsed.getFullYear() <= CURRENT_YEAR) {
+          console.log(`  📅 Date from content: ${parsed.toISOString()}`);
+          return parsed;
+        }
+      } catch {
+        continue;
+      }
+    }
+  }
+  
+  console.log(`  ⚠️ Could not extract publication date`);
+  return null;
+}
+
+// Check if article is within the freshness window
+function isArticleFresh(publishDate: Date | null): boolean {
+  if (!publishDate) {
+    // If we can't determine the date, we'll be conservative and reject it
+    return false;
+  }
+  return publishDate >= CUTOFF_DATE;
+}
+
+// Check if URL contains an obviously old year pattern
+function isUrlDateFresh(url: string): boolean {
+  // Look for year patterns in URL
+  const yearMatch = url.match(/\/(\d{4})\//);
+  if (yearMatch) {
+    const year = parseInt(yearMatch[1]);
+    // Reject if year is older than last year
+    if (year < MIN_ALLOWED_YEAR) {
+      console.log(`  🚫 URL contains old year: ${year}`);
+      return false;
+    }
+  }
+  return true;
 }
 
 // Map a website to discover article URLs
@@ -87,15 +211,21 @@ async function mapWebsite(url: string, apiKey: string, limit: number = 10): Prom
       if (lower.includes('/contact') || lower.includes('/about') || lower.includes('/login')) return false;
       if (lower.includes('/privacy') || lower.includes('/terms') || lower.includes('/cookie')) return false;
       if (lower.includes('/search') || lower.includes('/subscribe') || lower.includes('/register')) return false;
+      
+      // PRE-FILTER: Check if URL contains an obviously old year
+      if (!isUrlDateFresh(link)) {
+        return false;
+      }
+      
       // Prefer URLs that look like articles
       return lower.includes('/news') || lower.includes('/article') || lower.includes('/press') || 
              lower.includes('/release') || lower.includes('/media') || lower.includes('/blog') ||
              lower.includes('/story') || lower.includes('/update') || 
-             // Also include date patterns in URLs
+             // Also include date patterns in URLs (but already filtered for freshness)
              /\/\d{4}\//.test(link) || /\/\d{4}-\d{2}/.test(link);
     });
 
-    console.log(`Found ${articleUrls.length} potential article URLs from ${url}`);
+    console.log(`Found ${articleUrls.length} potential article URLs from ${url} (after date pre-filter)`);
     return articleUrls.slice(0, 5); // Return max 5 articles
   } catch (error) {
     console.error(`Error mapping ${url}:`, error);
@@ -109,6 +239,7 @@ async function scrapeUrl(url: string, apiKey: string): Promise<{
   title?: string;
   content?: string;
   imageUrl?: string;
+  metadata?: Record<string, unknown>;
   error?: string;
 }> {
   console.log(`Scraping URL: ${url}`);
@@ -144,6 +275,7 @@ async function scrapeUrl(url: string, apiKey: string): Promise<{
       title: result.data.metadata?.title || 'Untitled',
       content: result.data.markdown || '',
       imageUrl: result.data.metadata?.ogImage,
+      metadata: result.data.metadata as Record<string, unknown>,
     };
   } catch (error) {
     console.error(`Error scraping ${url}:`, error);
@@ -159,6 +291,7 @@ serve(async (req) => {
 
   try {
     console.log('=== OCTG Scraper Starting ===');
+    console.log(`📅 Cutoff date for articles: ${CUTOFF_DATE.toISOString()} (${MAX_ARTICLE_AGE_DAYS} days ago)`);
 
     // Auth check
     const cronSecret = Deno.env.get('CRON_SECRET');
@@ -232,6 +365,8 @@ serve(async (req) => {
       articlesFound: 0,
       articlesInserted: 0,
       duplicatesSkipped: 0,
+      articlesFilteredByDate: 0, // NEW: Track date-filtered articles
+      articlesWithUnknownDate: 0, // NEW: Track articles with unparseable dates
       errors: [] as string[],
     };
 
@@ -275,6 +410,31 @@ serve(async (req) => {
             continue;
           }
 
+          results.articlesFound++;
+
+          // ===== DATE FRESHNESS CHECK =====
+          const publishDate = extractPublishDate(
+            scrapeResult.metadata,
+            articleUrl,
+            scrapeResult.content || ''
+          );
+          
+          if (!publishDate) {
+            console.log(`  ⚠️ SKIPPED (unknown date): "${scrapeResult.title}"`);
+            results.articlesWithUnknownDate++;
+            continue;
+          }
+          
+          if (!isArticleFresh(publishDate)) {
+            const daysSincePublish = Math.floor((Date.now() - publishDate.getTime()) / (1000 * 60 * 60 * 24));
+            console.log(`  🚫 SKIPPED (too old): "${scrapeResult.title}" - published ${publishDate.toISOString().split('T')[0]} (${daysSincePublish} days ago)`);
+            results.articlesFilteredByDate++;
+            continue;
+          }
+          
+          console.log(`  ✅ FRESH: "${scrapeResult.title}" - published ${publishDate.toISOString().split('T')[0]}`);
+          // ===== END DATE CHECK =====
+
           // Insert into source_articles
           const regionId = REGION_MAP[source.region] || null;
           
@@ -292,6 +452,7 @@ serve(async (req) => {
                 category: source.category,
                 source_type: source.source_type,
                 scraped_from: source.url,
+                original_publish_date: publishDate.toISOString(), // Store the extracted date
               },
             });
 
@@ -303,8 +464,6 @@ serve(async (req) => {
             results.articlesInserted++;
             articlesFoundForSource++;
           }
-
-          results.articlesFound++;
         }
 
         // Update source last_scraped_at
@@ -327,11 +486,14 @@ serve(async (req) => {
     console.log(`Articles found: ${results.articlesFound}`);
     console.log(`Articles inserted: ${results.articlesInserted}`);
     console.log(`Duplicates skipped: ${results.duplicatesSkipped}`);
+    console.log(`🚫 Filtered by date (>60 days): ${results.articlesFilteredByDate}`);
+    console.log(`⚠️ Unknown date (skipped): ${results.articlesWithUnknownDate}`);
     console.log(`Errors: ${results.errors.length}`);
 
     return new Response(JSON.stringify({
       success: true,
       ...results,
+      cutoffDate: CUTOFF_DATE.toISOString(),
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
