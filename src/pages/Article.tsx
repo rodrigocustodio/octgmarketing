@@ -240,19 +240,8 @@ const Article = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
               {/* Article Body */}
               <div className="lg:col-span-2">
-                <article 
-                  className="prose dark:prose-invert prose-lg max-w-none
-                    prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground
-                    prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
-                    prose-p:text-foreground/85 prose-p:leading-relaxed
-                    prose-p.lead:text-xl prose-p.lead:text-foreground/90 prose-p.lead:font-medium
-                    prose-blockquote:border-l-4 prose-blockquote:border-accent prose-blockquote:pl-6 
-                    prose-blockquote:italic prose-blockquote:text-foreground/80
-                    prose-blockquote:not-italic prose-blockquote:font-normal
-                    [&_blockquote_cite]:block [&_blockquote_cite]:mt-3 [&_blockquote_cite]:text-sm 
-                    [&_blockquote_cite]:text-accent [&_blockquote_cite]:not-italic
-                    prose-strong:text-foreground prose-strong:font-semibold
-                    prose-a:text-accent prose-a:no-underline hover:prose-a:underline"
+              <article 
+                  className="article-content max-w-none"
                   dangerouslySetInnerHTML={{ __html: sampleArticle.body }}
                 />
 
