@@ -10,6 +10,7 @@ const regions = [
   { name: "Africa", slug: "africa" },
   { name: "Middle East", slug: "middle-east" },
   { name: "Asia-Pacific", slug: "asia-pacific" },
+  { name: "Australia", slug: "australia" },
 ];
 
 export function Header() {

@@ -23,7 +23,8 @@ const REGION_MAP: Record<string, string | null> = {
   "Europe": "bb626c97-c8e0-4a28-871d-568db3810664",
   "Asia-Pacific": "b00e8f7b-72ee-4bdf-a632-fff16b1ffa29",
   "Middle East": "de0d536e-f402-4861-ab5c-7220857b1379",
-  "Africa": "53298537-f28d-4b6f-a161-ca0ba0a419f3"
+  "Africa": "53298537-f28d-4b6f-a161-ca0ba0a419f3",
+  "Australia": "1e5146eb-fb22-4e4c-b201-0eced3eabcda"
 };
 
 interface ScrapeSource {

@@ -30,7 +30,8 @@ const regionDescriptions: Record<string, string> = {
   "europe": "Analysis of European OCTG markets including the North Sea, Norway, UK, and emerging Eastern European opportunities.",
   "africa": "Insights on African oil & gas developments across Nigeria, Angola, Libya, and emerging frontiers like Mozambique and Senegal.",
   "middle-east": "Comprehensive coverage of Middle Eastern OCTG markets including Saudi Arabia, UAE, Qatar, Kuwait, and Iraq.",
-  "asia-pacific": "Market intelligence on Asia-Pacific OCTG demand from China, India, Australia, Indonesia, and Southeast Asia.",
+  "asia-pacific": "Market intelligence on Asia-Pacific OCTG demand from China, India, Indonesia, and Southeast Asia.",
+  "australia": "Comprehensive coverage of Australia's oil and gas sector, including major LNG projects, offshore developments, and OCTG supply chain dynamics across the continent.",
 };
 
 const Region = () => {
