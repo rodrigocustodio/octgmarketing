@@ -20,7 +20,10 @@ import {
   Globe,
   Tag,
   Building2,
-  Search
+  Search,
+  ImageIcon,
+  Wand2,
+  Undo2
 } from "lucide-react";
 
 interface DraftArticle {
@@ -66,6 +69,12 @@ const DraftDetail = () => {
   const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([]);
   
+  // Featured image state
+  const [currentImageUrl, setCurrentImageUrl] = useState<string | null>(null);
+  const [imageSource, setImageSource] = useState<"original" | "ai" | null>(null);
+  const [generatingImage, setGeneratingImage] = useState(false);
+  const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
+  
   // Fetch regions, topics, companies
   const { data: regions } = useRegions();
   const { data: topics } = useTopics();
@@ -96,6 +105,8 @@ const DraftDetail = () => {
         setDraft(data as DraftArticle);
         setEditorNotes(data.editor_notes || "");
         setSelectedRegionId(data.region_id || "");
+        setCurrentImageUrl(data.hero_image_url || null);
+        setImageSource(data.hero_image_url ? "original" : null);
       } catch (error) {
         console.error("Error fetching draft:", error);
         toast({
@@ -110,6 +121,56 @@ const DraftDetail = () => {
 
     fetchDraft();
   }, [id, toast]);
+
+  const handleGenerateImage = async () => {
+    if (!draft) return;
+    
+    setGeneratingImage(true);
+    setGeneratedPrompt(null);
+    
+    try {
+      const { data: sessionData } = await supabase.auth.getSession();
+      
+      const response = await supabase.functions.invoke("generate-featured-image", {
+        body: {
+          title: draft.title,
+          excerpt: draft.excerpt,
+          body: draft.body_markdown,
+          draftId: draft.id,
+        },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to generate image");
+      }
+
+      const { imageUrl, prompt } = response.data;
+      
+      setCurrentImageUrl(imageUrl);
+      setImageSource("ai");
+      setGeneratedPrompt(prompt);
+      
+      toast({
+        title: "Image Generated",
+        description: "AI-generated featured image is ready for review.",
+      });
+    } catch (error) {
+      console.error("Error generating image:", error);
+      toast({
+        title: "Image Generation Failed",
+        description: error instanceof Error ? error.message : "Failed to generate featured image",
+        variant: "destructive",
+      });
+    } finally {
+      setGeneratingImage(false);
+    }
+  };
+
+  const handleUseOriginalImage = () => {
+    setCurrentImageUrl(draft?.hero_image_url || null);
+    setImageSource("original");
+    setGeneratedPrompt(null);
+  };
 
   const handleTopicToggle = (topicId: string) => {
     setSelectedTopicIds((prev) =>
@@ -141,19 +202,20 @@ const DraftDetail = () => {
     
     setSubmitting(true);
     try {
-      // Update draft status
+      // Update draft status and image
       const { error: draftError } = await supabase
         .from("draft_articles")
         .update({
           status: "approved",
           editor_notes: editorNotes || null,
           region_id: selectedRegionId,
+          hero_image_url: currentImageUrl,
         })
         .eq("id", draft.id);
 
       if (draftError) throw draftError;
 
-      // Create new article in main articles table
+      // Create new article in main articles table with the current image
       const { data: newArticle, error: articleError } = await supabase
         .from("articles")
         .insert({
@@ -161,7 +223,7 @@ const DraftDetail = () => {
           slug: draft.slug,
           subtitle: draft.excerpt,
           body: draft.body_markdown,
-          hero_image_url: draft.hero_image_url,
+          hero_image_url: currentImageUrl,
           region_id: selectedRegionId,
           status: "published",
           publish_date: new Date().toISOString(),
@@ -404,6 +466,97 @@ const DraftDetail = () => {
             </CardContent>
           </Card>
         </div>
+
+        {/* Featured Image Section - Only show for pending drafts */}
+        {draft.status === "pending_review" && (
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-lg flex items-center gap-2">
+                <ImageIcon className="h-5 w-5" />
+                Featured Image
+              </CardTitle>
+              <CardDescription>
+                Generate an AI image or keep the original source image
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              {/* Current Image Preview */}
+              <div className="relative">
+                {currentImageUrl ? (
+                  <img
+                    src={currentImageUrl}
+                    alt="Featured image preview"
+                    className="w-full h-64 object-cover rounded-lg border border-border"
+                  />
+                ) : (
+                  <div className="w-full h-64 bg-muted rounded-lg border border-dashed border-border flex items-center justify-center">
+                    <p className="text-muted-foreground text-sm">No featured image</p>
+                  </div>
+                )}
+                {imageSource && (
+                  <Badge 
+                    className={`absolute top-3 right-3 ${
+                      imageSource === "ai" 
+                        ? "bg-primary text-primary-foreground" 
+                        : "bg-secondary text-secondary-foreground"
+                    }`}
+                  >
+                    {imageSource === "ai" ? "AI Generated" : "Original"}
+                  </Badge>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex flex-wrap gap-3">
+                <Button
+                  onClick={handleGenerateImage}
+                  disabled={generatingImage}
+                  variant="default"
+                >
+                  {generatingImage ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Generating...
+                    </>
+                  ) : (
+                    <>
+                      <Wand2 className="h-4 w-4 mr-2" />
+                      Generate Featured Image
+                    </>
+                  )}
+                </Button>
+
+                {draft.hero_image_url && imageSource !== "original" && (
+                  <Button variant="outline" onClick={handleUseOriginalImage}>
+                    <Undo2 className="h-4 w-4 mr-2" />
+                    Use Original Image
+                  </Button>
+                )}
+              </div>
+
+              {/* AI Prompt Preview */}
+              {generatedPrompt && (
+                <div className="p-3 bg-muted rounded-lg border border-border">
+                  <Label className="text-xs text-muted-foreground uppercase tracking-wide">
+                    AI Prompt Used
+                  </Label>
+                  <p className="text-sm mt-1 text-foreground/80">{generatedPrompt}</p>
+                </div>
+              )}
+
+              {generatingImage && (
+                <div className="p-4 bg-muted/50 rounded-lg text-center">
+                  <p className="text-sm text-muted-foreground">
+                    Analyzing article content and generating realistic editorial photograph...
+                  </p>
+                  <p className="text-xs text-muted-foreground mt-1">
+                    This may take 15-30 seconds
+                  </p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
 
         {/* Metadata Editor - Only show for pending drafts */}
         {draft.status === "pending_review" && (
