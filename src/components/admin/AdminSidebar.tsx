@@ -7,7 +7,8 @@ import {
   Settings, 
   LogOut,
   ChevronLeft,
-  Workflow
+  Workflow,
+  Globe
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -27,6 +28,11 @@ const navItems = [
     title: "Source Queue",
     href: "/admin/sources",
     icon: Newspaper,
+  },
+  {
+    title: "Source Config",
+    href: "/admin/sources-config",
+    icon: Globe,
   },
   {
     title: "Draft Review",

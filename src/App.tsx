@@ -16,6 +16,7 @@ import Auth from "./pages/Auth";
 import Dashboard from "./pages/admin/Dashboard";
 import Pipeline from "./pages/admin/Pipeline";
 import Sources from "./pages/admin/Sources";
+import SourcesConfig from "./pages/admin/SourcesConfig";
 import Drafts from "./pages/admin/Drafts";
 import DraftDetail from "./pages/admin/DraftDetail";
 import Settings from "./pages/admin/Settings";
@@ -44,6 +45,7 @@ const App = () => (
                 <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
                 <Route path="/admin/pipeline" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
                 <Route path="/admin/sources" element={<ProtectedRoute><Sources /></ProtectedRoute>} />
+                <Route path="/admin/sources-config" element={<ProtectedRoute><SourcesConfig /></ProtectedRoute>} />
                 <Route path="/admin/drafts" element={<ProtectedRoute><Drafts /></ProtectedRoute>} />
                 <Route path="/admin/drafts/:id" element={<ProtectedRoute><DraftDetail /></ProtectedRoute>} />
                 <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
