@@ -8,7 +8,8 @@ import {
   LogOut,
   ChevronLeft,
   Workflow,
-  Globe
+  Globe,
+  PenSquare
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -38,6 +39,11 @@ const navItems = [
     title: "Draft Review",
     href: "/admin/drafts",
     icon: FileEdit,
+  },
+  {
+    title: "Edit Articles",
+    href: "/admin/articles",
+    icon: PenSquare,
   },
   {
     title: "Settings",

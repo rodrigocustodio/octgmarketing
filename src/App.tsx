@@ -19,6 +19,8 @@ import Sources from "./pages/admin/Sources";
 import SourcesConfig from "./pages/admin/SourcesConfig";
 import Drafts from "./pages/admin/Drafts";
 import DraftDetail from "./pages/admin/DraftDetail";
+import Articles from "./pages/admin/Articles";
+import ArticleEdit from "./pages/admin/ArticleEdit";
 import Settings from "./pages/admin/Settings";
 import NotFound from "./pages/NotFound";
 
@@ -48,6 +50,8 @@ const App = () => (
                 <Route path="/admin/sources-config" element={<ProtectedRoute><SourcesConfig /></ProtectedRoute>} />
                 <Route path="/admin/drafts" element={<ProtectedRoute><Drafts /></ProtectedRoute>} />
                 <Route path="/admin/drafts/:id" element={<ProtectedRoute><DraftDetail /></ProtectedRoute>} />
+                <Route path="/admin/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
+                <Route path="/admin/articles/:id" element={<ProtectedRoute><ArticleEdit /></ProtectedRoute>} />
                 <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
