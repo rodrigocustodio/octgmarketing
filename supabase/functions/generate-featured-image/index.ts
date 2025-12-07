@@ -101,26 +101,23 @@ Return ONLY the image generation prompt, nothing else. Make it 2-4 sentences max
 
     console.log(`Generated image prompt: ${imagePrompt}`);
 
-    // Step 2: Use Gemini 3 Pro Image (Imagen) to generate the image
-    console.log("Calling Gemini Imagen API for image generation...");
+    // Step 2: Use Gemini Imagen 3 to generate the image
+    console.log("Calling Gemini Imagen 3 API for image generation...");
     
     const imagenResponse = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash-preview-image-generation:generateContent?key=${googleApiKey}`,
+      `https://generativelanguage.googleapis.com/v1beta/models/imagen-3.0-generate-002:predict?key=${googleApiKey}`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          contents: [
+          instances: [
             {
-              parts: [
-                {
-                  text: `Generate a photorealistic editorial photograph: ${imagePrompt}. Style: professional news photography, high resolution, 16:9 aspect ratio, cinematic lighting.`,
-                },
-              ],
+              prompt: `Photorealistic editorial photograph: ${imagePrompt}. Style: professional news photography, high resolution, cinematic lighting.`,
             },
           ],
-          generationConfig: {
-            responseModalities: ["TEXT", "IMAGE"],
+          parameters: {
+            sampleCount: 1,
+            aspectRatio: "16:9",
           },
         }),
       }
@@ -129,24 +126,22 @@ Return ONLY the image generation prompt, nothing else. Make it 2-4 sentences max
     if (!imagenResponse.ok) {
       const errorText = await imagenResponse.text();
       console.error("Imagen API error:", errorText);
-      throw new Error(`Imagen API error: ${imagenResponse.status}`);
+      console.error("Imagen API status:", imagenResponse.status);
+      throw new Error(`Imagen API error: ${imagenResponse.status} - ${errorText}`);
     }
 
     const imagenData = await imagenResponse.json();
-    console.log("Imagen response received");
+    console.log("Imagen response received:", JSON.stringify(imagenData, null, 2).substring(0, 500));
 
-    // Extract the image data from the response
-    const imagePart = imagenData.candidates?.[0]?.content?.parts?.find(
-      (part: { inlineData?: { mimeType: string; data: string } }) => part.inlineData
-    );
-
-    if (!imagePart?.inlineData?.data) {
+    // Extract the image data from the Imagen 3 response
+    const predictions = imagenData.predictions;
+    if (!predictions || predictions.length === 0 || !predictions[0].bytesBase64Encoded) {
       console.error("No image data in response:", JSON.stringify(imagenData, null, 2));
       throw new Error("No image data in Imagen response");
     }
 
-    const imageBase64 = imagePart.inlineData.data;
-    const mimeType = imagePart.inlineData.mimeType || "image/png";
+    const imageBase64 = predictions[0].bytesBase64Encoded;
+    const mimeType = predictions[0].mimeType || "image/png";
     
     // Convert base64 to Uint8Array
     const binaryString = atob(imageBase64);
