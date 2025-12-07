@@ -294,6 +294,18 @@ serve(async (req) => {
     console.log('=== OCTG Scraper Starting ===');
     console.log(`📅 Cutoff date for articles: ${CUTOFF_DATE.toISOString()} (${MAX_ARTICLE_AGE_DAYS} days ago)`);
 
+    // Parse request body for optional region filter
+    let regionFilter: string | null = null;
+    try {
+      const body = await req.json();
+      regionFilter = body?.region || null;
+      if (regionFilter) {
+        console.log(`🌍 Region filter requested: ${regionFilter}`);
+      }
+    } catch {
+      // No body or invalid JSON - scrape all regions
+    }
+
     // Auth check
     const cronSecret = Deno.env.get('CRON_SECRET');
     const authHeader = req.headers.get('Authorization');
@@ -344,12 +356,17 @@ serve(async (req) => {
       auth: { persistSession: false }
     });
 
-    // Fetch all active sources from database
-    const { data: sources, error: sourcesError } = await supabaseAdmin
+    // Fetch all active sources from database, optionally filtered by region
+    let sourcesQuery = supabaseAdmin
       .from('scrape_sources')
       .select('*')
-      .eq('is_active', true)
-      .order('priority', { ascending: true });
+      .eq('is_active', true);
+    
+    if (regionFilter && regionFilter !== 'all') {
+      sourcesQuery = sourcesQuery.eq('region', regionFilter);
+    }
+    
+    const { data: sources, error: sourcesError } = await sourcesQuery.order('priority', { ascending: true });
 
     if (sourcesError) {
       console.error('Error fetching sources:', sourcesError);

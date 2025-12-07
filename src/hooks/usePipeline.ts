@@ -65,9 +65,10 @@ export function useScrapeOctg() {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async () => {
+    mutationFn: async (region?: string) => {
       const { data, error } = await supabase.functions.invoke("scrape-octg", {
         method: "POST",
+        body: region ? { region } : {},
       });
       
       if (error) throw error;
@@ -77,7 +78,7 @@ export function useScrapeOctg() {
       queryClient.invalidateQueries({ queryKey: ["source-article-counts"] });
       toast({
         title: "Scraping Complete",
-        description: `Inserted ${data.inserted} new articles from ${data.sourcesSearched} sources.`,
+        description: `Inserted ${data.articlesInserted} new articles from ${data.sourcesProcessed} sources.`,
       });
     },
     onError: (error) => {
