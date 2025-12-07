@@ -2,6 +2,7 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Menu, X, Search } from "lucide-react";
 import { useState } from "react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const regions = [
   { name: "Americas", slug: "americas" },
@@ -42,6 +43,7 @@ export function Header() {
           <Button variant="ghost" size="icon" className="hidden sm:flex">
             <Search className="h-5 w-5" />
           </Button>
+          <ThemeToggle />
           <Link to="/auth" className="hidden sm:block">
             <Button variant="outline" size="sm">Sign In</Button>
           </Link>

@@ -151,7 +151,7 @@ const Article = () => {
           <section className="relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-transparent z-10" />
             <div 
-              className="absolute inset-0 opacity-50"
+              className="absolute inset-0 opacity-40 dark:opacity-50"
               style={{
                 backgroundImage: `url(${sampleArticle.heroImage})`,
                 backgroundSize: 'cover',
@@ -241,7 +241,7 @@ const Article = () => {
               {/* Article Body */}
               <div className="lg:col-span-2">
                 <article 
-                  className="prose prose-invert prose-lg max-w-none
+                  className="prose dark:prose-invert prose-lg max-w-none
                     prose-headings:font-display prose-headings:font-bold prose-headings:tracking-tight prose-headings:text-foreground
                     prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-4
                     prose-p:text-foreground/85 prose-p:leading-relaxed
