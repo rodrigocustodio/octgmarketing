@@ -21,7 +21,7 @@ export function Header() {
         <Link to="/" className="flex items-center gap-2">
           <div>
             <span className="font-display text-xl font-bold tracking-tight">OCTG</span>
-            <span className="ml-1 text-sm text-muted-foreground">Marketing</span>
+            <span className="ml-1 text-xl text-muted-foreground">Marketing</span>
           </div>
         </Link>
 
