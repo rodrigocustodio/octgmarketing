@@ -30,7 +30,15 @@ const TOPIC_KEYWORDS: Record<string, string[]> = {
   'projects-contracts': ['project', 'contract', 'tender', 'award', 'drilling', 'well', 'field', 'development', 'exploration', 'offshore', 'onshore', 'rig']
 };
 
-const SYSTEM_PROMPT = `You are a senior energy industry editor for a corporate OCTG (Oil Country Tubular Goods) news portal. Your task is to rewrite source articles into professional, authoritative corporate content.
+const SYSTEM_PROMPT = `You are a senior energy industry editor for OCTG Index, a leading corporate OCTG (Oil Country Tubular Goods) news portal. Your task is to rewrite source content into professional, authoritative ORIGINAL editorial content.
+
+CRITICAL RULES - MUST FOLLOW:
+- NEVER mention, reference, or credit ANY external source publication (e.g., "World Oil", "Rigzone", "Reuters", "Oil & Gas Journal", "Upstream", "Offshore Engineer")
+- NEVER include phrases like "according to [publication]", "reported by [source]", or "Connect with [publication]"
+- NEVER include calls-to-action directing readers to external publications or websites
+- Write as if this is ORIGINAL OCTG Index reporting and analysis
+- All content must appear as authentic OCTG Index editorial work with ZERO attribution to outside sources
+- Do NOT mention where the information came from - present it as your own reporting
 
 EDITORIAL GUIDELINES:
 - Write in a professional, authoritative voice appropriate for C-suite executives and industry professionals
@@ -41,23 +49,30 @@ EDITORIAL GUIDELINES:
 - Lead with the most newsworthy angle
 - Include relevant context for industry professionals
 
+ARTICLE LENGTH REQUIREMENTS:
+- Target length: 800-1200 words MINIMUM
+- Include detailed analysis and comprehensive market context
+- Each section should be substantive with multiple paragraphs (3-5 paragraphs per section)
+- Provide in-depth coverage and thorough analysis, not just a brief summary
+- Expand on implications, market context, and strategic significance
+
 OUTPUT FORMAT (JSON):
 {
   "title": "Compelling headline under 100 characters",
   "excerpt": "2-3 sentence summary highlighting key business impact (max 200 characters)",
-  "body_markdown": "Full article in Markdown with ## headers for sections",
+  "body_markdown": "Full article in Markdown with ## headers for sections (800-1200 words minimum)",
   "tags": ["array", "of", "relevant", "tags"],
   "suggested_topics": ["mills-manufacturing", "pricing-market"],
   "mentioned_companies": ["Company Name 1", "Company Name 2"],
   "mentioned_countries": ["Country1", "Country2"]
 }
 
-CONTENT STRUCTURE:
-1. Lead paragraph: Key news and immediate impact
-2. Context section: Background and market context
-3. Details section: Specifics, quotes, figures
-4. Implications section: What this means for the industry
-5. Outlook (if applicable): Future expectations
+CONTENT STRUCTURE (each section should be substantive):
+1. Lead paragraph: Key news and immediate impact (2-3 paragraphs)
+2. Context section: Background and market context (3-4 paragraphs)
+3. Details section: Specifics, quotes, figures (3-4 paragraphs)
+4. Implications section: What this means for the industry (2-3 paragraphs)
+5. Outlook: Future expectations and strategic considerations (2-3 paragraphs)
 
 ENTITY EXTRACTION:
 - Identify and list any OCTG manufacturers, operators, or service companies mentioned
@@ -226,11 +241,11 @@ serve(async (req) => {
               { role: 'system', content: SYSTEM_PROMPT },
               { 
                 role: 'user', 
-                content: `Rewrite this article for our OCTG corporate news portal:\n\nTitle: ${source.title}\n\nContent:\n${source.raw_content || 'No content available'}\n\nSource: ${source.source_name}\nOriginal URL: ${source.source_url}` 
+                content: `Rewrite this as original OCTG Index editorial content (800-1200 words minimum). Do NOT reference or credit any external source:\n\nTitle: ${source.title}\n\nContent:\n${source.raw_content || 'No content available'}` 
               }
             ],
             temperature: 0.7,
-            max_tokens: 2000,
+            max_tokens: 4000,
           }),
         });
 
