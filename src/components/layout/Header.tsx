@@ -33,8 +33,8 @@ export function Header() {
               <Button variant="nav" size="sm">{region.name}</Button>
             </Link>
           ))}
-          <Link to="/map">
-            <Button variant="nav" size="sm">Asset Map</Button>
+          <Link to="/directory">
+            <Button variant="nav" size="sm">OCTG Directory</Button>
           </Link>
         </nav>
 
@@ -65,8 +65,8 @@ export function Header() {
                 <Button variant="nav" className="w-full justify-start">{region.name}</Button>
               </Link>
             ))}
-            <Link to="/map" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="nav" className="w-full justify-start">Asset Map</Button>
+            <Link to="/directory" onClick={() => setMobileMenuOpen(false)}>
+              <Button variant="nav" className="w-full justify-start">OCTG Directory</Button>
             </Link>
           </nav>
         </div>
