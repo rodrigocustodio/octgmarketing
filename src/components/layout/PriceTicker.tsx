@@ -57,11 +57,21 @@ function TickerSkeleton() {
 export function PriceTicker() {
   const { data: prices, isLoading } = useSteelPrices();
 
-  if (isLoading || !prices || prices.length === 0) {
+  if (isLoading) {
     return (
       <div className="sticky top-16 z-40 w-full border-b border-border bg-muted/30 backdrop-blur supports-[backdrop-filter]:bg-muted/20">
         <div className="h-8 flex items-center overflow-hidden">
           <TickerSkeleton />
+        </div>
+      </div>
+    );
+  }
+
+  if (!prices || prices.length === 0) {
+    return (
+      <div className="sticky top-16 z-40 w-full border-b border-border bg-muted/30 backdrop-blur supports-[backdrop-filter]:bg-muted/20">
+        <div className="h-8 flex items-center justify-center text-xs text-muted-foreground">
+          No price data available
         </div>
       </div>
     );

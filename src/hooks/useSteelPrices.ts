@@ -27,7 +27,9 @@ export function useSteelPrices() {
       if (error) throw error;
       return data as SteelPrice[];
     },
-    refetchInterval: 5 * 60 * 1000, // Refetch every 5 minutes
-    staleTime: 2 * 60 * 1000, // Consider data stale after 2 minutes
+    refetchInterval: 5 * 60 * 1000,
+    staleTime: 2 * 60 * 1000,
+    refetchOnMount: true,
+    refetchOnWindowFocus: true,
   });
 }
