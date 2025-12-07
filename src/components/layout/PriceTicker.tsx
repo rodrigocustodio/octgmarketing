@@ -26,9 +26,9 @@ function PriceItem({ symbol, price, change, changePercent, currency }: {
       </span>
       <span className={cn(
         "flex items-center gap-0.5 text-xs font-medium",
-        isPositive && "text-emerald-500",
-        isNegative && "text-red-500",
-        isNeutral && "text-muted-foreground"
+        isPositive && "text-emerald-400/70",
+        isNegative && "text-rose-400/70",
+        isNeutral && "text-muted-foreground/70"
       )}>
         {isPositive && <TrendingUp className="h-3 w-3" />}
         {isNegative && <TrendingDown className="h-3 w-3" />}
@@ -78,10 +78,10 @@ export function PriceTicker() {
   }
 
   return (
-    <div className="sticky top-16 z-40 w-full border-b border-border bg-muted/30 backdrop-blur supports-[backdrop-filter]:bg-muted/20">
-      <div className="h-8 flex items-center overflow-hidden">
+    <div className="sticky top-16 z-40 w-full border-b border-border/50 bg-muted/20 backdrop-blur-sm">
+      <div className="h-7 flex items-center overflow-hidden">
         <div className="ticker-wrapper">
-          <div className="ticker-content text-xs font-mono">
+          <div className="ticker-content text-[11px] font-mono text-muted-foreground">
             {/* Double the content for seamless loop */}
             {[...prices, ...prices].map((price, index) => (
               <PriceItem

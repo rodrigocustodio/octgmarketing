@@ -461,15 +461,15 @@
   @apply border-t-card !important;
 }
 
-/* Price Ticker Animation */
+/* Price Ticker Animation - Continuous scroll on all screens */
 .ticker-wrapper {
   @apply flex overflow-hidden;
   width: 100%;
 }
 
 .ticker-content {
-  @apply flex items-center;
-  animation: ticker-scroll 40s linear infinite;
+  @apply flex items-center gap-1;
+  animation: ticker-scroll 60s linear infinite;
 }
 
 .ticker-content:hover {
@@ -485,10 +485,22 @@
   }
 }
 
-/* Responsive ticker - no animation on larger screens */
+/* Responsive ticker speed adjustments */
+@media (max-width: 768px) {
+  .ticker-content {
+    animation-duration: 35s;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1279px) {
+  .ticker-content {
+    animation-duration: 45s;
+  }
+}
+
+/* Large screens - slower for readability with more content */
 @media (min-width: 1280px) {
   .ticker-content {
-    animation: none;
-    justify-content: center;
+    animation-duration: 60s;
   }
 }
