@@ -226,3 +226,88 @@ export function useRegions() {
     },
   });
 }
+
+export function useTopics() {
+  return useQuery({
+    queryKey: ["topics"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("topics")
+        .select("id, name, slug")
+        .order("name");
+
+      if (error) throw error;
+      return data;
+    },
+  });
+}
+
+export function useArticlesByTopic(topicSlug: string, limit?: number) {
+  return useQuery({
+    queryKey: ["articles-by-topic", topicSlug, limit],
+    queryFn: async () => {
+      // First get the topic ID
+      const { data: topic, error: topicError } = await supabase
+        .from("topics")
+        .select("id")
+        .eq("slug", topicSlug)
+        .maybeSingle();
+
+      if (topicError) throw topicError;
+      if (!topic) return [];
+
+      // Get article IDs linked to this topic
+      const { data: articleTopics, error: linkError } = await supabase
+        .from("article_topics")
+        .select("article_id")
+        .eq("topic_id", topic.id);
+
+      if (linkError) throw linkError;
+      if (!articleTopics || articleTopics.length === 0) return [];
+
+      const articleIds = articleTopics.map((at) => at.article_id);
+
+      let query = supabase
+        .from("articles")
+        .select(`
+          id,
+          title,
+          subtitle,
+          slug,
+          body,
+          hero_image_url,
+          publish_date,
+          status,
+          created_at,
+          region:regions(id, name, slug)
+        `)
+        .in("id", articleIds)
+        .in("status", ["published", "featured"])
+        .order("publish_date", { ascending: false });
+
+      if (limit) {
+        query = query.limit(limit);
+      }
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return data as ArticleWithRegion[];
+    },
+    enabled: !!topicSlug,
+  });
+}
+
+export function useCompanies() {
+  return useQuery({
+    queryKey: ["companies"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("companies")
+        .select("id, name, slug")
+        .order("name");
+
+      if (error) throw error;
+      return data;
+    },
+  });
+}

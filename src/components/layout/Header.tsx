@@ -41,9 +41,6 @@ export function Header() {
             <Search className="h-5 w-5" />
           </Button>
           <ThemeToggle />
-          <Link to="/auth" className="hidden sm:block">
-            <Button variant="outline" size="sm">Sign In</Button>
-          </Link>
           <Button
             variant="ghost"
             size="icon"
@@ -65,9 +62,6 @@ export function Header() {
             ))}
             <Link to="/map" onClick={() => setMobileMenuOpen(false)}>
               <Button variant="nav" className="w-full justify-start">Asset Map</Button>
-            </Link>
-            <Link to="/auth" onClick={() => setMobileMenuOpen(false)}>
-              <Button variant="outline" className="w-full mt-2">Sign In</Button>
             </Link>
           </nav>
         </div>
