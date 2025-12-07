@@ -90,7 +90,7 @@ export function Footer() {
             <span className="font-display font-bold tracking-tight">OCTG Index</span>
           </div>
           <p className="text-xs text-muted-foreground">
-            Part of OCTG Marketing Group
+            OCTG Marketing Group
           </p>
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} OCTG Index. All rights reserved.
