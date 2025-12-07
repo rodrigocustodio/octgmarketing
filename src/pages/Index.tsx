@@ -115,18 +115,27 @@ const Index = () => {
         {secondaryArticles.length > 0 && (
           <section className="container py-12">
             <div className="grid md:grid-cols-3 gap-6">
-              {secondaryArticles.map((article, index) => (
-                <div key={article.id} className={`animate-fade-in-up animation-delay-${(index + 1) * 100}`}>
-                  <ArticleCard
-                    title={article.title}
-                    subtitle={article.subtitle || undefined}
-                    imageUrl={article.hero_image_url || undefined}
-                    region={article.region?.name}
-                    date={formatArticleDate(article.publish_date)}
-                    slug={article.slug}
-                  />
-                </div>
-              ))}
+              {secondaryArticles.map((article, index) => {
+                const placeholderImages = [
+                  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80",
+                  "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&q=80",
+                  "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=800&q=80",
+                ];
+                const imageUrl = article.hero_image_url || placeholderImages[index % placeholderImages.length];
+                
+                return (
+                  <div key={article.id} className={`animate-fade-in-up animation-delay-${(index + 1) * 100}`}>
+                    <ArticleCard
+                      title={article.title}
+                      subtitle={article.subtitle || undefined}
+                      imageUrl={imageUrl}
+                      region={article.region?.name}
+                      date={formatArticleDate(article.publish_date)}
+                      slug={article.slug}
+                    />
+                  </div>
+                );
+              })}
             </div>
           </section>
         )}
