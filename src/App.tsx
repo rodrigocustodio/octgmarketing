@@ -11,6 +11,7 @@ import Index from "./pages/Index";
 import Article from "./pages/Article";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/admin/Dashboard";
+import Pipeline from "./pages/admin/Pipeline";
 import Sources from "./pages/admin/Sources";
 import Drafts from "./pages/admin/Drafts";
 import DraftDetail from "./pages/admin/DraftDetail";
@@ -35,6 +36,7 @@ const App = () => (
                 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/admin/pipeline" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
                 <Route path="/admin/sources" element={<ProtectedRoute><Sources /></ProtectedRoute>} />
                 <Route path="/admin/drafts" element={<ProtectedRoute><Drafts /></ProtectedRoute>} />
                 <Route path="/admin/drafts/:id" element={<ProtectedRoute><DraftDetail /></ProtectedRoute>} />
