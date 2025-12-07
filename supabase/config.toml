@@ -2,3 +2,6 @@ project_id = "mlhngmnuxoetnlesnxgu"
 
 [functions.scrape-octg]
 verify_jwt = false
+
+[functions.generate-drafts]
+verify_jwt = false
