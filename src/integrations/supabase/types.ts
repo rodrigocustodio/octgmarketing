@@ -256,6 +256,69 @@ export type Database = {
         }
         Relationships: []
       }
+      draft_articles: {
+        Row: {
+          body_markdown: string | null
+          created_at: string
+          editor_notes: string | null
+          excerpt: string | null
+          hero_image_url: string | null
+          id: string
+          region_id: string | null
+          slug: string
+          source_article_id: string | null
+          status: Database["public"]["Enums"]["draft_article_status"]
+          tags: Json | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          body_markdown?: string | null
+          created_at?: string
+          editor_notes?: string | null
+          excerpt?: string | null
+          hero_image_url?: string | null
+          id?: string
+          region_id?: string | null
+          slug: string
+          source_article_id?: string | null
+          status?: Database["public"]["Enums"]["draft_article_status"]
+          tags?: Json | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          body_markdown?: string | null
+          created_at?: string
+          editor_notes?: string | null
+          excerpt?: string | null
+          hero_image_url?: string | null
+          id?: string
+          region_id?: string | null
+          slug?: string
+          source_article_id?: string | null
+          status?: Database["public"]["Enums"]["draft_article_status"]
+          tags?: Json | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "draft_articles_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "draft_articles_source_article_id_fkey"
+            columns: ["source_article_id"]
+            isOneToOne: false
+            referencedRelation: "source_articles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           email: string
@@ -334,6 +397,62 @@ export type Database = {
         }
         Relationships: []
       }
+      source_articles: {
+        Row: {
+          created_at: string
+          id: string
+          image_url: string | null
+          language: string
+          meta: Json | null
+          raw_content: string | null
+          region_id: string | null
+          scraped_at: string
+          source_name: string
+          source_url: string
+          status: Database["public"]["Enums"]["source_article_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          language?: string
+          meta?: Json | null
+          raw_content?: string | null
+          region_id?: string | null
+          scraped_at?: string
+          source_name: string
+          source_url: string
+          status?: Database["public"]["Enums"]["source_article_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          image_url?: string | null
+          language?: string
+          meta?: Json | null
+          raw_content?: string | null
+          region_id?: string | null
+          scraped_at?: string
+          source_name?: string
+          source_url?: string
+          status?: Database["public"]["Enums"]["source_article_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "source_articles_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       topics: {
         Row: {
           created_at: string
@@ -403,6 +522,8 @@ export type Database = {
       article_status: "draft" | "published" | "featured"
       asset_status: "active" | "construction" | "idle" | "decommissioned"
       asset_type: "mill" | "yard" | "rig" | "port" | "coating" | "inspection"
+      draft_article_status: "pending_review" | "approved" | "rejected"
+      source_article_status: "new" | "processed" | "failed"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -534,6 +655,8 @@ export const Constants = {
       article_status: ["draft", "published", "featured"],
       asset_status: ["active", "construction", "idle", "decommissioned"],
       asset_type: ["mill", "yard", "rig", "port", "coating", "inspection"],
+      draft_article_status: ["pending_review", "approved", "rejected"],
+      source_article_status: ["new", "processed", "failed"],
     },
   },
 } as const
