@@ -204,28 +204,15 @@ const Article = () => {
                 {sampleArticle.subtitle}
               </p>
 
-              {/* Author & Meta */}
-              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                <div className="flex items-center gap-2">
-                  <img 
-                    src={sampleArticle.author.avatar} 
-                    alt={sampleArticle.author.name}
-                    className="w-10 h-10 rounded-full object-cover border-2 border-accent/30"
-                  />
-                  <div>
-                    <p className="font-medium text-foreground">{sampleArticle.author.name}</p>
-                    <p className="text-xs">{sampleArticle.author.role}</p>
-                  </div>
+              {/* Meta */}
+              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1">
+                  <Calendar className="h-4 w-4" />
+                  <span>{sampleArticle.publishDate}</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="flex items-center gap-1">
-                    <Calendar className="h-4 w-4" />
-                    <span>{sampleArticle.publishDate}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Clock className="h-4 w-4" />
-                    <span>{sampleArticle.readingTime}</span>
-                  </div>
+                <div className="flex items-center gap-1">
+                  <Clock className="h-4 w-4" />
+                  <span>{sampleArticle.readingTime}</span>
                 </div>
               </div>
             </div>
@@ -240,6 +227,25 @@ const Article = () => {
                   className="article-content max-w-none"
                   dangerouslySetInnerHTML={{ __html: sampleArticle.body }}
                 />
+
+                {/* Author Signature */}
+                <div className="mt-12 pt-8 border-t border-border">
+                  <div className="flex items-center gap-4">
+                    <img 
+                      src={sampleArticle.author.avatar} 
+                      alt={sampleArticle.author.name}
+                      className="w-16 h-16 rounded-full object-cover border-2 border-accent/30"
+                    />
+                    <div>
+                      <p className="font-display font-semibold text-foreground text-lg">
+                        {sampleArticle.author.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {sampleArticle.author.role}
+                      </p>
+                    </div>
+                  </div>
+                </div>
 
                 {/* Companies Mentioned */}
                 {sampleArticle.companies.length > 0 && (
