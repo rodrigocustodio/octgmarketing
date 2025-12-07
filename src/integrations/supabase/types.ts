@@ -225,36 +225,65 @@ export type Database = {
           country: string | null
           created_at: string
           description: string | null
+          email: string | null
+          headquarters: string | null
           id: string
+          industry_role: Database["public"]["Enums"]["company_role"] | null
           logo_url: string | null
           name: string
+          notes: string | null
+          phone: string | null
+          region_id: string | null
           slug: string
           updated_at: string
           website: string | null
+          year_founded: number | null
         }
         Insert: {
           country?: string | null
           created_at?: string
           description?: string | null
+          email?: string | null
+          headquarters?: string | null
           id?: string
+          industry_role?: Database["public"]["Enums"]["company_role"] | null
           logo_url?: string | null
           name: string
+          notes?: string | null
+          phone?: string | null
+          region_id?: string | null
           slug: string
           updated_at?: string
           website?: string | null
+          year_founded?: number | null
         }
         Update: {
           country?: string | null
           created_at?: string
           description?: string | null
+          email?: string | null
+          headquarters?: string | null
           id?: string
+          industry_role?: Database["public"]["Enums"]["company_role"] | null
           logo_url?: string | null
           name?: string
+          notes?: string | null
+          phone?: string | null
+          region_id?: string | null
           slug?: string
           updated_at?: string
           website?: string | null
+          year_founded?: number | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "companies_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       draft_articles: {
         Row: {
@@ -612,6 +641,14 @@ export type Database = {
       article_status: "draft" | "published" | "featured"
       asset_status: "active" | "construction" | "idle" | "decommissioned"
       asset_type: "mill" | "yard" | "rig" | "port" | "coating" | "inspection"
+      company_role:
+        | "mill"
+        | "yard"
+        | "inspection"
+        | "drilling"
+        | "logistics"
+        | "software"
+        | "trading"
       draft_article_status: "pending_review" | "approved" | "rejected"
       source_article_status: "new" | "processed" | "failed"
     }
@@ -745,6 +782,15 @@ export const Constants = {
       article_status: ["draft", "published", "featured"],
       asset_status: ["active", "construction", "idle", "decommissioned"],
       asset_type: ["mill", "yard", "rig", "port", "coating", "inspection"],
+      company_role: [
+        "mill",
+        "yard",
+        "inspection",
+        "drilling",
+        "logistics",
+        "software",
+        "trading",
+      ],
       draft_article_status: ["pending_review", "approved", "rejected"],
       source_article_status: ["new", "processed", "failed"],
     },

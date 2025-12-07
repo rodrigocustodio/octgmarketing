@@ -23,6 +23,10 @@ import Articles from "./pages/admin/Articles";
 import ArticleEdit from "./pages/admin/ArticleEdit";
 import Settings from "./pages/admin/Settings";
 import NotFound from "./pages/NotFound";
+import Directory from "./pages/Directory";
+import DirectoryRegion from "./pages/DirectoryRegion";
+import DirectoryCategory from "./pages/DirectoryCategory";
+import CompanyDetail from "./pages/CompanyDetail";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +45,10 @@ const App = () => (
                 <Route path="/article/:slug" element={<Article />} />
                 <Route path="/region/:slug" element={<Region />} />
                 <Route path="/topic/:slug" element={<Topic />} />
+                <Route path="/directory" element={<Directory />} />
+                <Route path="/directory/region/:slug" element={<DirectoryRegion />} />
+                <Route path="/directory/category/:slug" element={<DirectoryCategory />} />
+                <Route path="/directory/company/:slug" element={<CompanyDetail />} />
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Admin Routes */}
