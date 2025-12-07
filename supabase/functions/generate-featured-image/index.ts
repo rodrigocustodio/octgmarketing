@@ -43,7 +43,7 @@ serve(async (req) => {
     console.log(`Article title: ${title}`);
 
     // Step 1: Use Gemini to analyze article and create a photorealistic prompt
-    const analysisPrompt = `You are a professional photo editor for an oil & gas industry news publication (OCTG Marketing).
+    const analysisPrompt = `You are a professional photo editor for an oil & gas industry news publication (OCTG Index).
 
 Analyze this article and create a highly detailed image generation prompt for a REALISTIC, EDITORIAL-STYLE photograph to illustrate it.
 

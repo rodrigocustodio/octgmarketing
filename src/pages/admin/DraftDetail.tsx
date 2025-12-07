@@ -413,7 +413,7 @@ const DraftDetail = () => {
             <CardHeader>
               <CardTitle className="text-lg">AI-Generated Draft</CardTitle>
               <CardDescription>
-                Rewritten for OCTG Marketing
+                Rewritten for OCTG Index
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">

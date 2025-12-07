@@ -102,7 +102,7 @@ const Article = () => {
   return (
     <>
       <Helmet>
-        <title>{article.title} | OCTG Marketing</title>
+        <title>{article.title} | OCTG Index</title>
         <meta name="description" content={article.subtitle || ""} />
         <link rel="canonical" href={currentUrl} />
         <meta property="og:title" content={article.title} />
@@ -110,7 +110,7 @@ const Article = () => {
         <meta property="og:image" content={article.hero_image_url || heroImage} />
         <meta property="og:url" content={currentUrl} />
         <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="OCTG Marketing" />
+        <meta property="og:site_name" content="OCTG Index" />
         <meta property="article:published_time" content={article.publish_date || ""} />
         {article.region && <meta property="article:section" content={article.region.name} />}
         <meta name="twitter:card" content="summary_large_image" />
