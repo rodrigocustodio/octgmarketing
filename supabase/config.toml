@@ -20,3 +20,6 @@ verify_jwt = false
 
 [functions.migrate-to-bunny]
 verify_jwt = false
+
+[functions.search-topic]
+verify_jwt = false
