@@ -130,21 +130,32 @@ function detectRegion(content: string, regions: Array<{ id: string; slug: string
 
 function detectTopics(content: string, topics: Array<{ id: string; slug: string }>): string[] {
   const lowerContent = content.toLowerCase();
-  const detectedTopicIds: string[] = [];
+  const topicScores: Array<{ topicId: string; score: number }> = [];
   
   for (const [topicSlug, keywords] of Object.entries(TOPIC_KEYWORDS)) {
+    let score = 0;
+    
+    // Count how many keywords match for this topic
     for (const keyword of keywords) {
       if (lowerContent.includes(keyword)) {
-        const topic = topics.find(t => t.slug === topicSlug);
-        if (topic && !detectedTopicIds.includes(topic.id)) {
-          detectedTopicIds.push(topic.id);
-        }
-        break;
+        score++;
+      }
+    }
+    
+    // Only consider topics with at least 2 keyword matches
+    if (score >= 2) {
+      const topic = topics.find(t => t.slug === topicSlug);
+      if (topic) {
+        topicScores.push({ topicId: topic.id, score });
       }
     }
   }
   
-  return detectedTopicIds;
+  // Sort by score (highest first) and take top 2
+  topicScores.sort((a, b) => b.score - a.score);
+  
+  // Return maximum 2 topic IDs
+  return topicScores.slice(0, 2).map(ts => ts.topicId);
 }
 
 serve(async (req) => {
