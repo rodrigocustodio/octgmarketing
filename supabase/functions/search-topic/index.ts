@@ -51,38 +51,156 @@ function detectRegion(content: string): string | null {
   return null;
 }
 
-// Extract publication date from metadata
-function extractPublishDate(metadata: Record<string, unknown> | undefined): Date | null {
-  if (!metadata) return null;
+// Extract publication date from metadata AND content
+function extractPublishDate(
+  metadata: Record<string, unknown> | undefined,
+  content?: string,
+  url?: string
+): Date | null {
+  // 1. Check metadata fields first (most reliable)
+  if (metadata) {
+    const dateFields = [
+      'publishedTime',
+      'article:published_time',
+      'og:article:published_time',
+      'datePublished',
+      'date',
+      'pubDate',
+      'published',
+      'created',
+    ];
+    
+    for (const field of dateFields) {
+      const value = metadata[field];
+      if (value && typeof value === 'string') {
+        const parsed = new Date(value);
+        if (!isNaN(parsed.getTime())) {
+          console.log(`📅 Date from metadata field "${field}": ${parsed.toISOString()}`);
+          return parsed;
+        }
+      }
+    }
+  }
   
-  const dateFields = [
-    'publishedTime',
-    'article:published_time',
-    'og:article:published_time',
-    'datePublished',
-    'date',
-    'pubDate',
-    'published',
-    'created',
-  ];
-  
-  for (const field of dateFields) {
-    const value = metadata[field];
-    if (value && typeof value === 'string') {
-      const parsed = new Date(value);
+  // 2. Check URL for date patterns
+  if (url) {
+    // Pattern: /2023/10/02/ or /2023-10-02/ in URL path
+    const urlDateMatch = url.match(/\/(\d{4})[-\/](\d{1,2})[-\/](\d{1,2})/);
+    if (urlDateMatch) {
+      const parsed = new Date(
+        parseInt(urlDateMatch[1]),
+        parseInt(urlDateMatch[2]) - 1,
+        parseInt(urlDateMatch[3])
+      );
       if (!isNaN(parsed.getTime())) {
+        console.log(`📅 Date from URL pattern: ${parsed.toISOString()}`);
         return parsed;
       }
     }
   }
   
+  // 3. Check content for visible date patterns
+  if (content) {
+    // Pattern: YYYY.MM.DD (Japanese/corporate style) - e.g., "2023.10.2" or "2023.10.02"
+    const jpDateMatch = content.match(/(\d{4})\.(\d{1,2})\.(\d{1,2})/);
+    if (jpDateMatch) {
+      const parsed = new Date(
+        parseInt(jpDateMatch[1]),
+        parseInt(jpDateMatch[2]) - 1,
+        parseInt(jpDateMatch[3])
+      );
+      if (!isNaN(parsed.getTime())) {
+        console.log(`📅 Date from YYYY.MM.DD pattern: ${parsed.toISOString()}`);
+        return parsed;
+      }
+    }
+    
+    // Pattern: "Published: Month DD, YYYY" or "Published in Month YYYY"
+    const publishedMatch = content.match(/[Pp]ublished(?:\s+(?:on|in))?\s*:?\s*(\w+\s+\d{1,2},?\s+\d{4}|\w+\s+\d{4})/);
+    if (publishedMatch) {
+      const parsed = new Date(publishedMatch[1]);
+      if (!isNaN(parsed.getTime())) {
+        console.log(`📅 Date from "Published" pattern: ${parsed.toISOString()}`);
+        return parsed;
+      }
+    }
+    
+    // Pattern: "Month DD, YYYY" near the start of content (first 500 chars)
+    const contentStart = content.substring(0, 500);
+    const datePatternMatch = contentStart.match(/(January|February|March|April|May|June|July|August|September|October|November|December)\s+\d{1,2},?\s+\d{4}/i);
+    if (datePatternMatch) {
+      const parsed = new Date(datePatternMatch[0]);
+      if (!isNaN(parsed.getTime())) {
+        console.log(`📅 Date from "Month DD, YYYY" pattern: ${parsed.toISOString()}`);
+        return parsed;
+      }
+    }
+    
+    // Pattern: DD Month YYYY (European style) - e.g., "2 October 2023"
+    const euDateMatch = contentStart.match(/(\d{1,2})\s+(January|February|March|April|May|June|July|August|September|October|November|December)\s+(\d{4})/i);
+    if (euDateMatch) {
+      const parsed = new Date(`${euDateMatch[2]} ${euDateMatch[1]}, ${euDateMatch[3]}`);
+      if (!isNaN(parsed.getTime())) {
+        console.log(`📅 Date from "DD Month YYYY" pattern: ${parsed.toISOString()}`);
+        return parsed;
+      }
+    }
+    
+    // Pattern: YYYY-MM-DD (ISO format)
+    const isoMatch = content.match(/(\d{4})-(\d{2})-(\d{2})/);
+    if (isoMatch) {
+      const parsed = new Date(isoMatch[0]);
+      if (!isNaN(parsed.getTime())) {
+        console.log(`📅 Date from ISO pattern: ${parsed.toISOString()}`);
+        return parsed;
+      }
+    }
+    
+    // Pattern: DD/MM/YYYY or MM/DD/YYYY (assume MM/DD/YYYY for US sites)
+    const slashDateMatch = contentStart.match(/(\d{1,2})\/(\d{1,2})\/(\d{4})/);
+    if (slashDateMatch) {
+      // Assume MM/DD/YYYY format
+      const parsed = new Date(
+        parseInt(slashDateMatch[3]),
+        parseInt(slashDateMatch[1]) - 1,
+        parseInt(slashDateMatch[2])
+      );
+      if (!isNaN(parsed.getTime())) {
+        console.log(`📅 Date from MM/DD/YYYY pattern: ${parsed.toISOString()}`);
+        return parsed;
+      }
+    }
+  }
+  
+  console.log(`⚠️ No date found for article`);
   return null;
 }
 
+interface FreshnessResult {
+  fresh: boolean;
+  uncertain: boolean;
+  reason: string;
+}
+
 // Check if article is within freshness window
-function isArticleFresh(publishDate: Date | null): boolean {
-  if (!publishDate) return true; // Accept if no date found
-  return publishDate >= CUTOFF_DATE;
+function isArticleFresh(publishDate: Date | null): FreshnessResult {
+  if (!publishDate) {
+    // CRITICAL FIX: Unknown dates are now rejected by default
+    return { 
+      fresh: false, 
+      uncertain: true, 
+      reason: 'No publication date found - rejecting to prevent old content' 
+    };
+  }
+  
+  const isFresh = publishDate >= CUTOFF_DATE;
+  return { 
+    fresh: isFresh, 
+    uncertain: false, 
+    reason: isFresh 
+      ? `Fresh: ${publishDate.toISOString()}` 
+      : `Old: ${publishDate.toISOString()} (before ${CUTOFF_DATE.toISOString()})` 
+  };
 }
 
 interface FirecrawlSearchResult {
@@ -231,10 +349,14 @@ serve(async (req) => {
       articlesInserted: 0,
       duplicatesSkipped: 0,
       filteredByDate: 0,
+      filteredByUnknownDate: 0,
       filteredByContent: 0,
     };
 
     for (const result of searchResult.data) {
+      console.log(`\n--- Processing: ${result.title} ---`);
+      console.log(`URL: ${result.url}`);
+      
       // Skip duplicates
       if (existingUrls.has(result.url)) {
         console.log(`⏭️ Skipping duplicate: ${result.url}`);
@@ -249,13 +371,22 @@ serve(async (req) => {
         continue;
       }
 
-      // Check date freshness
-      const publishDate = extractPublishDate(result.metadata);
-      if (!isArticleFresh(publishDate)) {
-        console.log(`⏭️ Skipping old article: ${result.url} (${publishDate?.toISOString()})`);
-        results.filteredByDate++;
+      // Check date freshness with enhanced extraction (now includes content parsing)
+      const publishDate = extractPublishDate(result.metadata, result.markdown, result.url);
+      const freshness = isArticleFresh(publishDate);
+      
+      if (!freshness.fresh) {
+        if (freshness.uncertain) {
+          console.log(`⏭️ Skipping article with unknown date: ${result.url} - ${freshness.reason}`);
+          results.filteredByUnknownDate++;
+        } else {
+          console.log(`⏭️ Skipping old article: ${result.url} - ${freshness.reason}`);
+          results.filteredByDate++;
+        }
         continue;
       }
+      
+      console.log(`✅ Date check passed: ${freshness.reason}`);
 
       // Detect region from content
       const regionId = detectRegion(result.markdown || result.title || '');
@@ -280,6 +411,7 @@ serve(async (req) => {
           meta: {
             search_query: query,
             description: result.description,
+            detected_publish_date: publishDate?.toISOString(),
             ...(result.metadata || {}),
           },
         });
@@ -298,7 +430,7 @@ serve(async (req) => {
     }
 
     console.log('\n=== Topic Search Complete ===');
-    console.log(`📊 Results: ${results.articlesInserted} inserted, ${results.duplicatesSkipped} duplicates, ${results.filteredByDate} filtered by date`);
+    console.log(`📊 Results: ${results.articlesInserted} inserted, ${results.duplicatesSkipped} duplicates, ${results.filteredByDate} old, ${results.filteredByUnknownDate} unknown date`);
 
     return new Response(JSON.stringify({
       success: true,
