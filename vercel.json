@@ -1,0 +1,19 @@
+{
+  "rewrites": [
+    {
+      "source": "/og/:path*",
+      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/:path*"
+    }
+  ],
+  "headers": [
+    {
+      "source": "/og/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        }
+      ]
+    }
+  ]
+}

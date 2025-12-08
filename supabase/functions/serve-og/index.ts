@@ -40,7 +40,7 @@ function generateOgHtml(article: {
   hero_image_url: string | null;
   slug: string;
   region?: { name: string } | null;
-}): string {
+}, isCrawlerRequest: boolean): string {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
   const canonicalUrl = `${siteUrl}/article/${article.slug}`;
   
@@ -56,8 +56,15 @@ function generateOgHtml(article: {
   const siteName = "OCTG Index";
   const regionText = article.region?.name ? ` | ${article.region.name}` : "";
 
+  // For crawlers: NO redirect - just serve the meta tags and let them scrape
+  // For humans: include redirect to the actual article page
+  const redirectScript = isCrawlerRequest 
+    ? '' 
+    : `<script>window.location.replace("${canonicalUrl}");</script>
+  <noscript><meta http-equiv="refresh" content="0;url=${canonicalUrl}"></noscript>`;
+
   return `<!DOCTYPE html>
-<html lang="en">
+<html lang="en" prefix="og: http://ogp.me/ns#">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -73,35 +80,36 @@ function generateOgHtml(article: {
   <meta property="og:title" content="${article.title}">
   <meta property="og:description" content="${description}">
   <meta property="og:image" content="${imageUrl}">
+  <meta property="og:image:secure_url" content="${imageUrl}">
+  <meta property="og:image:type" content="image/png">
   <meta property="og:image:width" content="1200">
   <meta property="og:image:height" content="630">
   <meta property="og:site_name" content="${siteName}">
+  <meta property="og:locale" content="en_US">
   
   <!-- Twitter -->
-  <meta property="twitter:card" content="summary_large_image">
-  <meta property="twitter:url" content="${canonicalUrl}">
-  <meta property="twitter:title" content="${article.title}">
-  <meta property="twitter:description" content="${description}">
-  <meta property="twitter:image" content="${imageUrl}">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:url" content="${canonicalUrl}">
+  <meta name="twitter:title" content="${article.title}">
+  <meta name="twitter:description" content="${description}">
+  <meta name="twitter:image" content="${imageUrl}">
   
   <!-- LinkedIn specific -->
   <meta property="og:image:alt" content="${article.title}${regionText}">
+  <meta name="author" content="${siteName}">
   
   <!-- Canonical URL -->
   <link rel="canonical" href="${canonicalUrl}">
   
-  <!-- Redirect for humans (JavaScript) -->
-  <script>
-    window.location.href = "${canonicalUrl}";
-  </script>
-  <noscript>
-    <meta http-equiv="refresh" content="0;url=${canonicalUrl}">
-  </noscript>
+  ${redirectScript}
 </head>
 <body>
-  <h1>${article.title}</h1>
-  <p>${description}</p>
-  <p>Redirecting to <a href="${canonicalUrl}">${canonicalUrl}</a>...</p>
+  <article>
+    <h1>${article.title}</h1>
+    <p>${description}</p>
+    <img src="${imageUrl}" alt="${article.title}" />
+    <p><a href="${canonicalUrl}">Read full article at ${siteName}</a></p>
+  </article>
 </body>
 </html>`;
 }
@@ -206,13 +214,13 @@ serve(async (req: Request): Promise<Response> => {
     }
 
     const userAgent = req.headers.get("user-agent");
+    const crawlerRequest = isCrawler(userAgent);
     console.log(`[serve-og] User-Agent: ${userAgent?.slice(0, 100)}`);
-    console.log(`[serve-og] Is Crawler: ${isCrawler(userAgent)}`);
+    console.log(`[serve-og] Is Crawler: ${crawlerRequest}`);
 
-    // For crawlers: return HTML with OG tags
-    // For humans: also return HTML (it includes JS redirect)
-    // This ensures crawlers always get the meta tags
-    const html = generateOgHtml(articleWithRegion);
+    // For crawlers: return HTML with OG tags (no redirect)
+    // For humans: also return HTML (includes JS redirect)
+    const html = generateOgHtml(articleWithRegion, crawlerRequest);
     
     return new Response(html, {
       headers: { 
