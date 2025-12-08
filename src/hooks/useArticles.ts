@@ -311,3 +311,72 @@ export function useCompanies() {
     },
   });
 }
+
+export interface ArticleWithTopics extends ArticleWithRegion {
+  topics?: { id: string; name: string; slug: string }[];
+}
+
+export function useHomepageArticles() {
+  return useQuery({
+    queryKey: ["homepage-articles"],
+    queryFn: async () => {
+      // Fetch all published articles
+      const { data: articles, error: articlesError } = await supabase
+        .from("articles")
+        .select(`
+          id,
+          title,
+          subtitle,
+          slug,
+          body,
+          hero_image_url,
+          publish_date,
+          status,
+          created_at,
+          region:regions(id, name, slug)
+        `)
+        .in("status", ["published", "featured"])
+        .order("publish_date", { ascending: false, nullsFirst: false });
+
+      if (articlesError) throw articlesError;
+      if (!articles) return [];
+
+      // Fetch article-topic relationships for all articles
+      const articleIds = articles.map(a => a.id);
+      const { data: articleTopics, error: topicsError } = await supabase
+        .from("article_topics")
+        .select("article_id, topic_id")
+        .in("article_id", articleIds);
+
+      if (topicsError) throw topicsError;
+
+      // Fetch all topics
+      const { data: topics, error: allTopicsError } = await supabase
+        .from("topics")
+        .select("id, name, slug");
+
+      if (allTopicsError) throw allTopicsError;
+
+      // Create topic lookup map
+      const topicMap = new Map(topics?.map(t => [t.id, t]) || []);
+
+      // Attach topics to articles
+      const articlesWithTopics: ArticleWithTopics[] = articles.map(article => {
+        const articleTopicIds = articleTopics
+          ?.filter(at => at.article_id === article.id)
+          .map(at => at.topic_id) || [];
+        
+        const articleTopicsList = articleTopicIds
+          .map(id => topicMap.get(id))
+          .filter((t): t is { id: string; name: string; slug: string } => !!t);
+
+        return {
+          ...article,
+          topics: articleTopicsList,
+        } as ArticleWithTopics;
+      });
+
+      return articlesWithTopics;
+    },
+  });
+}

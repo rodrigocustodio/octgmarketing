@@ -5,9 +5,8 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight, Factory, TrendingUp, MapPin } from "lucide-react";
 import { format } from "date-fns";
 import heroImage from "@/assets/hero-octg.jpg";
-import { useArticlesByTopic } from "@/hooks/useArticles";
-import { Skeleton } from "@/components/ui/skeleton";
 import { LucideIcon } from "lucide-react";
+import { ArticleWithTopics } from "@/hooks/useArticles";
 
 const topicConfig: { slug: string; name: string; icon: LucideIcon }[] = [
   { slug: "mills-manufacturing", name: "Mills & Manufacturing", icon: Factory },
@@ -24,32 +23,15 @@ function formatDate(dateString: string | null): string {
   }
 }
 
-function TopicRowSkeleton() {
-  return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <Skeleton className="h-9 w-9 rounded-lg" />
-        <Skeleton className="h-6 w-48" />
-      </div>
-      <div className="grid md:grid-cols-2 gap-4">
-        <Skeleton className="h-48 rounded-lg" />
-        <Skeleton className="h-48 rounded-lg" />
-      </div>
-    </div>
-  );
-}
-
 interface TopicRowProps {
   slug: string;
   name: string;
   icon: LucideIcon;
+  articles: ArticleWithTopics[];
 }
 
-function TopicRow({ slug, name, icon: Icon }: TopicRowProps) {
-  const { data: articles, isLoading } = useArticlesByTopic(slug, 2);
-
-  if (isLoading) return <TopicRowSkeleton />;
-  if (!articles || articles.length === 0) return null;
+function TopicRow({ slug, name, icon: Icon, articles }: TopicRowProps) {
+  if (articles.length === 0) return null;
 
   return (
     <div className="space-y-4">
@@ -98,7 +80,30 @@ function TopicRow({ slug, name, icon: Icon }: TopicRowProps) {
   );
 }
 
-export function TopicRows() {
+interface TopicRowsProps {
+  articles: ArticleWithTopics[];
+  usedIds: Set<string>;
+}
+
+export function TopicRows({ articles, usedIds }: TopicRowsProps) {
+  // For each topic, find articles that have this topic and haven't been used yet
+  const getArticlesForTopic = (topicSlug: string, count: number): ArticleWithTopics[] => {
+    const result: ArticleWithTopics[] = [];
+    
+    for (const article of articles) {
+      if (usedIds.has(article.id)) continue;
+      
+      const hasTopics = article.topics?.some(t => t.slug === topicSlug);
+      if (hasTopics) {
+        result.push(article);
+        usedIds.add(article.id); // Mark as used
+        if (result.length >= count) break;
+      }
+    }
+    
+    return result;
+  };
+
   return (
     <section className="container py-12">
       <div className="flex items-center justify-between mb-8">
@@ -110,7 +115,13 @@ export function TopicRows() {
 
       <div className="space-y-10">
         {topicConfig.map((topic) => (
-          <TopicRow key={topic.slug} {...topic} />
+          <TopicRow 
+            key={topic.slug} 
+            slug={topic.slug}
+            name={topic.name}
+            icon={topic.icon}
+            articles={getArticlesForTopic(topic.slug, 2)}
+          />
         ))}
       </div>
     </section>

@@ -1,3 +1,4 @@
+import { useMemo } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { ArticleCard } from "@/components/articles/ArticleCard";
@@ -8,7 +9,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-octg.jpg";
-import { usePublishedArticles } from "@/hooks/useArticles";
+import { useHomepageArticles, ArticleWithTopics } from "@/hooks/useArticles";
 import { format } from "date-fns";
 import { BreakingNewsRow } from "@/components/home/BreakingNewsRow";
 import { IndustryFocusMasonry } from "@/components/home/IndustryFocusMasonry";
@@ -25,16 +26,113 @@ function formatArticleDate(dateString: string | null): string {
   }
 }
 
-const Index = () => {
-  const { data: articles, isLoading } = usePublishedArticles();
+// Helper to get next N unused articles
+function getUnusedArticles(
+  articles: ArticleWithTopics[],
+  usedIds: Set<string>,
+  count: number
+): ArticleWithTopics[] {
+  const result: ArticleWithTopics[] = [];
+  for (const article of articles) {
+    if (usedIds.has(article.id)) continue;
+    result.push(article);
+    usedIds.add(article.id);
+    if (result.length >= count) break;
+  }
+  return result;
+}
 
-  // Slice articles for different sections
-  const featuredArticle = articles?.[0];
-  const secondaryArticles = articles?.slice(1, 4) || [];
-  const breakingNewsArticles = articles?.slice(4, 7) || [];
-  const industryFocusArticles = articles?.slice(7, 12) || [];
-  const analysisArticles = articles?.slice(12, 19) || [];
-  const quickReadsArticles = articles?.slice(17, 21) || [];
+const Index = () => {
+  const { data: articles, isLoading } = useHomepageArticles();
+
+  // Memoize article distribution with deduplication
+  const { 
+    featuredArticle, 
+    secondaryArticles, 
+    breakingNewsArticles, 
+    industryFocusArticles,
+    topicRowsArticles,
+    analysisArticles,
+    quickReadsArticles,
+    usedIds 
+  } = useMemo(() => {
+    if (!articles || articles.length === 0) {
+      return {
+        featuredArticle: null,
+        secondaryArticles: [],
+        breakingNewsArticles: [],
+        industryFocusArticles: [],
+        topicRowsArticles: [],
+        analysisArticles: [],
+        quickReadsArticles: [],
+        usedIds: new Set<string>(),
+      };
+    }
+
+    const usedIds = new Set<string>();
+
+    // Hero: 1 article
+    const featuredArticle = articles[0];
+    usedIds.add(featuredArticle.id);
+
+    // Secondary: 3 articles
+    const secondaryArticles = getUnusedArticles(articles, usedIds, 3);
+
+    // Breaking News: 3 articles
+    const breakingNewsArticles = getUnusedArticles(articles, usedIds, 3);
+
+    // Industry Focus: 5 articles
+    const industryFocusArticles = getUnusedArticles(articles, usedIds, 5);
+
+    // Topic Rows will handle its own deduplication using usedIds
+    // Pass all remaining articles to TopicRows
+    const topicRowsArticles = articles.filter(a => !usedIds.has(a.id));
+
+    // Analysis & Reports: 7 articles (will be taken after TopicRows marks its usage)
+    // We'll calculate this after TopicRows, but for now reserve what's left
+    // TopicRows typically uses ~6 articles (3 topics x 2 each)
+    
+    // For initial calculation, assume TopicRows will use up to 6
+    const estimatedTopicUsage = Math.min(6, topicRowsArticles.length);
+    const remainingAfterTopics = articles.length - usedIds.size - estimatedTopicUsage;
+    
+    // We need to pass usedIds to TopicRows, so analysis will be calculated after
+    // For now, set empty - actual slicing happens in component based on remaining
+    const analysisArticles: ArticleWithTopics[] = [];
+    const quickReadsArticles: ArticleWithTopics[] = [];
+
+    return {
+      featuredArticle,
+      secondaryArticles,
+      breakingNewsArticles,
+      industryFocusArticles,
+      topicRowsArticles,
+      analysisArticles,
+      quickReadsArticles,
+      usedIds,
+    };
+  }, [articles]);
+
+  // Calculate Analysis and QuickReads after TopicRows renders
+  // Since TopicRows mutates usedIds, we need these as separate calculations
+  const { finalAnalysisArticles, finalQuickReadsArticles } = useMemo(() => {
+    if (!articles) return { finalAnalysisArticles: [], finalQuickReadsArticles: [] };
+    
+    // Get remaining articles not used by any section including TopicRows
+    // TopicRows modifies usedIds directly, so we get fresh unused articles
+    const remaining = articles.filter(a => !usedIds.has(a.id));
+    
+    // Analysis: up to 7 articles
+    const analysisCount = Math.min(7, remaining.length);
+    const finalAnalysisArticles = remaining.slice(0, analysisCount);
+    finalAnalysisArticles.forEach(a => usedIds.add(a.id));
+    
+    // Quick Reads: up to 4 of remaining
+    const afterAnalysis = remaining.slice(analysisCount);
+    const finalQuickReadsArticles = afterAnalysis.slice(0, 4);
+    
+    return { finalAnalysisArticles, finalQuickReadsArticles };
+  }, [articles, usedIds]);
 
   return (
     <div className="min-h-screen bg-background">
@@ -137,13 +235,13 @@ const Index = () => {
         <IndustryFocusMasonry articles={industryFocusArticles} />
 
         {/* SECTION 3: By Topic Rows */}
-        <TopicRows />
+        <TopicRows articles={topicRowsArticles} usedIds={usedIds} />
 
         {/* SECTION 4: Analysis & Reports */}
-        <AnalysisReportsSection articles={analysisArticles} />
+        <AnalysisReportsSection articles={finalAnalysisArticles} />
 
         {/* SECTION 5: Quick Reads Grid */}
-        <QuickReadsGrid articles={quickReadsArticles} />
+        <QuickReadsGrid articles={finalQuickReadsArticles} />
 
         {/* Newsletter CTA */}
         <section className="bg-card">
