@@ -90,8 +90,8 @@ export default function CEODetail() {
       <SEOHead
         title={`${executive.name} | ${executive.company_name} CEO`}
         description={`${executive.name} is ${executive.title} of ${executive.company_name}. ${executive.bio?.slice(0, 120)}...`}
-        canonicalUrl={`https://octgindex.com/ceo/${executive.slug}`}
-        ogImage={executive.photo_url || undefined}
+        canonical={`https://octgindex.com/ceo/${executive.slug}`}
+        image={executive.photo_url || undefined}
       />
 
       {/* Schema.org JSON-LD */}

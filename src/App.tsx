@@ -28,6 +28,10 @@ import Directory from "./pages/Directory";
 import DirectoryRegion from "./pages/DirectoryRegion";
 import DirectoryCategory from "./pages/DirectoryCategory";
 import CompanyDetail from "./pages/CompanyDetail";
+import CEODirectory from "./pages/CEODirectory";
+import CEODetail from "./pages/CEODetail";
+import Executives from "./pages/admin/Executives";
+import ExecutiveEdit from "./pages/admin/ExecutiveEdit";
 
 const queryClient = new QueryClient();
 
