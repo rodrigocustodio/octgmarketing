@@ -23,3 +23,9 @@ verify_jwt = false
 
 [functions.search-topic]
 verify_jwt = false
+
+[functions.generate-article-from-content]
+verify_jwt = false
+
+[functions.upload-image]
+verify_jwt = false

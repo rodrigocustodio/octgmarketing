@@ -9,7 +9,8 @@ import {
   ChevronLeft,
   Workflow,
   Globe,
-  PenSquare
+  PenSquare,
+  FilePlus
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -19,6 +20,11 @@ const navItems = [
     title: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Create Article",
+    href: "/admin/create",
+    icon: FilePlus,
   },
   {
     title: "Pipeline",
