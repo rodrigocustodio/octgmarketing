@@ -159,3 +159,26 @@ export function useSearchTopic() {
     },
   });
 }
+
+export function useGenerateFromContent() {
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async ({ content, sourceName }: { content: string; sourceName?: string }) => {
+      const { data, error } = await supabase.functions.invoke("generate-article-from-content", {
+        method: "POST",
+        body: { content, source_name: sourceName },
+      });
+      
+      if (error) throw error;
+      return data;
+    },
+    onError: (error) => {
+      toast({
+        title: "Generation Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
