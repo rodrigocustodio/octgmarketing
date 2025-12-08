@@ -4,6 +4,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Newspaper, FileEdit, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
+import { PriceTickerManager } from "@/components/admin/PriceTickerManager";
 
 interface Stats {
   newSources: number;
@@ -139,21 +140,11 @@ const Dashboard = () => {
           ))}
         </div>
 
+        {/* Price Ticker Management */}
+        <PriceTickerManager />
+
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Recent Activity</CardTitle>
-              <CardDescription>
-                Latest changes in the editorial pipeline
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <p className="text-sm text-muted-foreground">
-                No recent activity. Run the scraper to start collecting articles.
-              </p>
-            </CardContent>
-          </Card>
 
           <Card>
             <CardHeader>
