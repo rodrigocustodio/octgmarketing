@@ -44,8 +44,8 @@ function generateOgHtml(article: {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
   const canonicalUrl = `${siteUrl}/article/${article.slug}`;
   
-  // Default fallback image if no hero image
-  const defaultImage = `${siteUrl}/og-default.png`;
+  // Default fallback image - use Supabase Storage for reliable access
+  const defaultImage = "https://mlhngmnuxoetnlesnxgu.supabase.co/storage/v1/object/public/article-images/branding/og-default.png";
   const imageUrl = article.hero_image_url || defaultImage;
   
   // Clean description - remove markdown, limit length
@@ -108,6 +108,7 @@ function generateOgHtml(article: {
 
 function generateFallbackHtml(): string {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
+  const defaultImage = "https://mlhngmnuxoetnlesnxgu.supabase.co/storage/v1/object/public/article-images/branding/og-default.png";
   
   return `<!DOCTYPE html>
 <html lang="en">
@@ -117,7 +118,9 @@ function generateFallbackHtml(): string {
   <title>OCTG Index - Industry News & Analysis</title>
   <meta property="og:title" content="OCTG Index - Industry News & Analysis">
   <meta property="og:description" content="Your source for OCTG industry news, market analysis, and insights">
-  <meta property="og:image" content="${siteUrl}/og-default.png">
+  <meta property="og:image" content="${defaultImage}">
+  <meta property="og:image:width" content="1200">
+  <meta property="og:image:height" content="630">
   <meta property="og:url" content="${siteUrl}">
   <script>window.location.href = "${siteUrl}";</script>
 </head>

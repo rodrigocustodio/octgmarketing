@@ -107,7 +107,7 @@ const Article = () => {
         <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.subtitle || ""} />
-        <meta property="og:image" content={article.hero_image_url || "https://octgindex.com/og-default.png"} />
+        <meta property="og:image" content={article.hero_image_url || "https://mlhngmnuxoetnlesnxgu.supabase.co/storage/v1/object/public/article-images/branding/og-default.png"} />
         <meta property="og:image:width" content="1200" />
         <meta property="og:image:height" content="630" />
         <meta property="og:url" content={canonicalUrl} />
@@ -118,7 +118,7 @@ const Article = () => {
         <meta name="twitter:card" content="summary_large_image" />
         <meta name="twitter:title" content={article.title} />
         <meta name="twitter:description" content={article.subtitle || ""} />
-        <meta name="twitter:image" content={article.hero_image_url || "https://octgindex.com/og-default.png"} />
+        <meta name="twitter:image" content={article.hero_image_url || "https://mlhngmnuxoetnlesnxgu.supabase.co/storage/v1/object/public/article-images/branding/og-default.png"} />
       </Helmet>
 
       <div className="min-h-screen bg-background flex flex-col">
