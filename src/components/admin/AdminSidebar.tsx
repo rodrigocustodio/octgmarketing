@@ -10,7 +10,8 @@ import {
   Workflow,
   Globe,
   PenSquare,
-  FilePlus
+  FilePlus,
+  Users
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -50,6 +51,11 @@ const navItems = [
     title: "Edit Articles",
     href: "/admin/articles",
     icon: PenSquare,
+  },
+  {
+    title: "CEO Directory",
+    href: "/admin/executives",
+    icon: Users,
   },
   {
     title: "Settings",

@@ -50,6 +50,8 @@ const App = () => (
                 <Route path="/directory/region/:slug" element={<DirectoryRegion />} />
                 <Route path="/directory/category/:slug" element={<DirectoryCategory />} />
                 <Route path="/directory/company/:slug" element={<CompanyDetail />} />
+                <Route path="/ceo-directory" element={<CEODirectory />} />
+                <Route path="/ceo/:slug" element={<CEODetail />} />
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Admin Routes */}
@@ -62,6 +64,8 @@ const App = () => (
                 <Route path="/admin/articles" element={<ProtectedRoute><Articles /></ProtectedRoute>} />
                 <Route path="/admin/articles/:id" element={<ProtectedRoute><ArticleEdit /></ProtectedRoute>} />
                 <Route path="/admin/create" element={<ProtectedRoute><CreateArticle /></ProtectedRoute>} />
+                <Route path="/admin/executives" element={<ProtectedRoute><Executives /></ProtectedRoute>} />
+                <Route path="/admin/executives/:id" element={<ProtectedRoute><ExecutiveEdit /></ProtectedRoute>} />
                 <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
