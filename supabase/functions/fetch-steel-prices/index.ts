@@ -7,21 +7,38 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// Steel and OCTG related stock symbols
-const STOCK_SYMBOLS = [
-  { symbol: 'TS', name: 'Tenaris', category: 'stock', region: 'Americas' },
-  { symbol: 'X', name: 'U.S. Steel', category: 'stock', region: 'Americas' },
-  { symbol: 'NUE', name: 'Nucor', category: 'stock', region: 'Americas' },
-  { symbol: 'STLD', name: 'Steel Dynamics', category: 'stock', region: 'Americas' },
-  { symbol: 'CLF', name: 'Cleveland-Cliffs', category: 'stock', region: 'Americas' },
-  { symbol: 'MT', name: 'ArcelorMittal', category: 'stock', region: 'Europe' },
-  { symbol: 'PKX', name: 'POSCO', category: 'stock', region: 'Asia-Pacific' },
-  { symbol: 'VALE', name: 'Vale S.A.', category: 'stock', region: 'Americas' },
-  { symbol: 'RIO', name: 'Rio Tinto', category: 'stock', region: 'Australia' },
-  { symbol: 'BHP', name: 'BHP Group', category: 'stock', region: 'Australia' },
+// All 22 US-traded OCTG-related stocks
+const OCTG_STOCKS = [
+  // Americas - Direct US listings
+  { symbol: 'X', name: 'U.S. Steel', region: 'Americas' },
+  { symbol: 'CMC', name: 'Commercial Metals', region: 'Americas' },
+  { symbol: 'NUE', name: 'Nucor', region: 'Americas' },
+  { symbol: 'NOV', name: 'NOV Inc.', region: 'Americas' },
+  { symbol: 'BKR', name: 'Baker Hughes', region: 'Americas' },
+  { symbol: 'HAL', name: 'Halliburton', region: 'Americas' },
+  { symbol: 'SLB', name: 'Schlumberger', region: 'Americas' },
+  { symbol: 'WFRD', name: 'Weatherford', region: 'Americas' },
+  { symbol: 'NBR', name: 'Nabors Industries', region: 'Americas' },
+  { symbol: 'PTEN', name: 'Patterson-UTI', region: 'Americas' },
+  { symbol: 'DO', name: 'Diamond Offshore', region: 'Americas' },
+  { symbol: 'SDRL', name: 'Seadrill', region: 'Americas' },
+  { symbol: 'VAL', name: 'Valaris', region: 'Americas' },
+  { symbol: 'HP', name: 'Helmerich & Payne', region: 'Americas' },
+  { symbol: 'PDS', name: 'Precision Drilling', region: 'Americas' },
+  { symbol: 'ORCL', name: 'Oracle', region: 'Americas' },
+  { symbol: 'NE', name: 'Noble Corp', region: 'Europe' },
+  { symbol: 'RIG', name: 'Transocean', region: 'Europe' },
+  
+  // Europe - US ADR listings
+  { symbol: 'TS', name: 'Tenaris', region: 'Europe' },
+  { symbol: 'MT', name: 'ArcelorMittal', region: 'Europe' },
+  { symbol: 'SAP', name: 'SAP SE', region: 'Europe' },
+  
+  // Asia-Pacific - US ADR listings  
+  { symbol: 'PKX', name: 'POSCO', region: 'Asia-Pacific' },
 ];
 
-// Commodity indices (we'll simulate these with realistic data)
+// Commodity indices (simulated with realistic data)
 const COMMODITY_INDICES = [
   { symbol: 'HRC', name: 'Hot Rolled Coil', category: 'commodity', region: 'Global', basePrice: 720, currency: 'USD' },
   { symbol: 'CRC', name: 'Cold Rolled Coil', category: 'commodity', region: 'Global', basePrice: 850, currency: 'USD' },
@@ -30,31 +47,7 @@ const COMMODITY_INDICES = [
   { symbol: 'BILLET', name: 'Steel Billet', category: 'commodity', region: 'Global', basePrice: 520, currency: 'USD' },
 ];
 
-async function fetchStockPrice(symbol: string, apiKey: string): Promise<{ price: number; change: number; changePercent: number } | null> {
-  try {
-    const response = await fetch(
-      `https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${apiKey}`
-    );
-    const data = await response.json();
-    
-    if (data['Global Quote'] && data['Global Quote']['05. price']) {
-      const quote = data['Global Quote'];
-      return {
-        price: parseFloat(quote['05. price']),
-        change: parseFloat(quote['09. change']),
-        changePercent: parseFloat(quote['10. change percent'].replace('%', '')),
-      };
-    }
-    console.log(`No data for ${symbol}:`, data);
-    return null;
-  } catch (error) {
-    console.error(`Error fetching ${symbol}:`, error);
-    return null;
-  }
-}
-
 function generateCommodityPrice(basePrice: number): { price: number; change: number; changePercent: number } {
-  // Generate realistic daily fluctuation (-3% to +3%)
   const changePercent = (Math.random() - 0.5) * 6;
   const change = basePrice * (changePercent / 100);
   const price = basePrice + change;
@@ -72,43 +65,62 @@ serve(async (req) => {
   }
 
   try {
-    const alphaVantageKey = Deno.env.get('ALPHA_VANTAGE_API_KEY');
+    const massiveApiKey = Deno.env.get('MASSIVE_API_KEY');
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 
+    if (!massiveApiKey) {
+      throw new Error('MASSIVE_API_KEY is not configured');
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
     const results: any[] = [];
-    let stocksFetched = 0;
-    const maxStocksToFetch = 5; // Alpha Vantage free tier limit
 
-    // Fetch real stock prices (limited by API rate)
-    if (alphaVantageKey) {
-      for (const stock of STOCK_SYMBOLS.slice(0, maxStocksToFetch)) {
-        const priceData = await fetchStockPrice(stock.symbol, alphaVantageKey);
-        
-        if (priceData) {
+    // Fetch all stocks from Massive API in a single batch call
+    const symbols = OCTG_STOCKS.map(s => s.symbol).join(',');
+    console.log(`Fetching ${OCTG_STOCKS.length} stocks from Massive API...`);
+
+    const response = await fetch(
+      `https://api.massive.com/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${symbols}`,
+      {
+        headers: {
+          'Authorization': `Bearer ${massiveApiKey}`,
+          'Content-Type': 'application/json',
+        },
+      }
+    );
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Massive API error:', response.status, errorText);
+      throw new Error(`Massive API error: ${response.status} - ${errorText}`);
+    }
+
+    const data = await response.json();
+    console.log('Massive API response:', JSON.stringify(data).slice(0, 500));
+
+    // Process Massive API response
+    if (data.tickers && Array.isArray(data.tickers)) {
+      for (const ticker of data.tickers) {
+        const stockInfo = OCTG_STOCKS.find(s => s.symbol === ticker.ticker);
+        if (stockInfo && ticker.day) {
           results.push({
-            symbol: stock.symbol,
-            name: stock.name,
-            price: priceData.price,
-            change: priceData.change,
-            change_percent: priceData.changePercent,
-            category: stock.category,
-            region: stock.region,
+            symbol: ticker.ticker,
+            name: stockInfo.name,
+            price: ticker.day.c || ticker.prevDay?.c || 0, // Current close or previous close
+            change: ticker.todaysChange || 0,
+            change_percent: ticker.todaysChangePerc || 0,
+            category: 'stock',
+            region: stockInfo.region,
             currency: 'USD',
           });
-          stocksFetched++;
-        }
-        
-        // Rate limiting: wait 12 seconds between calls (5 calls/minute for free tier)
-        if (stocksFetched < maxStocksToFetch) {
-          await new Promise(resolve => setTimeout(resolve, 12000));
         }
       }
     }
 
-    // Generate commodity prices (simulated but realistic)
+    console.log(`Successfully fetched ${results.length} stock prices`);
+
+    // Generate commodity prices (simulated)
     for (const commodity of COMMODITY_INDICES) {
       const priceData = generateCommodityPrice(commodity.basePrice);
       results.push({
@@ -135,13 +147,13 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Updated ${results.length} prices (${stocksFetched} stocks, ${COMMODITY_INDICES.length} commodities)`);
+    console.log(`Updated ${results.length} prices (${results.length - COMMODITY_INDICES.length} stocks, ${COMMODITY_INDICES.length} commodities)`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         updated: results.length,
-        stocks: stocksFetched,
+        stocks: results.length - COMMODITY_INDICES.length,
         commodities: COMMODITY_INDICES.length 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
