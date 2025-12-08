@@ -354,6 +354,62 @@ export type Database = {
           },
         ]
       }
+      executives: {
+        Row: {
+          bio: string | null
+          company_id: string | null
+          company_name: string
+          created_at: string
+          id: string
+          linkedin_url: string | null
+          name: string
+          photo_url: string | null
+          region: string
+          slug: string
+          stock_symbol: string | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          company_id?: string | null
+          company_name: string
+          created_at?: string
+          id?: string
+          linkedin_url?: string | null
+          name: string
+          photo_url?: string | null
+          region: string
+          slug: string
+          stock_symbol?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          company_id?: string | null
+          company_name?: string
+          created_at?: string
+          id?: string
+          linkedin_url?: string | null
+          name?: string
+          photo_url?: string | null
+          region?: string
+          slug?: string
+          stock_symbol?: string | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "executives_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       newsletter_subscribers: {
         Row: {
           email: string
