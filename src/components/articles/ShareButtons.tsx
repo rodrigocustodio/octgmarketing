@@ -14,10 +14,11 @@ interface ShareButtonsProps {
 const ShareButtons = ({ url, title, subtitle, slug }: ShareButtonsProps) => {
   const [copied, setCopied] = useState(false);
   
-  // Use edge function URL for social sharing to get proper OG tags
-  // Add cache-busting parameter to force social platforms to re-fetch fresh OG data
+  // Use /og/ proxy path for social sharing - this routes through vercel.json rewrites
+  // to the serve-og edge function, ensuring crawlers get proper OG meta tags
+  // while keeping the domain as octgindex.com (not supabase.co)
   const ogUrl = slug 
-    ? `https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/article/${slug}?v=${Date.now()}`
+    ? `https://octgindex.com/og/article/${slug}`
     : url;
   
   const encodedUrl = encodeURIComponent(ogUrl);
