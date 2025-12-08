@@ -121,7 +121,7 @@ export default function CompanyDetail() {
         <meta property="og:title" content={`${company.name} | OCTG Company Profile`} />
         <meta property="og:description" content={`${getCategoryLabel(company.industry_role || "")} - ${company.headquarters || company.country}`} />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href={`/directory/company/${slug}`} />
+        <link rel="canonical" href={`https://octgindex.com/directory/company/${slug}`} />
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>

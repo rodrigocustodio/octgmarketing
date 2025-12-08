@@ -41,7 +41,7 @@ const Region = () => {
 
   const region = regions?.find((r) => r.slug === slug);
   const description = slug ? regionDescriptions[slug] || `Latest OCTG news and analysis from ${region?.name || slug}.` : "";
-  const canonicalUrl = typeof window !== "undefined" ? window.location.href : "";
+  const canonicalUrl = `https://octgindex.com/region/${slug}`;
 
   const isLoading = regionsLoading || articlesLoading;
 

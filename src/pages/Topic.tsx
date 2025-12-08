@@ -39,7 +39,7 @@ const Topic = () => {
 
   const topic = topics?.find((t) => t.slug === slug);
   const description = slug ? topicDescriptions[slug] || `Latest OCTG news and analysis about ${topic?.name || slug}.` : "";
-  const canonicalUrl = typeof window !== "undefined" ? window.location.href : "";
+  const canonicalUrl = `https://octgindex.com/topic/${slug}`;
 
   const isLoading = topicsLoading || articlesLoading;
 
