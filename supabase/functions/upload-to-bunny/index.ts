@@ -25,6 +25,34 @@ serve(async (req) => {
       );
     }
 
+    // Validate that imageUrl is an absolute URL (not a relative path)
+    if (!imageUrl.startsWith("http://") && !imageUrl.startsWith("https://")) {
+      console.log(`[upload-to-bunny] Skipping relative/invalid URL: ${imageUrl}`);
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid URL: must be an absolute URL starting with http:// or https://",
+          skipped: true,
+          originalUrl: imageUrl 
+        }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
+    // Skip URLs that are already on Bunny CDN
+    if (imageUrl.includes("tukia-cdn.b-cdn.net") || imageUrl.includes("bunnycdn.com")) {
+      console.log(`[upload-to-bunny] URL already on Bunny CDN, skipping: ${imageUrl}`);
+      return new Response(
+        JSON.stringify({
+          success: true,
+          cdnUrl: imageUrl,
+          originalUrl: imageUrl,
+          skipped: true,
+          reason: "Already on Bunny CDN"
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     if (!BUNNY_STORAGE_API_KEY) {
       console.error("BUNNY_STORAGE_API_KEY not configured");
       return new Response(
