@@ -33,7 +33,7 @@ const Index = () => {
   const secondaryArticles = articles?.slice(1, 4) || [];
   const breakingNewsArticles = articles?.slice(4, 7) || [];
   const industryFocusArticles = articles?.slice(7, 12) || [];
-  const analysisArticles = articles?.slice(12, 17) || [];
+  const analysisArticles = articles?.slice(12, 19) || [];
   const quickReadsArticles = articles?.slice(17, 21) || [];
 
   return (
