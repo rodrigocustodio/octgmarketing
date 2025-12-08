@@ -1,6 +1,6 @@
 import { useParams, Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
+import { SEOHead } from "@/components/SEOHead";
 import { Footer } from "@/components/layout/Footer";
 import ShareButtons from "@/components/articles/ShareButtons";
 import RelatedArticles from "@/components/articles/RelatedArticles";
@@ -101,25 +101,15 @@ const Article = () => {
 
   return (
     <>
-      <Helmet>
-        <title>{article.title} | OCTG Index</title>
-        <meta name="description" content={article.subtitle || ""} />
-        <link rel="canonical" href={canonicalUrl} />
-        <meta property="og:title" content={article.title} />
-        <meta property="og:description" content={article.subtitle || ""} />
-        <meta property="og:image" content={article.hero_image_url || "https://tukia-cdn.b-cdn.net/octgindex/branding/og-default.png"} />
-        <meta property="og:image:width" content="1200" />
-        <meta property="og:image:height" content="630" />
-        <meta property="og:url" content={canonicalUrl} />
-        <meta property="og:type" content="article" />
-        <meta property="og:site_name" content="OCTG Index" />
-        <meta property="article:published_time" content={article.publish_date || ""} />
-        {article.region && <meta property="article:section" content={article.region.name} />}
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content={article.title} />
-        <meta name="twitter:description" content={article.subtitle || ""} />
-        <meta name="twitter:image" content={article.hero_image_url || "https://tukia-cdn.b-cdn.net/octgindex/branding/og-default.png"} />
-      </Helmet>
+      <SEOHead
+        title={`${article.title} | OCTG Index`}
+        description={article.subtitle || "OCTG Index - Industry news and analysis"}
+        canonical={canonicalUrl}
+        image={article.hero_image_url || undefined}
+        type="article"
+        publishedTime={article.publish_date || undefined}
+        section={article.region?.name}
+      />
 
       <div className="min-h-screen bg-background flex flex-col">
         <Header />

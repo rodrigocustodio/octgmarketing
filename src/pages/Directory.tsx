@@ -1,7 +1,7 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
+import { SEOHead } from "@/components/SEOHead";
 import { Footer } from "@/components/layout/Footer";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -92,14 +92,11 @@ export default function Directory() {
 
   return (
     <>
-      <Helmet>
-        <title>OCTG Industry Directory | Global Companies & Suppliers | OCTG Index</title>
-        <meta name="description" content="Comprehensive directory of 200+ OCTG companies worldwide. Find mills, manufacturers, distributors, inspection services, drilling contractors, and logistics providers across all regions." />
-        <meta property="og:title" content="OCTG Industry Directory | Global Companies & Suppliers" />
-        <meta property="og:description" content="The definitive guide to global OCTG companies. Search 200+ mills, distributors, and service providers." />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href="https://octgindex.com/directory" />
-      </Helmet>
+      <SEOHead
+        title="OCTG Industry Directory | Global Companies & Suppliers | OCTG Index"
+        description="Comprehensive directory of 200+ OCTG companies worldwide. Find mills, manufacturers, distributors, inspection services, drilling contractors, and logistics providers across all regions."
+        canonical="https://octgindex.com/directory"
+      />
 
       <Header />
       

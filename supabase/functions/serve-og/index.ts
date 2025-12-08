@@ -44,8 +44,8 @@ function generateOgHtml(article: {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
   const canonicalUrl = `${siteUrl}/article/${article.slug}`;
   
-  // Default fallback image - use Bunny CDN for reliable access
-  const defaultImage = "https://tukia-cdn.b-cdn.net/octgindex/branding/og-default.png";
+  // Default fallback image - use local public file for reliable access
+  const defaultImage = "https://octgindex.com/og-default.png";
   const imageUrl = article.hero_image_url || defaultImage;
   
   // Clean description - remove markdown, limit length
@@ -116,7 +116,7 @@ function generateOgHtml(article: {
 
 function generateFallbackHtml(): string {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
-  const defaultImage = "https://tukia-cdn.b-cdn.net/octgindex/branding/og-default.png";
+  const defaultImage = "https://octgindex.com/og-default.png";
   
   return `<!DOCTYPE html>
 <html lang="en">
