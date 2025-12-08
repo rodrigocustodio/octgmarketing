@@ -39,7 +39,7 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
   if (articles.length === 0) return null;
 
   const featured = articles[0];
-  const numberedArticles = articles.slice(1, 4);
+  const numberedArticles = articles.slice(1, 5);
 
   return (
     <section className="container py-12">
