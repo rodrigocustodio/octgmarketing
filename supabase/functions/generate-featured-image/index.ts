@@ -1,10 +1,10 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
-const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
-const supabaseServiceRoleKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+const BUNNY_STORAGE_ZONE = "tukia-assets";
+const BUNNY_CDN_URL = "https://tukia-cdn.b-cdn.net";
+const BUNNY_STORAGE_API_KEY = Deno.env.get("BUNNY_STORAGE_API_KEY");
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -18,18 +18,6 @@ serve(async (req) => {
   }
 
   try {
-    // Verify authentication
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: "No authorization header" }),
-        { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } }
-      );
-    }
-
-    // Create Supabase client with user's token
-    const supabase = createClient(supabaseUrl, supabaseServiceRoleKey);
-    
     const { title, excerpt, body, draftId } = await req.json();
 
     if (!title || !body) {
@@ -106,31 +94,36 @@ Requirements:
       bytes[i] = binaryString.charCodeAt(i);
     }
 
-    // Upload to Supabase Storage
+    // Upload to Bunny.net CDN
     const fileName = `${draftId}-${Date.now()}.png`;
-    const filePath = `generated/${fileName}`;
+    const filePath = `octgindex/articles/generated/${fileName}`;
 
-    console.log(`Uploading image to storage: ${filePath}`);
+    console.log(`Uploading image to Bunny.net: ${filePath}`);
 
-    const { error: uploadError } = await supabase.storage
-      .from("article-images")
-      .upload(filePath, bytes, {
-        contentType: mimeType,
-        upsert: true,
-      });
-
-    if (uploadError) {
-      console.error("Storage upload error:", uploadError);
-      throw new Error(`Failed to upload image: ${uploadError.message}`);
+    if (!BUNNY_STORAGE_API_KEY) {
+      throw new Error("BUNNY_STORAGE_API_KEY not configured");
     }
 
-    // Get public URL
-    const { data: urlData } = supabase.storage
-      .from("article-images")
-      .getPublicUrl(filePath);
+    const uploadResponse = await fetch(
+      `https://storage.bunnycdn.com/${BUNNY_STORAGE_ZONE}/${filePath}`,
+      {
+        method: "PUT",
+        headers: {
+          "AccessKey": BUNNY_STORAGE_API_KEY,
+          "Content-Type": mimeType,
+        },
+        body: bytes,
+      }
+    );
 
-    const publicUrl = urlData.publicUrl;
-    console.log(`Image uploaded successfully: ${publicUrl}`);
+    if (!uploadResponse.ok) {
+      const errorText = await uploadResponse.text();
+      console.error("Bunny.net upload error:", uploadResponse.status, errorText);
+      throw new Error(`Failed to upload image to Bunny.net: ${uploadResponse.status}`);
+    }
+
+    const publicUrl = `${BUNNY_CDN_URL}/${filePath}`;
+    console.log(`Image uploaded successfully to Bunny.net: ${publicUrl}`);
 
     return new Response(
       JSON.stringify({
