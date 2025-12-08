@@ -64,7 +64,7 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
                 <img 
                   src={featured.hero_image_url || heroImage} 
                   alt={featured.title}
-                  className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
                 <div className="absolute top-4 left-4">
