@@ -236,6 +236,7 @@ const Article = () => {
                     url={currentUrl}
                     title={article.title}
                     subtitle={article.subtitle || ""}
+                    slug={article.slug}
                   />
                 </div>
               </aside>
