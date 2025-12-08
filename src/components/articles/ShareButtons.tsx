@@ -15,8 +15,9 @@ const ShareButtons = ({ url, title, subtitle, slug }: ShareButtonsProps) => {
   const [copied, setCopied] = useState(false);
   
   // Use edge function URL for social sharing to get proper OG tags
+  // Add cache-busting parameter to force social platforms to re-fetch fresh OG data
   const ogUrl = slug 
-    ? `https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/article/${slug}`
+    ? `https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/article/${slug}?v=${Date.now()}`
     : url;
   
   const encodedUrl = encodeURIComponent(ogUrl);
