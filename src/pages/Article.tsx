@@ -46,7 +46,7 @@ const Article = () => {
     3
   );
 
-  const currentUrl = typeof window !== "undefined" ? window.location.href : "";
+  const canonicalUrl = `https://octgindex.com/article/${slug}`;
 
   // Convert markdown body to HTML
   const bodyHtml = article?.body ? markdownToHtml(article.body) : "";
@@ -104,11 +104,11 @@ const Article = () => {
       <Helmet>
         <title>{article.title} | OCTG Index</title>
         <meta name="description" content={article.subtitle || ""} />
-        <link rel="canonical" href={currentUrl} />
+        <link rel="canonical" href={canonicalUrl} />
         <meta property="og:title" content={article.title} />
         <meta property="og:description" content={article.subtitle || ""} />
         <meta property="og:image" content={article.hero_image_url || heroImage} />
-        <meta property="og:url" content={currentUrl} />
+        <meta property="og:url" content={canonicalUrl} />
         <meta property="og:type" content="article" />
         <meta property="og:site_name" content="OCTG Index" />
         <meta property="article:published_time" content={article.publish_date || ""} />
@@ -233,7 +233,7 @@ const Article = () => {
                 {/* Share Buttons - below newsletter, sticky for visibility */}
                 <div className="sticky top-24">
                   <ShareButtons 
-                    url={currentUrl}
+                    url={canonicalUrl}
                     title={article.title}
                     subtitle={article.subtitle || ""}
                     slug={article.slug}

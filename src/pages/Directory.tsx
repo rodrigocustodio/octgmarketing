@@ -98,7 +98,7 @@ export default function Directory() {
         <meta property="og:title" content="OCTG Industry Directory | Global Companies & Suppliers" />
         <meta property="og:description" content="The definitive guide to global OCTG companies. Search 200+ mills, distributors, and service providers." />
         <meta property="og:type" content="website" />
-        <link rel="canonical" href="/directory" />
+        <link rel="canonical" href="https://octgindex.com/directory" />
       </Helmet>
 
       <Header />
