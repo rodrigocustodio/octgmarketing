@@ -108,6 +108,39 @@ const ArticleEdit = () => {
     enabled: !isNew,
   });
 
+  // Fetch source article info via draft_articles linkage
+  const { data: sourceInfo } = useQuery({
+    queryKey: ["article-source", article?.slug],
+    queryFn: async () => {
+      if (!article?.slug) return null;
+      
+      // Find draft article that matches this article's slug
+      const { data: draft, error: draftError } = await supabase
+        .from("draft_articles")
+        .select(`
+          id,
+          source_article_id,
+          source_articles(
+            id,
+            source_url,
+            source_name,
+            title
+          )
+        `)
+        .eq("slug", article.slug)
+        .maybeSingle();
+      
+      if (draftError || !draft?.source_articles) return null;
+      return draft.source_articles as {
+        id: string;
+        source_url: string;
+        source_name: string;
+        title: string;
+      };
+    },
+    enabled: !!article?.slug,
+  });
+
   // Fetch regions, topics, companies
   const { data: regions } = useQuery({
     queryKey: ["regions"],
@@ -509,6 +542,45 @@ const ArticleEdit = () => {
                 </Select>
               </CardContent>
             </Card>
+
+            {/* Source Reference */}
+            {sourceInfo && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4" />
+                    Source Reference
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-3">
+                  <div>
+                    <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                      Source
+                    </Label>
+                    <p className="text-sm font-medium mt-1">
+                      {sourceInfo.source_name}
+                    </p>
+                  </div>
+                  <div>
+                    <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                      Original Title
+                    </Label>
+                    <p className="text-sm mt-1 text-muted-foreground line-clamp-2">
+                      {sourceInfo.title}
+                    </p>
+                  </div>
+                  <a
+                    href={sourceInfo.source_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-2 text-sm text-primary hover:underline"
+                  >
+                    View original article
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </CardContent>
+              </Card>
+            )}
 
             {/* Featured Image */}
             <Card>
