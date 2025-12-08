@@ -60,15 +60,21 @@ export function useDraftArticleCounts() {
   });
 }
 
+export interface ScrapeOptions {
+  region?: string;
+  batch?: number;
+  continueFrom?: string;
+}
+
 export function useScrapeOctg() {
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: async (region?: string) => {
+    mutationFn: async (options?: ScrapeOptions) => {
       const { data, error } = await supabase.functions.invoke("scrape-octg", {
         method: "POST",
-        body: region ? { region } : {},
+        body: options || {},
       });
       
       if (error) throw error;
@@ -76,9 +82,10 @@ export function useScrapeOctg() {
     },
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: ["source-article-counts"] });
+      const batchInfo = data.batchNumber !== 'all' ? ` (batch ${data.batchNumber}/${data.totalBatches})` : '';
       toast({
         title: "Scraping Complete",
-        description: `Inserted ${data.articlesInserted} new articles from ${data.sourcesProcessed} sources.`,
+        description: `Inserted ${data.articlesInserted} articles from ${data.sourcesProcessed}/${data.sourcesTotal} sources${batchInfo}.`,
       });
     },
     onError: (error) => {

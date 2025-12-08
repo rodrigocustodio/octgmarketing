@@ -89,7 +89,7 @@ const Pipeline = () => {
                   </SelectContent>
                 </Select>
                 <Button
-                  onClick={() => scrapeOctg.mutate(selectedRegion === "all" ? undefined : selectedRegion)}
+                  onClick={() => scrapeOctg.mutate(selectedRegion === "all" ? {} : { region: selectedRegion })}
                   disabled={scrapeOctg.isPending}
                   className="w-full"
                 >
