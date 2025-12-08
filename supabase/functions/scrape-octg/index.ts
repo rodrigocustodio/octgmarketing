@@ -7,14 +7,18 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// ===== 60-DAY FRESHNESS FILTER =====
-const MAX_ARTICLE_AGE_DAYS = 60;
+// ===== CONFIGURABLE SETTINGS =====
+const MAX_ARTICLE_AGE_DAYS = 90; // Relaxed from 60 to 90 days
+const BATCH_SIZE = 15; // Process sources in batches to avoid timeouts
+const ARTICLES_PER_SOURCE = 10; // Increased from 5 to 10
+const ACCEPT_UNKNOWN_DATES = true; // Accept articles with unknown dates (flagged for review)
+
 const CUTOFF_DATE = new Date();
 CUTOFF_DATE.setDate(CUTOFF_DATE.getDate() - MAX_ARTICLE_AGE_DAYS);
 
 // Current year for URL filtering
 const CURRENT_YEAR = new Date().getFullYear();
-const MIN_ALLOWED_YEAR = CURRENT_YEAR - 1; // Allow current and previous year in URLs
+const MIN_ALLOWED_YEAR = CURRENT_YEAR - 1;
 
 // Region name to UUID mapping
 const REGION_MAP: Record<string, string | null> = {
@@ -26,6 +30,33 @@ const REGION_MAP: Record<string, string | null> = {
   "Africa": "53298537-f28d-4b6f-a161-ca0ba0a419f3",
   "Australia": "1e5146eb-fb22-4e4c-b201-0eced3eabcda"
 };
+
+// ===== EXPANDED URL PATTERNS =====
+const ARTICLE_URL_PATTERNS = [
+  // Standard news/article patterns
+  '/news', '/article', '/press', '/release', '/media', '/blog', '/story', '/update',
+  // Corporate newsroom patterns
+  '/newsroom', '/insights', '/announcements', '/media-centre', '/media-center',
+  '/latest', '/updates', '/publications', '/reports', '/briefing',
+  // Industry-specific patterns
+  '/drilling', '/energy', '/oil', '/gas', '/steel', '/octg', '/pipeline', '/exploration',
+  // Content hub patterns
+  '/stories', '/features', '/analysis', '/commentary', '/perspectives',
+  '/resources', '/knowledge', '/thought-leadership',
+  // Corporate PR patterns
+  '/investor-relations', '/ir/', '/corporate-news', '/company-news',
+  // Regional patterns
+  '/global/', '/international/', '/regional/',
+];
+
+const EXCLUDED_URL_PATTERNS = [
+  '/contact', '/about', '/login', '/privacy', '/terms', '/cookie',
+  '/search', '/subscribe', '/register', '/careers', '/jobs',
+  '/faq', '/help', '/support', '/sitemap', '/tag/', '/category/',
+  '/author/', '/archive', '/page/', '/wp-admin', '/wp-content',
+  '/cart', '/checkout', '/account', '/profile', '/settings',
+  '.pdf', '.doc', '.xls', '.ppt', '/download/',
+];
 
 interface ScrapeSource {
   id: string;
@@ -76,6 +107,7 @@ function extractPublishDate(metadata: Record<string, unknown> | undefined, url: 
       'pubDate',
       'published',
       'created',
+      'modifiedTime', // Fallback to modified time if no publish time
     ];
     
     for (const field of metadataDateFields) {
@@ -90,12 +122,14 @@ function extractPublishDate(metadata: Record<string, unknown> | undefined, url: 
     }
   }
   
-  // Priority 2: Extract date from URL pattern (e.g., /2024/12/05/ or /2024-12-05/)
+  // Priority 2: Extract date from URL pattern
   const urlDatePatterns = [
     /\/(\d{4})\/(\d{1,2})\/(\d{1,2})\//,  // /2024/12/05/
     /\/(\d{4})-(\d{1,2})-(\d{1,2})\//,     // /2024-12-05/
     /\/(\d{4})\/(\d{1,2})\//,              // /2024/12/
     /[/-](\d{4})(\d{2})(\d{2})[/-]/,       // /20241205/ or -20241205-
+    /-(\d{4})(\d{2})(\d{2})/,              // trailing -20241205
+    /\/(\d{4})(\d{2})(\d{2})\//,           // /20241205/
   ];
   
   for (const pattern of urlDatePatterns) {
@@ -112,8 +146,8 @@ function extractPublishDate(metadata: Record<string, unknown> | undefined, url: 
     }
   }
   
-  // Priority 3: Look for date patterns in first 1000 chars of content
-  const contentStart = content.substring(0, 1000);
+  // Priority 3: Look for date patterns in first 2000 chars of content (expanded from 1000)
+  const contentStart = content.substring(0, 2000);
   
   // Common date patterns in articles
   const contentDatePatterns = [
@@ -122,18 +156,18 @@ function extractPublishDate(metadata: Record<string, unknown> | undefined, url: 
     // "5 December 2024" or "5 Dec 2024"
     /(\d{1,2})(?:st|nd|rd|th)?\s+(?:January|February|March|April|May|June|July|August|September|October|November|December|Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)[.\s]+(\d{4})/i,
     // "Published: 2024-12-05" or "Date: 12/05/2024"
-    /(?:Published|Posted|Date|Updated)[:.\s]+(\d{4})[/-](\d{1,2})[/-](\d{1,2})/i,
-    /(?:Published|Posted|Date|Updated)[:.\s]+(\d{1,2})[/-](\d{1,2})[/-](\d{4})/i,
+    /(?:Published|Posted|Date|Updated|Released)[:.\s]+(\d{4})[/-](\d{1,2})[/-](\d{1,2})/i,
+    /(?:Published|Posted|Date|Updated|Released)[:.\s]+(\d{1,2})[/-](\d{1,2})[/-](\d{4})/i,
+    // ISO format in content
+    /(\d{4})-(\d{2})-(\d{2})T/,
   ];
   
   for (const pattern of contentDatePatterns) {
     const match = contentStart.match(pattern);
     if (match) {
       try {
-        // Try parsing the full match
         const fullMatch = match[0];
-        // Clean up the match for parsing
-        const cleanedMatch = fullMatch.replace(/(?:Published|Posted|Date|Updated)[:.\s]+/i, '').trim();
+        const cleanedMatch = fullMatch.replace(/(?:Published|Posted|Date|Updated|Released)[:.\s]+/i, '').trim();
         const parsed = new Date(cleanedMatch);
         if (!isNaN(parsed.getTime()) && parsed.getFullYear() >= 2000 && parsed.getFullYear() <= CURRENT_YEAR) {
           console.log(`  📅 Date from content: ${parsed.toISOString()}`);
@@ -152,19 +186,17 @@ function extractPublishDate(metadata: Record<string, unknown> | undefined, url: 
 // Check if article is within the freshness window
 function isArticleFresh(publishDate: Date | null): boolean {
   if (!publishDate) {
-    // If we can't determine the date, we'll be conservative and reject it
-    return false;
+    // If we can't determine the date, use ACCEPT_UNKNOWN_DATES setting
+    return ACCEPT_UNKNOWN_DATES;
   }
   return publishDate >= CUTOFF_DATE;
 }
 
 // Check if URL contains an obviously old year pattern
 function isUrlDateFresh(url: string): boolean {
-  // Look for year patterns in URL
   const yearMatch = url.match(/\/(\d{4})\//);
   if (yearMatch) {
     const year = parseInt(yearMatch[1]);
-    // Reject if year is older than last year
     if (year < MIN_ALLOWED_YEAR) {
       console.log(`  🚫 URL contains old year: ${year}`);
       return false;
@@ -173,8 +205,50 @@ function isUrlDateFresh(url: string): boolean {
   return true;
 }
 
+// Check if URL matches article patterns
+function isLikelyArticleUrl(url: string, baseUrl: string): boolean {
+  const lower = url.toLowerCase();
+  
+  // Exclude homepage
+  if (lower === baseUrl || lower === baseUrl + '/' || lower === baseUrl.replace('https://', 'http://')) {
+    return false;
+  }
+  
+  // Check exclusion patterns first
+  for (const pattern of EXCLUDED_URL_PATTERNS) {
+    if (lower.includes(pattern)) {
+      return false;
+    }
+  }
+  
+  // Check for date patterns in URL (good signal for articles)
+  if (/\/\d{4}\//.test(url) || /\/\d{4}-\d{2}/.test(url)) {
+    return isUrlDateFresh(url); // Only fresh dates
+  }
+  
+  // Check article patterns
+  for (const pattern of ARTICLE_URL_PATTERNS) {
+    if (lower.includes(pattern)) {
+      return true;
+    }
+  }
+  
+  // Check for numeric IDs which often indicate articles
+  if (/\/\d{5,}/.test(url) || /-\d{5,}\./.test(url)) {
+    return true;
+  }
+  
+  // Check for slug-like patterns (words-separated-by-dashes)
+  const pathPart = url.split('/').pop() || '';
+  if (pathPart.includes('-') && pathPart.length > 20 && !pathPart.includes('.')) {
+    return true;
+  }
+  
+  return false;
+}
+
 // Map a website to discover article URLs
-async function mapWebsite(url: string, apiKey: string, limit: number = 10): Promise<string[]> {
+async function mapWebsite(url: string, apiKey: string, limit: number = 20): Promise<string[]> {
   console.log(`Mapping website: ${url}`);
   
   try {
@@ -186,8 +260,8 @@ async function mapWebsite(url: string, apiKey: string, limit: number = 10): Prom
       },
       body: JSON.stringify({
         url,
-        limit,
-        includeSubdomains: false,
+        limit: limit * 3, // Request more to account for filtering
+        includeSubdomains: true, // Include subdomains for corporate newsrooms
       }),
     });
 
@@ -204,30 +278,11 @@ async function mapWebsite(url: string, apiKey: string, limit: number = 10): Prom
       return [];
     }
 
-    // Filter to likely article URLs (exclude homepage, contact, about pages)
-    const articleUrls = result.links.filter((link: string) => {
-      const lower = link.toLowerCase();
-      // Exclude common non-article pages
-      if (lower === url || lower === url + '/') return false;
-      if (lower.includes('/contact') || lower.includes('/about') || lower.includes('/login')) return false;
-      if (lower.includes('/privacy') || lower.includes('/terms') || lower.includes('/cookie')) return false;
-      if (lower.includes('/search') || lower.includes('/subscribe') || lower.includes('/register')) return false;
-      
-      // PRE-FILTER: Check if URL contains an obviously old year
-      if (!isUrlDateFresh(link)) {
-        return false;
-      }
-      
-      // Prefer URLs that look like articles
-      return lower.includes('/news') || lower.includes('/article') || lower.includes('/press') || 
-             lower.includes('/release') || lower.includes('/media') || lower.includes('/blog') ||
-             lower.includes('/story') || lower.includes('/update') || 
-             // Also include date patterns in URLs (but already filtered for freshness)
-             /\/\d{4}\//.test(link) || /\/\d{4}-\d{2}/.test(link);
-    });
+    // Filter to likely article URLs using expanded patterns
+    const articleUrls = result.links.filter((link: string) => isLikelyArticleUrl(link, url));
 
-    console.log(`Found ${articleUrls.length} potential article URLs from ${url} (after date pre-filter)`);
-    return articleUrls.slice(0, 5); // Return max 5 articles
+    console.log(`Found ${articleUrls.length} potential article URLs from ${url} (from ${result.links.length} total links)`);
+    return articleUrls.slice(0, ARTICLES_PER_SOURCE);
   } catch (error) {
     console.error(`Error mapping ${url}:`, error);
     return [];
@@ -256,6 +311,7 @@ async function scrapeUrl(url: string, apiKey: string): Promise<{
         url,
         formats: ['markdown'],
         onlyMainContent: true,
+        waitFor: 2000, // Wait 2s for JS-heavy sites
       }),
     });
 
@@ -285,7 +341,6 @@ async function scrapeUrl(url: string, apiKey: string): Promise<{
 }
 
 serve(async (req) => {
-  // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
   }
@@ -293,17 +348,32 @@ serve(async (req) => {
   try {
     console.log('=== OCTG Scraper Starting ===');
     console.log(`📅 Cutoff date for articles: ${CUTOFF_DATE.toISOString()} (${MAX_ARTICLE_AGE_DAYS} days ago)`);
+    console.log(`📦 Batch size: ${BATCH_SIZE} sources per run`);
+    console.log(`📰 Articles per source: ${ARTICLES_PER_SOURCE}`);
+    console.log(`🔓 Accept unknown dates: ${ACCEPT_UNKNOWN_DATES}`);
 
-    // Parse request body for optional region filter
+    // Parse request body for optional parameters
     let regionFilter: string | null = null;
+    let batchNumber = 0; // 0 = all batches, 1+ = specific batch
+    let continueFromSourceId: string | null = null;
+    
     try {
       const body = await req.json();
       regionFilter = body?.region || null;
+      batchNumber = body?.batch || 0;
+      continueFromSourceId = body?.continueFrom || null;
+      
       if (regionFilter) {
-        console.log(`🌍 Region filter requested: ${regionFilter}`);
+        console.log(`🌍 Region filter: ${regionFilter}`);
+      }
+      if (batchNumber > 0) {
+        console.log(`📦 Processing batch ${batchNumber} only`);
+      }
+      if (continueFromSourceId) {
+        console.log(`⏩ Continuing from source ID: ${continueFromSourceId}`);
       }
     } catch {
-      // No body or invalid JSON - scrape all regions
+      // No body or invalid JSON
     }
 
     // Auth check
@@ -324,7 +394,6 @@ serve(async (req) => {
       });
     }
 
-    // Auth client for verifying user
     const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
       auth: { persistSession: false }
     });
@@ -351,12 +420,11 @@ serve(async (req) => {
       console.log('Cron job authenticated');
     }
 
-    // Admin client for database operations
     const supabaseAdmin = createClient(supabaseUrl, supabaseServiceKey, {
       auth: { persistSession: false }
     });
 
-    // Fetch all active sources from database, optionally filtered by region
+    // Fetch all active sources from database
     let sourcesQuery = supabaseAdmin
       .from('scrape_sources')
       .select('*')
@@ -366,7 +434,7 @@ serve(async (req) => {
       sourcesQuery = sourcesQuery.eq('region', regionFilter);
     }
     
-    const { data: sources, error: sourcesError } = await sourcesQuery.order('priority', { ascending: true });
+    const { data: allSources, error: sourcesError } = await sourcesQuery.order('priority', { ascending: true });
 
     if (sourcesError) {
       console.error('Error fetching sources:', sourcesError);
@@ -376,36 +444,80 @@ serve(async (req) => {
       });
     }
 
-    console.log(`Found ${sources?.length || 0} active sources to scrape`);
+    let sources = allSources as ScrapeSource[] || [];
+    const totalSources = sources.length;
+    const totalBatches = Math.ceil(totalSources / BATCH_SIZE);
+
+    console.log(`Found ${totalSources} active sources (${totalBatches} batches of ${BATCH_SIZE})`);
+
+    // Apply batch filtering
+    if (batchNumber > 0) {
+      const startIndex = (batchNumber - 1) * BATCH_SIZE;
+      const endIndex = startIndex + BATCH_SIZE;
+      sources = sources.slice(startIndex, endIndex);
+      console.log(`Processing batch ${batchNumber}: sources ${startIndex + 1} to ${Math.min(endIndex, totalSources)}`);
+    }
+
+    // Apply continueFrom filtering
+    if (continueFromSourceId) {
+      const sourceIndex = sources.findIndex(s => s.id === continueFromSourceId);
+      if (sourceIndex >= 0) {
+        sources = sources.slice(sourceIndex);
+        console.log(`Continuing from source index ${sourceIndex}, ${sources.length} sources remaining`);
+      }
+    }
 
     const results = {
       sourcesProcessed: 0,
+      sourcesTotal: totalSources,
+      batchNumber: batchNumber || 'all',
+      totalBatches,
       articlesFound: 0,
       articlesInserted: 0,
       duplicatesSkipped: 0,
-      articlesFilteredByDate: 0, // NEW: Track date-filtered articles
-      articlesWithUnknownDate: 0, // NEW: Track articles with unparseable dates
+      articlesFilteredByDate: 0,
+      articlesWithUnknownDate: 0,
+      articlesAcceptedWithUnknownDate: 0,
+      sourceResults: [] as { name: string; status: string; articlesFound: number; error?: string }[],
       errors: [] as string[],
     };
 
     // Process each source
-    for (const source of (sources as ScrapeSource[]) || []) {
+    for (const source of sources) {
       console.log(`\n--- Processing source: ${source.name} (${source.url}) ---`);
       results.sourcesProcessed++;
 
+      const sourceResult = {
+        name: source.name,
+        status: 'success',
+        articlesFound: 0,
+        error: undefined as string | undefined,
+      };
+
       try {
         // Map the website to find article URLs
-        const articleUrls = await mapWebsite(source.url, firecrawlApiKey, 10);
+        const articleUrls = await mapWebsite(source.url, firecrawlApiKey, ARTICLES_PER_SOURCE * 2);
         
         if (articleUrls.length === 0) {
           console.log(`No articles found for ${source.name}`);
+          sourceResult.status = 'no_articles';
+          results.sourceResults.push(sourceResult);
+          
+          // Update source to track that we tried
+          await supabaseAdmin
+            .from('scrape_sources')
+            .update({
+              last_scraped_at: new Date().toISOString(),
+              articles_found: 0,
+            })
+            .eq('id', source.id);
           continue;
         }
 
         let articlesFoundForSource = 0;
 
         // Scrape each article URL
-        for (const articleUrl of articleUrls.slice(0, 5)) {
+        for (const articleUrl of articleUrls.slice(0, ARTICLES_PER_SOURCE)) {
           // Check for duplicates
           const { data: existing } = await supabaseAdmin
             .from('source_articles')
@@ -437,20 +549,27 @@ serve(async (req) => {
             scrapeResult.content || ''
           );
           
-          if (!publishDate) {
+          const dateUncertain = !publishDate;
+          
+          if (!publishDate && !ACCEPT_UNKNOWN_DATES) {
             console.log(`  ⚠️ SKIPPED (unknown date): "${scrapeResult.title}"`);
             results.articlesWithUnknownDate++;
             continue;
           }
           
-          if (!isArticleFresh(publishDate)) {
+          if (publishDate && !isArticleFresh(publishDate)) {
             const daysSincePublish = Math.floor((Date.now() - publishDate.getTime()) / (1000 * 60 * 60 * 24));
             console.log(`  🚫 SKIPPED (too old): "${scrapeResult.title}" - published ${publishDate.toISOString().split('T')[0]} (${daysSincePublish} days ago)`);
             results.articlesFilteredByDate++;
             continue;
           }
           
-          console.log(`  ✅ FRESH: "${scrapeResult.title}" - published ${publishDate.toISOString().split('T')[0]}`);
+          if (dateUncertain) {
+            console.log(`  📝 ACCEPTED (unknown date, flagged): "${scrapeResult.title}"`);
+            results.articlesAcceptedWithUnknownDate++;
+          } else {
+            console.log(`  ✅ FRESH: "${scrapeResult.title}" - published ${publishDate!.toISOString().split('T')[0]}`);
+          }
           // ===== END DATE CHECK =====
 
           // Insert into source_articles
@@ -470,7 +589,8 @@ serve(async (req) => {
                 category: source.category,
                 source_type: source.source_type,
                 scraped_from: source.url,
-                original_publish_date: publishDate.toISOString(), // Store the extracted date
+                original_publish_date: publishDate?.toISOString() || null,
+                date_uncertain: dateUncertain,
               },
             });
 
@@ -484,6 +604,8 @@ serve(async (req) => {
           }
         }
 
+        sourceResult.articlesFound = articlesFoundForSource;
+
         // Update source last_scraped_at
         await supabaseAdmin
           .from('scrape_sources')
@@ -495,33 +617,31 @@ serve(async (req) => {
 
       } catch (sourceError) {
         console.error(`Error processing source ${source.name}:`, sourceError);
+        sourceResult.status = 'error';
+        sourceResult.error = String(sourceError);
         results.errors.push(`Source ${source.name}: ${String(sourceError)}`);
       }
+
+      results.sourceResults.push(sourceResult);
     }
 
     console.log('\n=== Scraping Complete ===');
-    console.log(`Sources processed: ${results.sourcesProcessed}`);
+    console.log(`Sources processed: ${results.sourcesProcessed}/${totalSources}`);
     console.log(`Articles found: ${results.articlesFound}`);
     console.log(`Articles inserted: ${results.articlesInserted}`);
     console.log(`Duplicates skipped: ${results.duplicatesSkipped}`);
-    console.log(`🚫 Filtered by date (>60 days): ${results.articlesFilteredByDate}`);
-    console.log(`⚠️ Unknown date (skipped): ${results.articlesWithUnknownDate}`);
+    console.log(`Filtered by date: ${results.articlesFilteredByDate}`);
+    console.log(`Accepted with unknown date: ${results.articlesAcceptedWithUnknownDate}`);
     console.log(`Errors: ${results.errors.length}`);
 
-    return new Response(JSON.stringify({
-      success: true,
-      ...results,
-      cutoffDate: CUTOFF_DATE.toISOString(),
-    }), {
+    return new Response(JSON.stringify(results), {
+      status: 200,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
   } catch (error) {
     console.error('Scraper error:', error);
-    return new Response(JSON.stringify({ 
-      error: String(error),
-      success: false,
-    }), {
+    return new Response(JSON.stringify({ error: String(error) }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
