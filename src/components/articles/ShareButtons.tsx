@@ -8,12 +8,18 @@ interface ShareButtonsProps {
   url: string;
   title: string;
   subtitle?: string;
+  slug?: string;
 }
 
-const ShareButtons = ({ url, title, subtitle }: ShareButtonsProps) => {
+const ShareButtons = ({ url, title, subtitle, slug }: ShareButtonsProps) => {
   const [copied, setCopied] = useState(false);
   
-  const encodedUrl = encodeURIComponent(url);
+  // Use edge function URL for social sharing to get proper OG tags
+  const ogUrl = slug 
+    ? `https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/article/${slug}`
+    : url;
+  
+  const encodedUrl = encodeURIComponent(ogUrl);
   const encodedTitle = encodeURIComponent(title);
   const encodedText = encodeURIComponent(`${title}${subtitle ? ` - ${subtitle}` : ''}`);
 
