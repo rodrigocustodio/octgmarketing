@@ -4,7 +4,8 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Download, Sparkles, RefreshCw } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Loader2, Download, Sparkles, RefreshCw, Search } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -17,6 +18,7 @@ import {
   useDraftArticleCounts,
   useScrapeOctg,
   useGenerateDrafts,
+  useSearchTopic,
 } from "@/hooks/usePipeline";
 
 const REGION_OPTIONS = [
@@ -32,10 +34,12 @@ const REGION_OPTIONS = [
 
 const Pipeline = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>("all");
+  const [topicQuery, setTopicQuery] = useState<string>("");
   const sourceCounts = useSourceArticleCounts();
   const draftCounts = useDraftArticleCounts();
   const scrapeOctg = useScrapeOctg();
   const generateDrafts = useGenerateDrafts();
+  const searchTopic = useSearchTopic();
 
   const isRefreshing = sourceCounts.isFetching || draftCounts.isFetching;
 
@@ -43,6 +47,13 @@ const Pipeline = () => {
     sourceCounts.refetch();
     draftCounts.refetch();
   };
+
+  const handleTopicSearch = () => {
+    if (topicQuery.trim()) {
+      searchTopic.mutate(topicQuery.trim());
+    }
+  };
+
   return (
     <>
       <Helmet>
@@ -62,6 +73,49 @@ const Pipeline = () => {
               {isRefreshing ? 'Refreshing...' : 'Refresh'}
             </Button>
           </div>
+
+          {/* Topic Search Agent */}
+          <Card className="border-primary/20 bg-primary/5">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Search className="h-5 w-5" />
+                Topic Search Agent
+              </CardTitle>
+              <CardDescription>
+                Search the web for recent OCTG articles on a specific topic
+              </CardDescription>
+            </CardHeader>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="e.g., OCTG pipe prices North America 2025"
+                  value={topicQuery}
+                  onChange={(e) => setTopicQuery(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && handleTopicSearch()}
+                  className="flex-1"
+                />
+                <Button
+                  onClick={handleTopicSearch}
+                  disabled={searchTopic.isPending || !topicQuery.trim()}
+                >
+                  {searchTopic.isPending ? (
+                    <>
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                      Searching...
+                    </>
+                  ) : (
+                    <>
+                      <Search className="h-4 w-4 mr-2" />
+                      Search
+                    </>
+                  )}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Examples: "steel tariffs import sanctions", "drilling rig count shale", "offshore pipeline contracts Middle East"
+              </p>
+            </CardContent>
+          </Card>
 
           {/* Pipeline Actions */}
           <div className="grid gap-4 md:grid-cols-2">

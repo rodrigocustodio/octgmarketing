@@ -128,3 +128,34 @@ export function useGenerateDrafts() {
     },
   });
 }
+
+export function useSearchTopic() {
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (query: string) => {
+      const { data, error } = await supabase.functions.invoke("search-topic", {
+        method: "POST",
+        body: { query, limit: 15 },
+      });
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      queryClient.invalidateQueries({ queryKey: ["source-article-counts"] });
+      toast({
+        title: "Topic Search Complete",
+        description: `Found ${data.articlesInserted} new articles (${data.duplicatesSkipped} duplicates skipped).`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Search Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
