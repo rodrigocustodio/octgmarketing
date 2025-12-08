@@ -195,7 +195,7 @@ serve(async (req: Request): Promise<Response> => {
       });
     }
 
-    if (!article) {
+    if (!article || !articleWithRegion) {
       console.log(`[serve-og] Article not found: ${slug}`);
       return new Response(generateFallbackHtml(), {
         headers: { ...corsHeaders, "Content-Type": "text/html; charset=utf-8" },
@@ -209,7 +209,7 @@ serve(async (req: Request): Promise<Response> => {
     // For crawlers: return HTML with OG tags
     // For humans: also return HTML (it includes JS redirect)
     // This ensures crawlers always get the meta tags
-    const html = generateOgHtml(article);
+    const html = generateOgHtml(articleWithRegion);
     
     return new Response(html, {
       headers: { 
