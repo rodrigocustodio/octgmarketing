@@ -7,8 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-// All 22 US-traded OCTG-related stocks
-const OCTG_STOCKS = [
+// All 22 US-traded OCTG-related stocks (fetched via Massive API)
+const US_TRADED_STOCKS = [
   // Americas - Direct US listings
   { symbol: 'X', name: 'U.S. Steel', region: 'Americas' },
   { symbol: 'CMC', name: 'Commercial Metals', region: 'Americas' },
@@ -36,6 +36,32 @@ const OCTG_STOCKS = [
   
   // Asia-Pacific - US ADR listings  
   { symbol: 'PKX', name: 'POSCO', region: 'Asia-Pacific' },
+];
+
+// 15 International stocks (simulated pricing - not available on US exchanges)
+const INTERNATIONAL_STOCKS = [
+  // Europe - Non-US exchanges
+  { symbol: 'VK.PA', name: 'Vallourec', region: 'Europe', basePrice: 16.50, currency: 'EUR' },
+  { symbol: 'TRMK.ME', name: 'TMK', region: 'Europe', basePrice: 85.00, currency: 'RUB' },
+  { symbol: 'SGSN.SW', name: 'SGS', region: 'Europe', basePrice: 89.00, currency: 'CHF' },
+  { symbol: 'BVI.PA', name: 'Bureau Veritas', region: 'Europe', basePrice: 29.00, currency: 'EUR' },
+  { symbol: 'ITRK.L', name: 'Intertek', region: 'Europe', basePrice: 42.00, currency: 'GBP' },
+  { symbol: 'MAERSK-B.CO', name: 'Maersk', region: 'Europe', basePrice: 11500, currency: 'DKK' },
+  { symbol: 'HLAG.DE', name: 'Hapag-Lloyd', region: 'Europe', basePrice: 145.00, currency: 'EUR' },
+  
+  // Asia-Pacific
+  { symbol: '5411.T', name: 'JFE Holdings', region: 'Asia-Pacific', basePrice: 2100, currency: 'JPY' },
+  { symbol: '5401.T', name: 'Nippon Steel', region: 'Asia-Pacific', basePrice: 3200, currency: 'JPY' },
+  { symbol: '8053.T', name: 'Sumitomo Corp', region: 'Asia-Pacific', basePrice: 3800, currency: 'JPY' },
+  { symbol: 'JINDALSTEL.NS', name: 'Jindal Steel', region: 'Asia-Pacific', basePrice: 950, currency: 'INR' },
+  { symbol: '1199.HK', name: 'COSCO Ports', region: 'Asia-Pacific', basePrice: 5.20, currency: 'HKD' },
+  { symbol: '1919.HK', name: 'COSCO Holdings', region: 'Asia-Pacific', basePrice: 11.50, currency: 'HKD' },
+  
+  // Australia
+  { symbol: 'BSL.AX', name: 'BlueScope Steel', region: 'Australia', basePrice: 22.50, currency: 'AUD' },
+  
+  // Middle East
+  { symbol: 'SABIC', name: 'SABIC', region: 'Middle East', basePrice: 82.00, currency: 'SAR' },
 ];
 
 // Commodity indices (simulated with realistic data)
@@ -76,9 +102,9 @@ serve(async (req) => {
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const results: any[] = [];
 
-    // Fetch all stocks from Massive API in a single batch call
-    const symbols = OCTG_STOCKS.map(s => s.symbol).join(',');
-    console.log(`Fetching ${OCTG_STOCKS.length} stocks from Massive API...`);
+    // Fetch all US-traded stocks from Massive API in a single batch call
+    const symbols = US_TRADED_STOCKS.map(s => s.symbol).join(',');
+    console.log(`Fetching ${US_TRADED_STOCKS.length} US stocks from Massive API...`);
 
     const response = await fetch(
       `https://api.massive.com/v2/snapshot/locale/us/markets/stocks/tickers?tickers=${symbols}`,
@@ -99,15 +125,15 @@ serve(async (req) => {
     const data = await response.json();
     console.log('Massive API response:', JSON.stringify(data).slice(0, 500));
 
-    // Process Massive API response
+    // Process Massive API response for US stocks
     if (data.tickers && Array.isArray(data.tickers)) {
       for (const ticker of data.tickers) {
-        const stockInfo = OCTG_STOCKS.find(s => s.symbol === ticker.ticker);
+        const stockInfo = US_TRADED_STOCKS.find(s => s.symbol === ticker.ticker);
         if (stockInfo && ticker.day) {
           results.push({
             symbol: ticker.ticker,
             name: stockInfo.name,
-            price: ticker.day.c || ticker.prevDay?.c || 0, // Current close or previous close
+            price: ticker.day.c || ticker.prevDay?.c || 0,
             change: ticker.todaysChange || 0,
             change_percent: ticker.todaysChangePerc || 0,
             category: 'stock',
@@ -118,7 +144,24 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Successfully fetched ${results.length} stock prices`);
+    console.log(`Successfully fetched ${results.length} US stock prices`);
+
+    // Generate simulated prices for international stocks
+    for (const stock of INTERNATIONAL_STOCKS) {
+      const priceData = generateCommodityPrice(stock.basePrice);
+      results.push({
+        symbol: stock.symbol,
+        name: stock.name,
+        price: priceData.price,
+        change: priceData.change,
+        change_percent: priceData.changePercent,
+        category: 'stock',
+        region: stock.region,
+        currency: stock.currency,
+      });
+    }
+
+    console.log(`Added ${INTERNATIONAL_STOCKS.length} international stock prices (simulated)`);
 
     // Generate commodity prices (simulated)
     for (const commodity of COMMODITY_INDICES) {
@@ -147,13 +190,16 @@ serve(async (req) => {
       }
     }
 
-    console.log(`Updated ${results.length} prices (${results.length - COMMODITY_INDICES.length} stocks, ${COMMODITY_INDICES.length} commodities)`);
+    const usStockCount = results.filter(r => r.category === 'stock' && r.currency === 'USD').length;
+    const intlStockCount = results.filter(r => r.category === 'stock' && r.currency !== 'USD').length;
+    console.log(`Updated ${results.length} prices (${usStockCount} US stocks, ${intlStockCount} international stocks, ${COMMODITY_INDICES.length} commodities)`);
 
     return new Response(
       JSON.stringify({ 
         success: true, 
         updated: results.length,
-        stocks: results.length - COMMODITY_INDICES.length,
+        usStocks: usStockCount,
+        internationalStocks: intlStockCount,
         commodities: COMMODITY_INDICES.length 
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
