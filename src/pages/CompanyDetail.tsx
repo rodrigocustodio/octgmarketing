@@ -1,6 +1,7 @@
 import { Link, useParams } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
+import { SEOHead } from "@/components/SEOHead";
 import { Footer } from "@/components/layout/Footer";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -115,13 +116,12 @@ export default function CompanyDetail() {
 
   return (
     <>
+      <SEOHead
+        title={`${company.name} | ${getCategoryLabel(company.industry_role || "")} | OCTG Index`}
+        description={`${company.name} - ${getCategoryLabel(company.industry_role || "")} based in ${company.country}. ${company.notes || company.description || ""}`}
+        canonical={`https://octgindex.com/directory/company/${slug}`}
+      />
       <Helmet>
-        <title>{company.name} | {getCategoryLabel(company.industry_role || "")} | OCTG Index</title>
-        <meta name="description" content={`${company.name} - ${getCategoryLabel(company.industry_role || "")} based in ${company.country}. ${company.notes || company.description || ""}`} />
-        <meta property="og:title" content={`${company.name} | OCTG Company Profile`} />
-        <meta property="og:description" content={`${getCategoryLabel(company.industry_role || "")} - ${company.headquarters || company.country}`} />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href={`https://octgindex.com/directory/company/${slug}`} />
         <script type="application/ld+json">
           {JSON.stringify(structuredData)}
         </script>

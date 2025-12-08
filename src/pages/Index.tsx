@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 import { Button } from "@/components/ui/button";
@@ -135,8 +136,14 @@ const Index = () => {
   }, [articles, usedIds]);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Header />
+    <>
+      <SEOHead
+        title="OCTG Index | Oil Country Tubular Goods Industry News & Analysis"
+        description="Your source for OCTG industry news, market analysis, pricing trends, and insights on mills, manufacturers, and global supply chain developments."
+        canonical="https://octgindex.com"
+      />
+      <div className="min-h-screen bg-background">
+        <Header />
       
       <main>
         {/* Hero Section */}
@@ -261,8 +268,9 @@ const Index = () => {
         </section>
       </main>
 
-      <Footer />
-    </div>
+        <Footer />
+      </div>
+    </>
   );
 };
 
