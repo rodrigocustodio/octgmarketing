@@ -49,7 +49,7 @@ function TopicRow({ slug, name, icon: Icon, articles }: TopicRowProps) {
         </Link>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-4">
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {articles.map((article) => (
           <Link key={article.id} to={`/article/${article.slug}`}>
             <Card variant="interactive" className="h-full overflow-hidden group">
@@ -120,7 +120,7 @@ export function TopicRows({ articles, usedIds }: TopicRowsProps) {
             slug={topic.slug}
             name={topic.name}
             icon={topic.icon}
-            articles={getArticlesForTopic(topic.slug, 2)}
+            articles={getArticlesForTopic(topic.slug, 4)}
           />
         ))}
       </div>
