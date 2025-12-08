@@ -194,6 +194,31 @@ const DraftDetail = () => {
     );
   };
 
+  // Helper to check if URL is already on Bunny CDN
+  const isBunnyCdnUrl = (url: string | null): boolean => {
+    if (!url) return false;
+    return url.includes("tukia-cdn.b-cdn.net") || url.includes("bunnycdn");
+  };
+
+  // Helper to upload image to Bunny CDN
+  const uploadToBunnyCdn = async (imageUrl: string): Promise<string> => {
+    console.log("[DraftDetail] Uploading to Bunny CDN:", imageUrl);
+    
+    const response = await supabase.functions.invoke("upload-to-bunny", {
+      body: {
+        imageUrl,
+        folder: `octgindex/articles/${draft?.id}`,
+      },
+    });
+
+    if (response.error) {
+      throw new Error(response.error.message || "Failed to upload to Bunny CDN");
+    }
+
+    console.log("[DraftDetail] Bunny CDN upload success:", response.data.cdnUrl);
+    return response.data.cdnUrl;
+  };
+
   const handleApprove = async () => {
     if (!draft) return;
     
@@ -208,6 +233,23 @@ const DraftDetail = () => {
     
     setSubmitting(true);
     try {
+      // Check if image needs to be uploaded to Bunny CDN
+      let finalImageUrl = currentImageUrl;
+      
+      if (currentImageUrl && !isBunnyCdnUrl(currentImageUrl)) {
+        toast({
+          title: "Uploading Image",
+          description: "Copying image to CDN for reliable social sharing...",
+        });
+        
+        try {
+          finalImageUrl = await uploadToBunnyCdn(currentImageUrl);
+        } catch (uploadError) {
+          console.error("[DraftDetail] CDN upload failed, using original URL:", uploadError);
+          // Continue with original URL if CDN upload fails
+        }
+      }
+
       // Update draft status and image
       const { error: draftError } = await supabase
         .from("draft_articles")
@@ -215,13 +257,13 @@ const DraftDetail = () => {
           status: "approved",
           editor_notes: editorNotes || null,
           region_id: selectedRegionId,
-          hero_image_url: currentImageUrl,
+          hero_image_url: finalImageUrl,
         })
         .eq("id", draft.id);
 
       if (draftError) throw draftError;
 
-      // Create new article in main articles table with the current image
+      // Create new article in main articles table with the CDN image
       const { data: newArticle, error: articleError } = await supabase
         .from("articles")
         .insert({
@@ -229,7 +271,7 @@ const DraftDetail = () => {
           slug: draft.slug,
           subtitle: draft.excerpt,
           body: draft.body_markdown,
-          hero_image_url: currentImageUrl,
+          hero_image_url: finalImageUrl,
           region_id: selectedRegionId,
           status: "published",
           publish_date: new Date().toISOString(),

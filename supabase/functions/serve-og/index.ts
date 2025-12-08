@@ -44,8 +44,8 @@ function generateOgHtml(article: {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
   const canonicalUrl = `${siteUrl}/article/${article.slug}`;
   
-  // Default fallback image - use Supabase Storage for reliable access
-  const defaultImage = "https://mlhngmnuxoetnlesnxgu.supabase.co/storage/v1/object/public/article-images/branding/og-default.png";
+  // Default fallback image - use Bunny CDN for reliable access
+  const defaultImage = "https://tukia-cdn.b-cdn.net/octgindex/branding/og-default.png";
   const imageUrl = article.hero_image_url || defaultImage;
   
   // Clean description - remove markdown, limit length
@@ -108,7 +108,7 @@ function generateOgHtml(article: {
 
 function generateFallbackHtml(): string {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
-  const defaultImage = "https://mlhngmnuxoetnlesnxgu.supabase.co/storage/v1/object/public/article-images/branding/og-default.png";
+  const defaultImage = "https://tukia-cdn.b-cdn.net/octgindex/branding/og-default.png";
   
   return `<!DOCTYPE html>
 <html lang="en">
