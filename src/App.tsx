@@ -30,6 +30,9 @@ import DirectoryCategory from "./pages/DirectoryCategory";
 import CompanyDetail from "./pages/CompanyDetail";
 import CEODirectory from "./pages/CEODirectory";
 import CEODetail from "./pages/CEODetail";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import NewsletterTerms from "./pages/NewsletterTerms";
 import Executives from "./pages/admin/Executives";
 import ExecutiveEdit from "./pages/admin/ExecutiveEdit";
 import Companies from "./pages/admin/Companies";
@@ -58,6 +61,9 @@ const App = () => (
                 <Route path="/directory/company/:slug" element={<CompanyDetail />} />
                 <Route path="/ceo-directory" element={<CEODirectory />} />
                 <Route path="/ceo/:slug" element={<CEODetail />} />
+                <Route path="/privacy" element={<PrivacyPolicy />} />
+                <Route path="/terms" element={<TermsAndConditions />} />
+                <Route path="/newsletter-terms" element={<NewsletterTerms />} />
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Admin Routes */}
