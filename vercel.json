@@ -1,11 +1,28 @@
 {
   "rewrites": [
     {
+      "source": "/sitemap.xml",
+      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap"
+    },
+    {
       "source": "/og/:path*",
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/:path*"
     }
   ],
   "headers": [
+    {
+      "source": "/sitemap.xml",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, max-age=3600, s-maxage=3600"
+        },
+        {
+          "key": "Content-Type",
+          "value": "application/xml"
+        }
+      ]
+    },
     {
       "source": "/og/(.*)",
       "headers": [
