@@ -5,7 +5,6 @@ import {
   useExecutiveById,
   useUpdateExecutive,
   useCreateExecutive,
-  Executive,
 } from "@/hooks/useExecutives";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { Button } from "@/components/ui/button";
@@ -82,7 +81,7 @@ export default function ExecutiveEdit() {
     }));
   };
 
-  const handleImageUpload = async (base64: string) => {
+  const handleImageUpload = async (base64: string): Promise<string> => {
     setIsUploading(true);
     try {
       const fileName = `${formData.slug || generateSlug(formData.name)}.jpg`;
@@ -97,11 +96,14 @@ export default function ExecutiveEdit() {
 
       if (error) throw error;
 
-      setFormData((prev) => ({ ...prev, photo_url: data.cdnUrl }));
+      const cdnUrl = data.cdnUrl;
+      setFormData((prev) => ({ ...prev, photo_url: cdnUrl }));
       toast.success("Photo uploaded successfully");
+      return cdnUrl;
     } catch (error) {
       console.error("Upload error:", error);
       toast.error("Failed to upload photo");
+      throw error;
     } finally {
       setIsUploading(false);
     }
@@ -114,6 +116,8 @@ export default function ExecutiveEdit() {
     }
 
     setIsSaving(true);
+    toast.loading("Saving executive...", { id: "saving" });
+    
     try {
       const saveData = {
         name: formData.name,
@@ -130,16 +134,16 @@ export default function ExecutiveEdit() {
 
       if (isNew) {
         await createExecutive.mutateAsync(saveData);
-        toast.success("Executive created successfully");
+        toast.success("Executive created successfully", { id: "saving" });
       } else {
         await updateExecutive.mutateAsync({ id: id!, updates: saveData });
-        toast.success("Executive updated successfully");
+        toast.success("Executive updated successfully", { id: "saving" });
       }
 
       navigate("/admin/executives");
     } catch (error: any) {
       console.error("Save error:", error);
-      toast.error(error.message || "Failed to save executive");
+      toast.error(error.message || "Failed to save executive", { id: "saving" });
     } finally {
       setIsSaving(false);
     }
@@ -157,7 +161,7 @@ export default function ExecutiveEdit() {
 
   return (
     <AdminLayout>
-      <div className="max-w-4xl space-y-6">
+      <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -177,64 +181,28 @@ export default function ExecutiveEdit() {
               </p>
             </div>
           </div>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button 
+            onClick={handleSave} 
+            disabled={isSaving}
+            className="min-w-[100px]"
+          >
             {isSaving ? (
-              <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
             ) : (
-              <Save className="mr-2 h-4 w-4" />
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save
+              </>
             )}
-            Save
           </Button>
         </div>
 
-        <div className="grid md:grid-cols-3 gap-6">
-          {/* Left Column - Photo */}
-          <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Photo</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="space-y-4">
-                  {formData.photo_url ? (
-                    <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-muted">
-                      <img
-                        src={formData.photo_url}
-                        alt={formData.name}
-                        className="w-full h-full object-cover"
-                      />
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        className="absolute top-2 right-2"
-                        onClick={() =>
-                          setFormData((prev) => ({ ...prev, photo_url: "" }))
-                        }
-                      >
-                        Remove
-                      </Button>
-                    </div>
-                  ) : (
-                    <div className="aspect-[3/4] rounded-lg bg-muted flex items-center justify-center">
-                      <User className="w-16 h-16 text-muted-foreground/30" />
-                    </div>
-                  )}
-
-                  <ImageUpload
-                    value={formData.photo_url}
-                    onChange={(url) =>
-                      setFormData((prev) => ({ ...prev, photo_url: url }))
-                    }
-                    onUpload={async (base64) => { await handleImageUpload(base64); return formData.photo_url; }}
-                    isUploading={isUploading}
-                  />
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-
-          {/* Right Column - Form */}
-          <div className="md:col-span-2 space-y-6">
+        <div className="grid lg:grid-cols-3 gap-6">
+          {/* Left Column - Form Fields (2/3 width) */}
+          <div className="lg:col-span-2 space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="text-sm">Basic Information</CardTitle>
@@ -251,6 +219,20 @@ export default function ExecutiveEdit() {
                     />
                   </div>
                   <div className="space-y-2">
+                    <Label htmlFor="title">Title *</Label>
+                    <Input
+                      id="title"
+                      value={formData.title}
+                      onChange={(e) =>
+                        setFormData((prev) => ({ ...prev, title: e.target.value }))
+                      }
+                      placeholder="e.g., Chief Executive Officer"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="space-y-2">
                     <Label htmlFor="slug">URL Slug</Label>
                     <Input
                       id="slug"
@@ -261,18 +243,26 @@ export default function ExecutiveEdit() {
                       placeholder="e.g., john-smith"
                     />
                   </div>
-                </div>
-
-                <div className="space-y-2">
-                  <Label htmlFor="title">Title *</Label>
-                  <Input
-                    id="title"
-                    value={formData.title}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, title: e.target.value }))
-                    }
-                    placeholder="e.g., Chief Executive Officer"
-                  />
+                  <div className="space-y-2">
+                    <Label htmlFor="region">Region *</Label>
+                    <Select
+                      value={formData.region}
+                      onValueChange={(value) =>
+                        setFormData((prev) => ({ ...prev, region: value }))
+                      }
+                    >
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select region" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {REGIONS.map((region) => (
+                          <SelectItem key={region} value={region}>
+                            {region}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -314,48 +304,6 @@ export default function ExecutiveEdit() {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="region">Region *</Label>
-                  <Select
-                    value={formData.region}
-                    onValueChange={(value) =>
-                      setFormData((prev) => ({ ...prev, region: value }))
-                    }
-                  >
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select region" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {REGIONS.map((region) => (
-                        <SelectItem key={region} value={region}>
-                          {region}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card>
-              <CardHeader>
-                <CardTitle className="text-sm">Biography</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="bio">Full Biography</Label>
-                  <Textarea
-                    id="bio"
-                    value={formData.bio}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, bio: e.target.value }))
-                    }
-                    placeholder="Enter the executive's biography..."
-                    rows={12}
-                    className="font-mono text-sm"
-                  />
-                </div>
-
-                <div className="space-y-2">
                   <Label htmlFor="linkedin_url">LinkedIn URL</Label>
                   <Input
                     id="linkedin_url"
@@ -369,6 +317,96 @@ export default function ExecutiveEdit() {
                     }
                     placeholder="https://linkedin.com/in/..."
                   />
+                </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Biography</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-2">
+                  <Label htmlFor="bio">Full Biography (Markdown supported)</Label>
+                  <Textarea
+                    id="bio"
+                    value={formData.bio}
+                    onChange={(e) =>
+                      setFormData((prev) => ({ ...prev, bio: e.target.value }))
+                    }
+                    placeholder="Enter the executive's biography..."
+                    rows={16}
+                    className="font-mono text-sm"
+                  />
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Right Sidebar - Photo (1/3 width) */}
+          <div className="space-y-6">
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Photo</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.photo_url ? (
+                  <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-muted">
+                    <img
+                      src={formData.photo_url}
+                      alt={formData.name}
+                      className="w-full h-full object-cover"
+                    />
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      className="absolute top-2 right-2"
+                      onClick={() =>
+                        setFormData((prev) => ({ ...prev, photo_url: "" }))
+                      }
+                    >
+                      Remove
+                    </Button>
+                  </div>
+                ) : (
+                  <div className="aspect-[3/4] rounded-lg bg-muted flex items-center justify-center">
+                    <User className="w-16 h-16 text-muted-foreground/30" />
+                  </div>
+                )}
+
+                <ImageUpload
+                  value={formData.photo_url}
+                  onChange={(url) =>
+                    setFormData((prev) => ({ ...prev, photo_url: url }))
+                  }
+                  onUpload={handleImageUpload}
+                  isUploading={isUploading}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Status</CardTitle>
+              </CardHeader>
+              <CardContent className="text-sm text-muted-foreground space-y-2">
+                <div className="flex justify-between">
+                  <span>Photo</span>
+                  <span className={formData.photo_url ? "text-emerald-500" : "text-amber-500"}>
+                    {formData.photo_url ? "Uploaded" : "Missing"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Biography</span>
+                  <span className={formData.bio ? "text-emerald-500" : "text-amber-500"}>
+                    {formData.bio ? `${formData.bio.length} chars` : "Empty"}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span>LinkedIn</span>
+                  <span className={formData.linkedin_url ? "text-emerald-500" : "text-muted-foreground"}>
+                    {formData.linkedin_url ? "Added" : "Optional"}
+                  </span>
                 </div>
               </CardContent>
             </Card>
