@@ -287,7 +287,7 @@ const Companies = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 px-2 text-xs"
+                            className="h-7 px-2 text-xs text-accent hover:text-accent hover:bg-accent/10"
                             onClick={() => handleQuickGenerate(company)}
                             disabled={generatingIds.has(company.id)}
                           >
