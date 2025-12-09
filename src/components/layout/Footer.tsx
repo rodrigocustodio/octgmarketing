@@ -23,7 +23,7 @@ const footerLinks = {
     { name: "Technology & Digitalization", href: "/topic/technology-digitalization" },
   ],
   company: [
-    { name: "Directory", href: "/directory" },
+    { name: "OCTG Industry Directory", href: "/directory" },
     { name: "CEO Directory", href: "/ceo-directory" },
   ],
   legal: [
