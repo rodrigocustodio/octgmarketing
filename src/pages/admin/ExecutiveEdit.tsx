@@ -96,7 +96,8 @@ export default function ExecutiveEdit() {
 
       if (error) throw error;
 
-      const cdnUrl = data.cdnUrl;
+      // Add cache-busting timestamp to force fresh image load
+      const cdnUrl = `${data.cdnUrl}?v=${Date.now()}`;
       setFormData((prev) => ({ ...prev, photo_url: cdnUrl }));
       toast.success("Photo uploaded successfully");
       return cdnUrl;
