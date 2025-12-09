@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, Company } from "@/hooks/useCompanies";
@@ -132,7 +133,9 @@ const Companies = () => {
       if (shouldStopBulk.current) break;
       
       const batch = missingCompanies.slice(i, i + BATCH_SIZE);
-      setBulkProgress(prev => ({ ...prev, currentBatch: batchNumber }));
+      flushSync(() => {
+        setBulkProgress(prev => ({ ...prev, currentBatch: batchNumber }));
+      });
       
       // Process each company in the batch
       for (let j = 0; j < batch.length; j++) {
@@ -142,11 +145,13 @@ const Companies = () => {
         }
         
         const company = batch[j];
-        setBulkProgress(prev => ({
-          ...prev,
-          current: company.name,
-          batchCurrent: j + 1,
-        }));
+        flushSync(() => {
+          setBulkProgress(prev => ({
+            ...prev,
+            current: company.name,
+            batchCurrent: j + 1,
+          }));
+        });
         
         try {
           const result = await generateDescription.mutateAsync({
@@ -165,7 +170,9 @@ const Companies = () => {
           failCount++;
         }
         
-        setBulkProgress(prev => ({ ...prev, completed: prev.completed + 1 }));
+        flushSync(() => {
+          setBulkProgress(prev => ({ ...prev, completed: prev.completed + 1 }));
+        });
         
         // Small delay between requests
         await new Promise(resolve => setTimeout(resolve, 500));
@@ -300,7 +307,6 @@ const Companies = () => {
               </div>
             </div>
             <Progress 
-              key={bulkProgress.completed}
               value={bulkProgress.total > 0 ? (bulkProgress.completed / bulkProgress.total) * 100 : 0} 
               className="h-2"
             />
