@@ -494,13 +494,12 @@
 
 @media (min-width: 769px) and (max-width: 1279px) {
   .ticker-content {
-    animation-duration: 120s; /* Tablet: medium speed */
+    animation-duration: 300s; /* Tablet: slower for comfortable reading */
   }
 }
 
-/* Large screens - faster since more content visible at once */
 @media (min-width: 1280px) {
   .ticker-content {
-    animation-duration: 90s; /* Desktop: faster */
+    animation-duration: 200s; /* Desktop: slower for comfortable reading */
   }
 }
