@@ -287,7 +287,11 @@ const Companies = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 px-2 text-xs bg-accent/20 text-accent hover:bg-accent/30"
+                            className={`h-7 px-2 text-xs ${
+                              company.description && company.description.length > 0
+                                ? "bg-green-500/20 text-green-500 hover:bg-green-500/30"
+                                : "bg-accent/20 text-accent hover:bg-accent/30"
+                            }`}
                             onClick={() => handleQuickGenerate(company)}
                             disabled={generatingIds.has(company.id)}
                           >
@@ -295,6 +299,11 @@ const Companies = () => {
                               <Check className="h-4 w-4 text-green-500" />
                             ) : generatingIds.has(company.id) ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : company.description && company.description.length > 0 ? (
+                              <>
+                                <Check className="h-3 w-3 mr-1" />
+                                GD
+                              </>
                             ) : (
                               <>
                                 <Sparkles className="h-3 w-3 mr-1" />
