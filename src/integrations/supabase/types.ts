@@ -431,6 +431,161 @@ export type Database = {
         }
         Relationships: []
       }
+      product_articles: {
+        Row: {
+          article_id: string
+          product_id: string
+        }
+        Insert: {
+          article_id: string
+          product_id: string
+        }
+        Update: {
+          article_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_articles_article_id_fkey"
+            columns: ["article_id"]
+            isOneToOne: false
+            referencedRelation: "articles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_articles_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      product_categories: {
+        Row: {
+          created_at: string
+          description: string | null
+          hero_image_url: string | null
+          icon: string | null
+          id: string
+          name: string
+          slug: string
+          sort_order: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          hero_image_url?: string | null
+          icon?: string | null
+          id?: string
+          name: string
+          slug: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          hero_image_url?: string | null
+          icon?: string | null
+          id?: string
+          name?: string
+          slug?: string
+          sort_order?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      product_companies: {
+        Row: {
+          company_id: string
+          product_id: string
+        }
+        Insert: {
+          company_id: string
+          product_id: string
+        }
+        Update: {
+          company_id?: string
+          product_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "product_companies_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "product_companies_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      products: {
+        Row: {
+          api_standard: string | null
+          applications: string[] | null
+          category_id: string | null
+          created_at: string
+          description: string | null
+          gallery_images: Json | null
+          hero_image_url: string | null
+          id: string
+          name: string
+          short_description: string | null
+          slug: string
+          sort_order: number | null
+          technical_specs: Json | null
+          updated_at: string
+        }
+        Insert: {
+          api_standard?: string | null
+          applications?: string[] | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          gallery_images?: Json | null
+          hero_image_url?: string | null
+          id?: string
+          name: string
+          short_description?: string | null
+          slug: string
+          sort_order?: number | null
+          technical_specs?: Json | null
+          updated_at?: string
+        }
+        Update: {
+          api_standard?: string | null
+          applications?: string[] | null
+          category_id?: string | null
+          created_at?: string
+          description?: string | null
+          gallery_images?: Json | null
+          hero_image_url?: string | null
+          id?: string
+          name?: string
+          short_description?: string | null
+          slug?: string
+          sort_order?: number | null
+          technical_specs?: Json | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "products_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "product_categories"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           avatar_url: string | null
