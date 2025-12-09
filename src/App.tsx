@@ -12,6 +12,7 @@ import Index from "./pages/Index";
 import Article from "./pages/Article";
 import Region from "./pages/Region";
 import Topic from "./pages/Topic";
+import Topics from "./pages/Topics";
 import Auth from "./pages/Auth";
 import Dashboard from "./pages/admin/Dashboard";
 import Pipeline from "./pages/admin/Pipeline";
@@ -55,6 +56,7 @@ const App = () => (
                 <Route path="/article/:slug" element={<Article />} />
                 <Route path="/region/:slug" element={<Region />} />
                 <Route path="/topic/:slug" element={<Topic />} />
+                <Route path="/topics" element={<Topics />} />
                 <Route path="/directory" element={<Directory />} />
                 <Route path="/directory/region/:slug" element={<DirectoryRegion />} />
                 <Route path="/directory/category/:slug" element={<DirectoryCategory />} />
