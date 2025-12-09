@@ -138,7 +138,7 @@ export default function PrivacyPolicy() {
             </p>
             <p className="text-foreground/90 leading-relaxed mt-4">
               <strong>OCTG Marketing Group</strong><br />
-              Email: privacy@octgindex.com
+              Email: info@octgindex.com
             </p>
           </section>
         </article>
