@@ -96,7 +96,7 @@ export default function CEODirectory() {
         <main className="flex-1 py-12">
           <div className="container mx-auto px-4">
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {Array.from({ length: 8 }).map((_, i) => (
                   <Card key={i} className="overflow-hidden">
                     <Skeleton className="aspect-[4/3] w-full" />
@@ -109,7 +109,7 @@ export default function CEODirectory() {
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
                 {executives?.map((executive) => (
                   <Link key={executive.id} to={`/ceo/${executive.slug}`}>
                     <Card className="group overflow-hidden hover:border-primary/50 transition-all duration-300 h-full">
