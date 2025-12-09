@@ -31,6 +31,7 @@ import {
   ArrowRight,
 } from "lucide-react";
 import { useCompanyBySlug, useSimilarCompanies, INDUSTRY_ROLES } from "@/hooks/useDirectory";
+import { generateCompanyTitle, generateCompanyDescription } from "@/lib/seo-utils";
 
 const getCategoryIcon = (role: string) => {
   switch (role) {
@@ -97,6 +98,8 @@ export default function CompanyDetail() {
     );
   }
 
+  const categoryLabel = getCategoryLabel(company.industry_role || "");
+
   // Schema.org structured data for Organization
   const structuredData = {
     "@context": "https://schema.org",
@@ -111,14 +114,19 @@ export default function CompanyDetail() {
       addressLocality: company.headquarters,
       addressCountry: company.country || undefined,
     } : undefined,
-    description: company.notes || company.description || undefined,
+    description: company.description || company.notes || undefined,
   };
 
   return (
     <>
       <SEOHead
-        title={`${company.name} | ${getCategoryLabel(company.industry_role || "")} | OCTG Index`}
-        description={`${company.name} - ${getCategoryLabel(company.industry_role || "")} based in ${company.country}. ${company.notes || company.description || ""}`}
+        title={generateCompanyTitle(company.name, categoryLabel)}
+        description={generateCompanyDescription(
+          company.name,
+          categoryLabel,
+          company.country,
+          company.description || company.notes
+        )}
         canonical={`https://octgindex.com/directory/company/${slug}`}
       />
       <Helmet>
@@ -170,10 +178,12 @@ export default function CompanyDetail() {
                   {company.name}
                 </h1>
                 <div className="flex flex-wrap items-center gap-3 mb-4">
-                  <Badge className="gap-1">
-                    {getCategoryIcon(company.industry_role || "")}
-                    {getCategoryLabel(company.industry_role || "")}
-                  </Badge>
+                  <Link to={`/directory/category/${company.industry_role}`}>
+                    <Badge className="gap-1 hover:bg-primary/80">
+                      {getCategoryIcon(company.industry_role || "")}
+                      {categoryLabel}
+                    </Badge>
+                  </Link>
                   {company.country && (
                     <Badge variant="outline" className="gap-1">
                       <MapPin className="h-3 w-3" />
@@ -239,7 +249,7 @@ export default function CompanyDetail() {
                             to={`/directory/category/${company.industry_role}`}
                             className="font-medium hover:text-accent transition-colors"
                           >
-                            {getCategoryLabel(company.industry_role)}
+                            {categoryLabel}
                           </Link>
                         </div>
                       </div>
@@ -359,7 +369,7 @@ export default function CompanyDetail() {
                     {company.industry_role && (
                       <Link to={`/directory/category/${company.industry_role}`}>
                         <Button variant="outline" className="w-full justify-start">
-                          More {getCategoryLabel(company.industry_role)}
+                          More {categoryLabel}
                         </Button>
                       </Link>
                     )}

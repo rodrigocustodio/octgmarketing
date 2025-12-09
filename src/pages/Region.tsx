@@ -15,6 +15,7 @@ import {
 import { useArticlesByRegion, useRegions } from "@/hooks/useArticles";
 import { format } from "date-fns";
 import heroImage from "@/assets/hero-octg.jpg";
+import { generateRegionTitle, generateRegionDescription } from "@/lib/seo-utils";
 
 function formatArticleDate(dateString: string | null): string {
   if (!dateString) return "";
@@ -93,8 +94,8 @@ const Region = () => {
   return (
     <>
       <SEOHead
-        title={`${region.name} OCTG News & Analysis | OCTG Index`}
-        description={description}
+        title={generateRegionTitle(region.name, "news")}
+        description={generateRegionDescription(region.name, "news")}
         canonical={canonicalUrl}
       />
 

@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -26,6 +26,7 @@ import {
   Phone,
 } from "lucide-react";
 import { useCompaniesByRegion, INDUSTRY_ROLES } from "@/hooks/useDirectory";
+import { generateRegionTitle, generateRegionDescription } from "@/lib/seo-utils";
 
 const getCategoryIcon = (role: string) => {
   switch (role) {
@@ -50,6 +51,7 @@ export default function DirectoryRegion() {
 
   const companies = data?.companies || [];
   const region = data?.region;
+  const companyCount = companies.length;
 
   // Group companies by industry role
   const groupedCompanies = companies.reduce((acc, company) => {
@@ -103,14 +105,11 @@ export default function DirectoryRegion() {
 
   return (
     <>
-      <Helmet>
-        <title>OCTG Companies in {region.name} | Industry Directory | OCTG Index</title>
-        <meta name="description" content={`Discover ${companies.length}+ OCTG companies in ${region.name}. Find mills, manufacturers, distributors, inspection services, and drilling contractors.`} />
-        <meta property="og:title" content={`OCTG Companies in ${region.name} | Industry Directory`} />
-        <meta property="og:description" content={`Complete directory of OCTG companies in ${region.name}. Mills, distributors, and service providers.`} />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href={`/directory/region/${slug}`} />
-      </Helmet>
+      <SEOHead
+        title={generateRegionTitle(region.name, "directory")}
+        description={generateRegionDescription(region.name, "directory", companyCount)}
+        canonical={`https://octgindex.com/directory/region/${slug}`}
+      />
 
       <Header />
       
@@ -138,7 +137,7 @@ export default function DirectoryRegion() {
               OCTG Companies in {region.name}
             </h1>
             <p className="text-lg text-muted-foreground max-w-2xl">
-              {companies.length} companies across {sortedCategories.length} categories serving the {region.name} OCTG market.
+              {companyCount} companies across {sortedCategories.length} categories serving the {region.name} OCTG market.
             </p>
           </div>
         </section>
@@ -156,6 +155,12 @@ export default function DirectoryRegion() {
                     {getCategoryLabel(category)}
                   </h2>
                   <Badge variant="secondary">{groupedCompanies[category].length}</Badge>
+                  <Link 
+                    to={`/directory/category/${category}`}
+                    className="text-sm text-accent hover:underline ml-auto"
+                  >
+                    View all {getCategoryLabel(category).toLowerCase()} →
+                  </Link>
                 </div>
 
                 <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -209,6 +214,31 @@ export default function DirectoryRegion() {
               </Link>
             </div>
           )}
+        </section>
+
+        {/* Internal Linking Section */}
+        <section className="container py-12 border-t border-border">
+          <h2 className="font-display text-xl font-bold mb-6">Explore More</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link to="/directory" className="p-4 rounded-lg border border-border hover:border-accent/50 transition-colors">
+              <h3 className="font-medium mb-1">All Companies</h3>
+              <p className="text-sm text-muted-foreground">Browse the complete OCTG directory</p>
+            </Link>
+            <Link to={`/region/${slug}`} className="p-4 rounded-lg border border-border hover:border-accent/50 transition-colors">
+              <h3 className="font-medium mb-1">{region.name} News</h3>
+              <p className="text-sm text-muted-foreground">Latest articles from this region</p>
+            </Link>
+            {INDUSTRY_ROLES.slice(0, 2).map((role) => (
+              <Link 
+                key={role.value}
+                to={`/directory/category/${role.value}`} 
+                className="p-4 rounded-lg border border-border hover:border-accent/50 transition-colors"
+              >
+                <h3 className="font-medium mb-1">{role.label}</h3>
+                <p className="text-sm text-muted-foreground">View {role.label.toLowerCase()} companies</p>
+              </Link>
+            ))}
+          </div>
         </section>
       </main>
 

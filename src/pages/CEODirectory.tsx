@@ -28,7 +28,7 @@ export default function CEODirectory() {
     <>
       <SEOHead
         title="OCTG Industry Leadership | CEO Directory"
-        description="Meet the CEOs leading 37 publicly traded companies in the OCTG industry. Executive profiles spanning steel manufacturing, oilfield services, and drilling operations."
+        description="Meet the CEOs leading major publicly traded companies in the OCTG industry. Executive profiles spanning steel manufacturing, oilfield services, and drilling."
         canonical="https://octgindex.com/ceo-directory"
       />
 

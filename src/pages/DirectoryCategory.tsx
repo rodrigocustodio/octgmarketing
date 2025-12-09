@@ -1,7 +1,7 @@
 import { Link, useParams } from "react-router-dom";
-import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
+import { SEOHead } from "@/components/SEOHead";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -28,6 +28,7 @@ import {
 } from "lucide-react";
 import { useCompaniesByCategory, INDUSTRY_ROLES } from "@/hooks/useDirectory";
 import { useRegions } from "@/hooks/useArticles";
+import { generateCategoryTitle, generateCategoryDescription } from "@/lib/seo-utils";
 
 const getCategoryIcon = (role: string) => {
   switch (role) {
@@ -66,6 +67,7 @@ export default function DirectoryCategory() {
 
   const categoryLabel = getCategoryLabel(slug || "");
   const categoryDescription = getCategoryDescription(slug || "");
+  const companyCount = companies?.length || 0;
 
   // Group companies by region
   const groupedByRegion = (companies || []).reduce((acc, company) => {
@@ -124,14 +126,11 @@ export default function DirectoryCategory() {
 
   return (
     <>
-      <Helmet>
-        <title>{categoryLabel} | OCTG Industry Directory | OCTG Index</title>
-        <meta name="description" content={`${categoryDescription} Find ${companies?.length || 0}+ companies in the ${categoryLabel.toLowerCase()} category.`} />
-        <meta property="og:title" content={`${categoryLabel} | OCTG Industry Directory`} />
-        <meta property="og:description" content={categoryDescription} />
-        <meta property="og:type" content="website" />
-        <link rel="canonical" href={`/directory/category/${slug}`} />
-      </Helmet>
+      <SEOHead
+        title={generateCategoryTitle(categoryLabel)}
+        description={generateCategoryDescription(categoryLabel, categoryDescription, companyCount)}
+        canonical={`https://octgindex.com/directory/category/${slug}`}
+      />
 
       <Header />
       
@@ -164,7 +163,7 @@ export default function DirectoryCategory() {
               </h1>
             </div>
             <p className="text-lg text-muted-foreground max-w-2xl">
-              {categoryDescription} {companies?.length || 0} companies listed globally.
+              {categoryDescription} {companyCount} companies listed globally.
             </p>
           </div>
         </section>
@@ -241,6 +240,27 @@ export default function DirectoryCategory() {
               </Link>
             </div>
           )}
+        </section>
+
+        {/* Internal Linking Section */}
+        <section className="container py-12 border-t border-border">
+          <h2 className="font-display text-xl font-bold mb-6">Explore More</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <Link to="/directory" className="p-4 rounded-lg border border-border hover:border-accent/50 transition-colors">
+              <h3 className="font-medium mb-1">All Companies</h3>
+              <p className="text-sm text-muted-foreground">Browse the complete OCTG directory</p>
+            </Link>
+            {INDUSTRY_ROLES.filter(r => r.value !== slug).slice(0, 3).map((role) => (
+              <Link 
+                key={role.value}
+                to={`/directory/category/${role.value}`} 
+                className="p-4 rounded-lg border border-border hover:border-accent/50 transition-colors"
+              >
+                <h3 className="font-medium mb-1">{role.label}</h3>
+                <p className="text-sm text-muted-foreground">View {role.label.toLowerCase()} companies</p>
+              </Link>
+            ))}
+          </div>
         </section>
       </main>
 
