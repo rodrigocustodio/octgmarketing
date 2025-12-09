@@ -39,8 +39,16 @@ const Companies = () => {
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   
   // Bulk generation state
+  const BATCH_SIZE = 10;
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
-  const [bulkProgress, setBulkProgress] = useState({ completed: 0, total: 0, current: "" });
+  const [bulkProgress, setBulkProgress] = useState({
+    completed: 0,
+    total: 0,
+    current: "",
+    batchCurrent: 0,
+    currentBatch: 0,
+    totalBatches: 0,
+  });
   const shouldStopBulk = useRef(false);
   
   const generateDescription = useGenerateCompanyDescription();
@@ -102,45 +110,77 @@ const Companies = () => {
     
     if (missingCompanies.length === 0) return;
     
+    const totalBatches = Math.ceil(missingCompanies.length / BATCH_SIZE);
+    
     setIsBulkGenerating(true);
-    setBulkProgress({ completed: 0, total: missingCompanies.length, current: "" });
+    setBulkProgress({
+      completed: 0,
+      total: missingCompanies.length,
+      current: "",
+      batchCurrent: 0,
+      currentBatch: 1,
+      totalBatches,
+    });
     shouldStopBulk.current = false;
     
     let successCount = 0;
     let failCount = 0;
+    let batchNumber = 1;
     
-    for (const company of missingCompanies) {
-      if (shouldStopBulk.current) {
-        toast({ title: "Bulk generation stopped", description: `Completed ${successCount} of ${missingCompanies.length}` });
-        break;
+    // Process in batches
+    for (let i = 0; i < missingCompanies.length; i += BATCH_SIZE) {
+      if (shouldStopBulk.current) break;
+      
+      const batch = missingCompanies.slice(i, i + BATCH_SIZE);
+      setBulkProgress(prev => ({ ...prev, currentBatch: batchNumber }));
+      
+      // Process each company in the batch
+      for (let j = 0; j < batch.length; j++) {
+        if (shouldStopBulk.current) {
+          toast({ title: "Bulk generation stopped", description: `Completed ${successCount} of ${missingCompanies.length}` });
+          break;
+        }
+        
+        const company = batch[j];
+        setBulkProgress(prev => ({
+          ...prev,
+          current: company.name,
+          batchCurrent: j + 1,
+        }));
+        
+        try {
+          const result = await generateDescription.mutateAsync({
+            companyName: company.name,
+            website: company.website || undefined,
+          });
+          
+          await updateCompany.mutateAsync({
+            id: company.id,
+            data: { description: result.description },
+          });
+          
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to generate for ${company.name}:`, error);
+          failCount++;
+        }
+        
+        setBulkProgress(prev => ({ ...prev, completed: prev.completed + 1 }));
+        
+        // Small delay between requests
+        await new Promise(resolve => setTimeout(resolve, 500));
       }
       
-      setBulkProgress(prev => ({ ...prev, current: company.name }));
+      // Refresh data after each batch
+      queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+      batchNumber++;
       
-      try {
-        const result = await generateDescription.mutateAsync({
-          companyName: company.name,
-          website: company.website || undefined,
-        });
-        
-        await updateCompany.mutateAsync({
-          id: company.id,
-          data: { description: result.description },
-        });
-        
-        successCount++;
-      } catch (error) {
-        console.error(`Failed to generate for ${company.name}:`, error);
-        failCount++;
+      // Pause between batches to avoid rate limiting
+      if (!shouldStopBulk.current && i + BATCH_SIZE < missingCompanies.length) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
       }
-      
-      setBulkProgress(prev => ({ ...prev, completed: prev.completed + 1 }));
-      
-      // Small delay between requests to avoid rate limiting
-      await new Promise(resolve => setTimeout(resolve, 500));
     }
     
-    // Refresh data and cleanup
     queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
     setIsBulkGenerating(false);
     
@@ -190,13 +230,28 @@ const Companies = () => {
           </div>
           <div className="flex items-center gap-2">
             {isBulkGenerating ? (
-              <Button
-                variant="destructive"
-                onClick={handleStopBulk}
-              >
-                <Square className="h-4 w-4 mr-2" />
-                Stop
-              </Button>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  disabled
+                  className="bg-accent/20 text-accent border-accent/30 min-w-[320px]"
+                >
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                  <span className="truncate max-w-[140px] inline-block">
+                    {bulkProgress.current || "Starting..."}
+                  </span>
+                  <span className="ml-2 text-xs opacity-80 flex-shrink-0">
+                    ({bulkProgress.batchCurrent}/{BATCH_SIZE} • Batch {bulkProgress.currentBatch}/{bulkProgress.totalBatches})
+                  </span>
+                </Button>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleStopBulk}
+                >
+                  <Square className="h-4 w-4" />
+                </Button>
+              </div>
             ) : (
               <Button
                 variant="outline"
@@ -217,19 +272,37 @@ const Companies = () => {
           </div>
         </div>
 
-        {/* Bulk Progress Bar */}
+        {/* Bulk Progress Panel */}
         {isBulkGenerating && (
-          <div className="bg-card border border-border rounded-lg p-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm font-medium flex items-center gap-2">
-                <Loader2 className="h-4 w-4 animate-spin" />
-                Generating: {bulkProgress.current}
-              </span>
-              <span className="text-sm text-muted-foreground">
-                {bulkProgress.completed} / {bulkProgress.total}
-              </span>
+          <div className="bg-card border border-accent/30 rounded-lg p-4">
+            <div className="flex items-center justify-between mb-3">
+              <div className="flex items-center gap-3">
+                <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
+                  <Loader2 className="h-5 w-5 animate-spin text-accent" />
+                </div>
+                <div>
+                  <p className="font-medium text-foreground">
+                    Generating: <span className="text-accent">{bulkProgress.current}</span>
+                  </p>
+                  <p className="text-xs text-muted-foreground">
+                    Batch {bulkProgress.currentBatch} of {bulkProgress.totalBatches} • 
+                    Item {bulkProgress.batchCurrent} of {Math.min(BATCH_SIZE, bulkProgress.total - (bulkProgress.currentBatch - 1) * BATCH_SIZE)}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-lg font-bold text-accent">
+                  {bulkProgress.completed} / {bulkProgress.total}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {Math.round((bulkProgress.completed / bulkProgress.total) * 100)}% complete
+                </p>
+              </div>
             </div>
-            <Progress value={(bulkProgress.completed / bulkProgress.total) * 100} />
+            <Progress 
+              value={(bulkProgress.completed / bulkProgress.total) * 100} 
+              className="h-2"
+            />
           </div>
         )}
 
