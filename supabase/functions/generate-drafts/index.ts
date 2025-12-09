@@ -65,14 +65,28 @@ ARTICLE LENGTH REQUIREMENTS:
 
 OUTPUT FORMAT (JSON):
 {
-  "title": "Compelling headline under 100 characters",
-  "excerpt": "2-3 sentence summary highlighting key business impact (max 200 characters)",
+  "title": "SEO-optimized headline, 40-50 characters MAX (strict limit - shorter is better)",
+  "excerpt": "Meta description: 1-2 sentences, 120-150 characters exactly, front-load key terms",
   "body_markdown": "Full article in Markdown with ## headers for sections (800-1200 words minimum)",
   "tags": ["array", "of", "relevant", "tags"],
   "suggested_topics": ["mills-manufacturing", "pricing-market"],
   "mentioned_companies": ["Company Name 1", "Company Name 2"],
   "mentioned_countries": ["Country1", "Country2"]
 }
+
+TITLE REQUIREMENTS (CRITICAL):
+- MAXIMUM 50 characters (count carefully!)
+- Front-load the most important keyword
+- Use action verbs where possible
+- Remove filler words (the, and, for, in, etc.)
+- Keep company/brand names only if crucial
+- Make it punchy and scannable
+
+EXCERPT/META DESCRIPTION REQUIREMENTS:
+- EXACTLY 120-150 characters (count carefully!)
+- Include primary keyword within first 70 characters
+- Summarize the key news value
+- Add a hook or benefit statement
 
 CONTENT STRUCTURE (each section should be substantive):
 1. Lead paragraph: Key news and immediate impact (2-3 paragraphs)
