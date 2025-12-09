@@ -3,6 +3,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/SEOHead";
 import { useExecutiveBySlug } from "@/hooks/useExecutives";
+import { markdownToHtml } from "@/lib/markdown";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -200,12 +201,14 @@ export default function CEODetail() {
                 <p className="text-lg text-accent mb-8">{executive.company_name}</p>
 
                 {/* Biography */}
-                <div className="prose prose-invert max-w-none">
-                  <h2 className="text-xl font-semibold mb-4">Biography</h2>
-                  <div className="text-muted-foreground leading-relaxed whitespace-pre-line">
-                    {executive.bio || "Biography not available."}
-                  </div>
-                </div>
+                {executive.bio ? (
+                  <div 
+                    className="prose dark:prose-invert prose-headings:text-foreground prose-headings:font-semibold prose-p:text-muted-foreground prose-strong:text-foreground max-w-none"
+                    dangerouslySetInnerHTML={{ __html: markdownToHtml(executive.bio) }}
+                  />
+                ) : (
+                  <p className="text-muted-foreground">Biography not available.</p>
+                )}
               </div>
             </div>
           </div>
