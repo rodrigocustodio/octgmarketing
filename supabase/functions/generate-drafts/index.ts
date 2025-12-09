@@ -93,7 +93,27 @@ CONTENT STRUCTURE (each section should be substantive):
 2. Context section: Background and market context (3-4 paragraphs)
 3. Details section: Specifics, quotes, figures (3-4 paragraphs)
 4. Implications section: What this means for the industry (2-3 paragraphs)
-5. Outlook: Future expectations and strategic considerations (2-3 paragraphs)
+5. Closing section: Future expectations and strategic considerations (2-3 paragraphs)
+
+FORBIDDEN CLOSING HEADERS - NEVER USE THESE:
+- "Conclusion" (sounds generic and AI-generated)
+- "Summary" (sounds like AI recap)
+- "Final Thoughts" (sounds like AI)
+- "In Conclusion" (forbidden)
+- "To Conclude" (forbidden)
+- "Wrapping Up" (forbidden)
+
+REQUIRED: Use creative, article-specific closing headers such as:
+- "The Path Forward" (for strategy pieces)
+- "What This Means for [Industry/Market/Region]"
+- "Industry Outlook" / "Market Outlook" / "Regional Outlook"
+- "Strategic Implications"
+- "Looking Ahead" / "Road Ahead"
+- "The Bigger Picture"
+- "[Topic] Momentum Continues"
+- "Shaping the Future"
+- "Beyond the Headlines"
+- "Setting the Stage"
 
 ENTITY EXTRACTION:
 - Identify and list any OCTG manufacturers, operators, or service companies mentioned

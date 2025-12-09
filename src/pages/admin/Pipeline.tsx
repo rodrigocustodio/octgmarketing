@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { Loader2, Download, Sparkles, RefreshCw, Search } from "lucide-react";
+import { Loader2, Download, Sparkles, RefreshCw, Search, Wand2 } from "lucide-react";
 import {
   Select,
   SelectContent,
@@ -19,6 +19,7 @@ import {
   useScrapeOctg,
   useGenerateDrafts,
   useSearchTopic,
+  useFixArticleEndings,
 } from "@/hooks/usePipeline";
 
 const REGION_OPTIONS = [
@@ -51,6 +52,7 @@ const Pipeline = () => {
   const scrapeOctg = useScrapeOctg();
   const generateDrafts = useGenerateDrafts();
   const searchTopic = useSearchTopic();
+  const fixEndings = useFixArticleEndings();
 
   const isRefreshing = sourceCounts.isFetching || draftCounts.isFetching;
 
@@ -253,6 +255,41 @@ const Pipeline = () => {
               </CardContent>
             </Card>
           </div>
+
+          {/* Utilities */}
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Wand2 className="h-5 w-5" />
+                Utilities
+              </CardTitle>
+              <CardDescription>
+                Tools for bulk content fixes and optimizations
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <Button
+                variant="outline"
+                onClick={() => fixEndings.mutate({ table: 'both', dryRun: false })}
+                disabled={fixEndings.isPending}
+              >
+                {fixEndings.isPending ? (
+                  <>
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                    Fixing Endings...
+                  </>
+                ) : (
+                  <>
+                    <Wand2 className="h-4 w-4 mr-2" />
+                    Fix "Conclusion" Headers
+                  </>
+                )}
+              </Button>
+              <p className="text-xs text-muted-foreground mt-2">
+                Replaces generic "Conclusion" headers with creative, contextual alternatives
+              </p>
+            </CardContent>
+          </Card>
 
           {/* Pipeline Status Summary */}
           <Card>
