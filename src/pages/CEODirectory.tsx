@@ -18,12 +18,6 @@ const REGIONS = [
   { value: "Australia", label: "Australia" },
 ];
 
-const regionColors: Record<string, string> = {
-  Americas: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-  Europe: "bg-emerald-500/20 text-emerald-400 border-emerald-500/30",
-  "Asia-Pacific": "bg-amber-500/20 text-amber-400 border-amber-500/30",
-  Australia: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-};
 
 export default function CEODirectory() {
   const [selectedRegion, setSelectedRegion] = useState("all");
@@ -73,7 +67,7 @@ export default function CEODirectory() {
         </section>
 
         {/* Filter Tabs */}
-        <section className="sticky top-16 z-30 bg-background/95 backdrop-blur border-b border-border">
+        <section className="sticky top-[88px] z-30 bg-background/95 backdrop-blur border-b border-border">
           <div className="container mx-auto px-4 py-4">
             <Tabs value={selectedRegion} onValueChange={setSelectedRegion}>
               <TabsList className="bg-muted/50">
@@ -128,7 +122,7 @@ export default function CEODirectory() {
                         )}
                         <Badge
                           variant="outline"
-                          className={`absolute top-3 right-3 ${regionColors[executive.region] || ""}`}
+                          className="absolute top-2 right-2 bg-gray-800/80 text-gray-300 border-gray-600/50 text-[10px] px-1.5 py-0.5"
                         >
                           {executive.region}
                         </Badge>
