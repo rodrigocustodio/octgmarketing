@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/SEOHead";
@@ -66,6 +67,92 @@ export default function DirectoryRegion() {
     .map(role => role.value)
     .filter(role => groupedCompanies[role]?.length > 0);
 
+  // WebPage Schema
+  const webPageSchema = region ? {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `https://octgindex.com/directory/region/${slug}`,
+    name: `OCTG Companies in ${region.name}`,
+    description: `${companyCount} OCTG companies across ${sortedCategories.length} categories serving the ${region.name} market.`,
+    url: `https://octgindex.com/directory/region/${slug}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "OCTG Index",
+      url: "https://octgindex.com"
+    },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: [".region-hero", ".region-description"]
+    }
+  } : null;
+
+  // ItemList Schema
+  const itemListSchema = region ? {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `OCTG Companies in ${region.name}`,
+    description: `Complete listing of OCTG companies in the ${region.name} region`,
+    numberOfItems: companyCount,
+    itemListElement: companies.slice(0, 20).map((company, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://octgindex.com/directory/company/${company.slug}`,
+      name: company.name
+    }))
+  } : null;
+
+  // BreadcrumbList Schema
+  const breadcrumbSchema = region ? {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://octgindex.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "OCTG Directory",
+        item: "https://octgindex.com/directory"
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: region.name,
+        item: `https://octgindex.com/directory/region/${slug}`
+      }
+    ]
+  } : null;
+
+  // FAQPage Schema
+  const faqSchema = region ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `How many OCTG companies operate in ${region.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `There are ${companyCount} OCTG companies operating in the ${region.name} region, spanning ${sortedCategories.length} industry categories.`
+        }
+      },
+      {
+        "@type": "Question",
+        name: `What types of OCTG companies are in ${region.name}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `OCTG companies in ${region.name} include ${sortedCategories.map(cat => getCategoryLabel(cat).toLowerCase()).join(", ")}.`
+        }
+      }
+    ]
+  } : null;
+
+  const structuredData = [webPageSchema, itemListSchema, breadcrumbSchema, faqSchema].filter(Boolean);
+
   if (isLoading) {
     return (
       <>
@@ -111,11 +198,17 @@ export default function DirectoryRegion() {
         canonical={`https://octgindex.com/directory/region/${slug}`}
       />
 
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+
       <Header />
       
       <main className="min-h-screen bg-background">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-background via-muted/30 to-background border-b border-border">
+        <section className="region-hero bg-gradient-to-br from-background via-muted/30 to-background border-b border-border">
           <div className="container py-12 md:py-16">
             <Breadcrumb className="mb-6">
               <BreadcrumbList>
@@ -136,7 +229,7 @@ export default function DirectoryRegion() {
             <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
               OCTG Companies in {region.name}
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl">
+            <p className="region-description text-lg text-muted-foreground max-w-2xl">
               {companyCount} companies across {sortedCategories.length} categories serving the {region.name} OCTG market.
             </p>
           </div>
