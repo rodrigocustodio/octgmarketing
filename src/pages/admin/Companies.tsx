@@ -295,12 +295,13 @@ const Companies = () => {
                   {bulkProgress.completed} / {bulkProgress.total}
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  {Math.round((bulkProgress.completed / bulkProgress.total) * 100)}% complete
+                  {bulkProgress.total > 0 ? Math.round((bulkProgress.completed / bulkProgress.total) * 100) : 0}% complete
                 </p>
               </div>
             </div>
             <Progress 
-              value={(bulkProgress.completed / bulkProgress.total) * 100} 
+              key={bulkProgress.completed}
+              value={bulkProgress.total > 0 ? (bulkProgress.completed / bulkProgress.total) * 100 : 0} 
               className="h-2"
             />
           </div>
