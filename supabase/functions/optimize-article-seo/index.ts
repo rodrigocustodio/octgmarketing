@@ -85,7 +85,12 @@ serve(async (req) => {
     }
 
     const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
-    const { articleId, mode = 'single' } = await req.json();
+    const { articleId, draftId, mode = 'single', table = 'articles' } = await req.json();
+
+    // Determine which table to use
+    const targetTable = draftId ? 'draft_articles' : table;
+    const targetId = draftId || articleId;
+    const subtitleField = targetTable === 'draft_articles' ? 'excerpt' : 'subtitle';
 
     interface ArticleToProcess {
       id: string;
@@ -96,29 +101,39 @@ serve(async (req) => {
     let articlesToProcess: ArticleToProcess[] = [];
 
     if (mode === 'bulk') {
-      // Fetch all articles with title > 60 chars or subtitle not in range
+      // Fetch all items with title > 60 chars or subtitle/excerpt not in range
       const { data, error } = await supabase
-        .from('articles')
-        .select('id, title, subtitle')
+        .from(targetTable)
+        .select(`id, title, ${subtitleField}`)
         .order('created_at', { ascending: false });
 
       if (error) throw error;
 
-      articlesToProcess = (data || []).filter((a: ArticleToProcess) => 
+      articlesToProcess = (data || []).map((a: any) => ({
+        id: a.id,
+        title: a.title,
+        subtitle: a[subtitleField]
+      })).filter((a: ArticleToProcess) => 
         a.title.length > 60 || 
         !a.subtitle || 
         a.subtitle.length < 120 || 
         a.subtitle.length > 155
       );
-    } else if (articleId) {
+    } else if (targetId) {
       const { data, error } = await supabase
-        .from('articles')
-        .select('id, title, subtitle')
-        .eq('id', articleId)
+        .from(targetTable)
+        .select(`id, title, ${subtitleField}`)
+        .eq('id', targetId)
         .single();
 
       if (error) throw error;
-      if (data) articlesToProcess = [data as ArticleToProcess];
+      if (data) {
+        articlesToProcess = [{
+          id: data.id,
+          title: data.title,
+          subtitle: (data as any)[subtitleField]
+        }];
+      }
     }
 
     console.log(`Processing ${articlesToProcess.length} articles for SEO optimization`);
@@ -199,14 +214,16 @@ serve(async (req) => {
           }
         }
 
-        // Update article
+        // Update article/draft
+        const updateData: Record<string, any> = {
+          title: newTitle,
+          updated_at: new Date().toISOString()
+        };
+        updateData[subtitleField] = newSubtitle;
+
         const { error: updateError } = await supabase
-          .from('articles')
-          .update({
-            title: newTitle,
-            subtitle: newSubtitle,
-            updated_at: new Date().toISOString()
-          })
+          .from(targetTable)
+          .update(updateData)
           .eq('id', article.id);
 
         if (updateError) throw updateError;

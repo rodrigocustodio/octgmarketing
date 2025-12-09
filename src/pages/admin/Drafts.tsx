@@ -13,8 +13,9 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Loader2, Eye, RefreshCw } from "lucide-react";
+import { Loader2, Eye, RefreshCw, AlertTriangle, CheckCircle } from "lucide-react";
 import { format } from "date-fns";
+import { SEOIndicator, isTitleValid, isDescriptionValid } from "@/components/admin/SEOIndicator";
 
 interface DraftArticle {
   id: string;
@@ -71,6 +72,10 @@ const Drafts = () => {
   }, []);
 
   const pendingCount = drafts.filter(d => d.status === "pending_review").length;
+  const seoOptimizedCount = drafts.filter(d => 
+    isTitleValid(d.title) && isDescriptionValid(d.excerpt)
+  ).length;
+  const needsSeoCount = drafts.length - seoOptimizedCount;
 
   return (
     <AdminLayout>
@@ -90,13 +95,23 @@ const Drafts = () => {
         </div>
 
         {/* Stats */}
-        <div className="flex items-center gap-4">
+        <div className="flex flex-wrap items-center gap-3">
           <Badge variant="outline" className="text-base py-1 px-3">
-            {drafts.length} total drafts
+            {drafts.length} total
           </Badge>
           {pendingCount > 0 && (
             <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 text-base py-1 px-3">
-              {pendingCount} pending review
+              {pendingCount} pending
+            </Badge>
+          )}
+          <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-base py-1 px-3">
+            <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
+            {seoOptimizedCount} SEO optimized
+          </Badge>
+          {needsSeoCount > 0 && (
+            <Badge className="bg-red-500/20 text-red-500 border-red-500/30 text-base py-1 px-3">
+              <AlertTriangle className="h-3.5 w-3.5 mr-1.5" />
+              {needsSeoCount} need SEO
             </Badge>
           )}
         </div>
@@ -125,8 +140,9 @@ const Drafts = () => {
                 <TableHeader>
                   <TableRow>
                     <TableHead>Region</TableHead>
-                    <TableHead className="max-w-md">Title</TableHead>
-                    <TableHead>Excerpt</TableHead>
+                    <TableHead>Title</TableHead>
+                    <TableHead className="text-center w-16">T</TableHead>
+                    <TableHead className="text-center w-16">D</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -143,8 +159,21 @@ const Drafts = () => {
                       <TableCell className="max-w-md truncate font-medium">
                         {draft.title}
                       </TableCell>
-                      <TableCell className="text-muted-foreground text-sm max-w-xs truncate">
-                        {draft.excerpt || "—"}
+                      <TableCell className="text-center">
+                        <SEOIndicator
+                          length={draft.title.length}
+                          min={35}
+                          max={60}
+                          label="Title length"
+                        />
+                      </TableCell>
+                      <TableCell className="text-center">
+                        <SEOIndicator
+                          length={draft.excerpt?.length || 0}
+                          min={120}
+                          max={155}
+                          label="Description length"
+                        />
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {format(new Date(draft.created_at), "MMM d, HH:mm")}

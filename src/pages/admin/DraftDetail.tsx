@@ -11,6 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Checkbox } from "@/components/ui/checkbox";
 import { useToast } from "@/hooks/use-toast";
 import { useRegions, useTopics, useCompanies } from "@/hooks/useArticles";
+import { SEOIndicator, isTitleValid, isDescriptionValid } from "@/components/admin/SEOIndicator";
 import { 
   Loader2, 
   ArrowLeft, 
@@ -23,7 +24,8 @@ import {
   Search,
   ImageIcon,
   Wand2,
-  Undo2
+  Undo2,
+  Sparkles
 } from "lucide-react";
 
 interface DraftArticle {
@@ -76,6 +78,9 @@ const DraftDetail = () => {
   const [imageSource, setImageSource] = useState<"original" | "ai" | null>(null);
   const [generatingImage, setGeneratingImage] = useState(false);
   const [generatedPrompt, setGeneratedPrompt] = useState<string | null>(null);
+  
+  // SEO optimization state
+  const [optimizingSeo, setOptimizingSeo] = useState(false);
   
   // Fetch regions, topics, companies
   const { data: regions } = useRegions();
@@ -192,6 +197,47 @@ const DraftDetail = () => {
         ? prev.filter((id) => id !== companyId)
         : [...prev, companyId]
     );
+  };
+
+  const handleOptimizeSeo = async () => {
+    if (!draft) return;
+    
+    setOptimizingSeo(true);
+    try {
+      const response = await supabase.functions.invoke("optimize-article-seo", {
+        body: { draftId: draft.id },
+      });
+
+      if (response.error) {
+        throw new Error(response.error.message || "Failed to optimize SEO");
+      }
+
+      const result = response.data.results?.[0];
+      if (result?.status === 'success') {
+        // Update local state with optimized values
+        setDraft(prev => prev ? {
+          ...prev,
+          title: result.newTitle,
+          excerpt: result.newSubtitle
+        } : null);
+
+        toast({
+          title: "SEO Optimized",
+          description: `Title: ${result.originalTitle.length} → ${result.newTitle.length} chars`,
+        });
+      } else {
+        throw new Error(result?.error || "Optimization failed");
+      }
+    } catch (error) {
+      console.error("Error optimizing SEO:", error);
+      toast({
+        title: "Optimization Failed",
+        description: error instanceof Error ? error.message : "Failed to optimize SEO",
+        variant: "destructive",
+      });
+    } finally {
+      setOptimizingSeo(false);
+    }
   };
 
   // Helper to check if URL is already on Bunny CDN
@@ -458,11 +504,28 @@ const DraftDetail = () => {
 
           {/* Right: AI Draft */}
           <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">AI-Generated Draft</CardTitle>
-              <CardDescription>
-                Rewritten for OCTG Index
-              </CardDescription>
+            <CardHeader className="flex flex-row items-start justify-between">
+              <div>
+                <CardTitle className="text-lg">AI-Generated Draft</CardTitle>
+                <CardDescription>
+                  Rewritten for OCTG Index
+                </CardDescription>
+              </div>
+              {draft.status === "pending_review" && (
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={handleOptimizeSeo}
+                  disabled={optimizingSeo || (isTitleValid(draft.title) && isDescriptionValid(draft.excerpt))}
+                >
+                  {optimizingSeo ? (
+                    <Loader2 className="h-4 w-4 mr-1.5 animate-spin" />
+                  ) : (
+                    <Sparkles className="h-4 w-4 mr-1.5" />
+                  )}
+                  Optimize SEO
+                </Button>
+              )}
             </CardHeader>
             <CardContent className="space-y-4">
               {draft.hero_image_url && (
@@ -473,11 +536,38 @@ const DraftDetail = () => {
                 />
               )}
 
+              {/* Title with SEO indicator */}
               <div>
-                <Label className="text-muted-foreground text-xs uppercase tracking-wide">
-                  Excerpt
-                </Label>
-                <p className="mt-1 text-foreground/80">
+                <div className="flex items-center gap-2 mb-1">
+                  <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                    Title
+                  </Label>
+                  <SEOIndicator
+                    length={draft.title.length}
+                    min={35}
+                    max={60}
+                    label="Title length"
+                  />
+                </div>
+                <p className="font-medium text-foreground">
+                  {draft.title}
+                </p>
+              </div>
+
+              {/* Excerpt with SEO indicator */}
+              <div>
+                <div className="flex items-center gap-2 mb-1">
+                  <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                    Excerpt (Meta Description)
+                  </Label>
+                  <SEOIndicator
+                    length={draft.excerpt?.length || 0}
+                    min={120}
+                    max={155}
+                    label="Description length"
+                  />
+                </div>
+                <p className="text-foreground/80">
                   {draft.excerpt || "—"}
                 </p>
               </div>
@@ -706,18 +796,36 @@ const DraftDetail = () => {
 
               {/* SEO Preview */}
               <div className="space-y-2">
-                <Label className="text-muted-foreground text-xs uppercase tracking-wide">
-                  SEO Preview
-                </Label>
+                <div className="flex items-center gap-2">
+                  <Label className="text-muted-foreground text-xs uppercase tracking-wide">
+                    SEO Preview
+                  </Label>
+                  {isTitleValid(draft.title) && isDescriptionValid(draft.excerpt) ? (
+                    <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-xs">
+                      <CheckCircle className="h-3 w-3 mr-1" />
+                      SEO Ready
+                    </Badge>
+                  ) : (
+                    <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 text-xs">
+                      Needs optimization
+                    </Badge>
+                  )}
+                </div>
                 <div className="p-4 bg-muted rounded-lg space-y-2">
-                  <p className="text-primary font-medium text-lg truncate">
-                    {draft.title} | OCTG Marketing
-                  </p>
-                  <p className="text-sm text-muted-foreground line-clamp-2">
-                    {draft.excerpt || "No excerpt provided"}
-                  </p>
+                  <div className="flex items-center gap-2">
+                    <p className="text-primary font-medium text-lg truncate flex-1">
+                      {draft.title} | OCTG Index
+                    </p>
+                    <SEOIndicator length={draft.title.length} min={35} max={60} label="Title" />
+                  </div>
+                  <div className="flex items-start gap-2">
+                    <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
+                      {draft.excerpt || "No excerpt provided"}
+                    </p>
+                    <SEOIndicator length={draft.excerpt?.length || 0} min={120} max={155} label="Desc" />
+                  </div>
                   <p className="text-xs text-green-600 dark:text-green-400">
-                    octgmarketing.com/article/{draft.slug}
+                    octgindex.com/article/{draft.slug}
                   </p>
                 </div>
               </div>
