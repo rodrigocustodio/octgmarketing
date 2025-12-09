@@ -13,7 +13,8 @@ import {
   TableHeader, 
   TableRow 
 } from "@/components/ui/table";
-import { Loader2, Eye, RefreshCw, AlertTriangle, CheckCircle } from "lucide-react";
+import { Loader2, Eye, RefreshCw, AlertTriangle, CheckCircle, Wrench } from "lucide-react";
+import { useFixArticleEndings } from "@/hooks/usePipeline";
 import { format } from "date-fns";
 import { SEOIndicator, isTitleValid, isDescriptionValid } from "@/components/admin/SEOIndicator";
 
@@ -44,7 +45,7 @@ const statusLabels = {
 const Drafts = () => {
   const [drafts, setDrafts] = useState<DraftArticle[]>([]);
   const [loading, setLoading] = useState(true);
-
+  const fixEndings = useFixArticleEndings();
   const fetchDrafts = async () => {
     setLoading(true);
     try {
@@ -88,10 +89,20 @@ const Drafts = () => {
               AI-generated articles awaiting approval
             </p>
           </div>
-          <Button onClick={fetchDrafts} variant="outline" disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={() => fixEndings.mutate({ table: 'both', dryRun: false })} 
+              variant="outline" 
+              disabled={fixEndings.isPending}
+            >
+              <Wrench className={`h-4 w-4 mr-2 ${fixEndings.isPending ? "animate-spin" : ""}`} />
+              {fixEndings.isPending ? "Fixing..." : "Fix Conclusion Headers"}
+            </Button>
+            <Button onClick={fetchDrafts} variant="outline" disabled={loading}>
+              <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+          </div>
         </div>
 
         {/* Stats */}
