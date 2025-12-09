@@ -18,6 +18,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { User, Building2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
+import globeCeoLeaders from "@/assets/globe-ceo-leaders.jpg";
 
 const REGIONS = [
   { value: "all", label: "All Regions" },
@@ -140,8 +141,18 @@ export default function CEODirectory() {
         <Header />
 
         {/* Hero Section */}
-        <section className="directory-hero relative py-16 md:py-24 bg-gradient-to-b from-card to-background border-b border-border">
-          <div className="container mx-auto px-4">
+        <section className="directory-hero relative py-16 md:py-24 overflow-hidden border-b border-border">
+          {/* Background Image with Gradient Overlay */}
+          <div className="absolute inset-0">
+            <img 
+              src={globeCeoLeaders} 
+              alt="" 
+              className="w-full h-full object-cover object-right"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/40" />
+          </div>
+          
+          <div className="container mx-auto px-4 relative z-10">
             <Breadcrumb className="mb-6">
               <BreadcrumbList>
                 <BreadcrumbItem>
