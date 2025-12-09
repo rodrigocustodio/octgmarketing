@@ -26,7 +26,7 @@
 
     /* Muted - Light Gray */
     --muted: 210 15% 93%;
-    --muted-foreground: 215 15% 45%;
+    --muted-foreground: 215 20% 35%;
 
     /* Accent - Bronze/Copper */
     --accent: 30 65% 42%;
@@ -48,7 +48,7 @@
     --octg-slate: 220 15% 92%;
     --octg-navy: 220 50% 30%;
     --octg-charcoal: 220 15% 25%;
-    --octg-gold: 45 85% 45%;
+    --octg-gold: 38 80% 38%;
 
     /* Gradients - Light Mode */
     --gradient-hero: linear-gradient(135deg, hsl(210 20% 98%) 0%, hsl(214 25% 95%) 50%, hsl(30 20% 95%) 100%);

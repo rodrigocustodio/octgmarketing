@@ -59,15 +59,15 @@ function TopicRow({ slug, name, icon: Icon, articles }: TopicRowProps) {
                   alt={article.title}
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background/90 via-background/40 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
                 <div className="absolute bottom-0 left-0 right-0 p-4">
                   {article.region && (
                     <Badge variant="region" className="mb-2 text-xs">{article.region.name}</Badge>
                   )}
-                  <h4 className="font-display font-bold text-sm line-clamp-2 group-hover:text-accent transition-colors">
+                  <h4 className="font-display font-bold text-sm text-white line-clamp-2 group-hover:text-accent transition-colors">
                     {article.title}
                   </h4>
-                  <p className="text-xs text-muted-foreground/80 mt-1">
+                  <p className="text-xs text-white/70 mt-1">
                     {formatDate(article.publish_date)}
                   </p>
                 </div>

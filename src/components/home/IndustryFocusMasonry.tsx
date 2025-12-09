@@ -66,14 +66,14 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
                   alt={featured.title}
                   className="absolute inset-0 w-full h-full object-cover"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
                 <div className="absolute top-4 left-4">
                   <Badge className="bg-accent text-accent-foreground font-semibold text-xs uppercase tracking-wider">
                     Featured Analysis
                   </Badge>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="font-display text-xl lg:text-2xl font-bold group-hover:text-accent transition-colors line-clamp-2">
+                  <h3 className="font-display text-xl lg:text-2xl font-bold text-white group-hover:text-accent transition-colors line-clamp-2">
                     {featured.title}
                   </h3>
                 </div>
@@ -109,7 +109,7 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
               to={`/article/${article.slug}`} 
               className="group flex gap-4 py-5 first:pt-0 last:pb-0 border-b border-border/50 last:border-0"
             >
-              <span className="text-4xl font-light text-muted-foreground/30 leading-none w-10 flex-shrink-0">
+              <span className="text-4xl font-light text-muted-foreground/50 leading-none w-10 flex-shrink-0">
                 {String(index + 1).padStart(2, '0')}
               </span>
               <div className="flex-1 min-w-0 space-y-2">
