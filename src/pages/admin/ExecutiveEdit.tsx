@@ -8,6 +8,7 @@ import {
 } from "@/hooks/useExecutives";
 import { useSearchTopic } from "@/hooks/usePipeline";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { SEOIndicator } from "@/components/admin/SEOIndicator";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -20,9 +21,12 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, Loader2, User, Newspaper } from "lucide-react";
+import { ArrowLeft, Save, Loader2, User, Newspaper, Sparkles } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+
+const MIN_BIO_LENGTH = 750;
+const MAX_BIO_LENGTH = 850;
 
 const REGIONS = ["Americas", "Europe", "Asia-Pacific", "Australia"];
 
@@ -58,6 +62,48 @@ export default function ExecutiveEdit() {
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isSearchingNews, setIsSearchingNews] = useState(false);
+  const [isGeneratingBio, setIsGeneratingBio] = useState(false);
+
+  const isBioValid = formData.bio.length >= MIN_BIO_LENGTH && formData.bio.length <= MAX_BIO_LENGTH;
+
+  const handleGenerateBio = async () => {
+    if (!formData.name || !formData.company_name) {
+      toast.error("Please fill in CEO name and company name first");
+      return;
+    }
+
+    setIsGeneratingBio(true);
+    toast.loading("Generating biography...", { id: "bio-gen" });
+
+    try {
+      const { data, error } = await supabase.functions.invoke("generate-executive-bio", {
+        body: {
+          executiveName: formData.name,
+          title: formData.title,
+          companyName: formData.company_name,
+          linkedinUrl: formData.linkedin_url,
+        },
+      });
+
+      if (error) throw error;
+
+      if (data.biography) {
+        setFormData((prev) => ({ ...prev, bio: data.biography }));
+        if (data.isValid) {
+          toast.success(`Biography generated (${data.length} chars)`, { id: "bio-gen" });
+        } else {
+          toast.warning(data.message, { id: "bio-gen" });
+        }
+      } else {
+        throw new Error("No biography returned");
+      }
+    } catch (error: any) {
+      console.error("Bio generation error:", error);
+      toast.error(error.message || "Failed to generate biography", { id: "bio-gen" });
+    } finally {
+      setIsGeneratingBio(false);
+    }
+  };
 
   const handleFindNews = async () => {
     if (!formData.name || !formData.company_name) {
@@ -149,6 +195,17 @@ export default function ExecutiveEdit() {
     if (!formData.name || !formData.company_name || !formData.region) {
       toast.error("Please fill in all required fields");
       return;
+    }
+
+    // SEO validation warning for bio length
+    if (formData.bio && !isBioValid) {
+      const bioLength = formData.bio.length;
+      const warning = bioLength < MIN_BIO_LENGTH 
+        ? `Biography is too short (${bioLength}/${MIN_BIO_LENGTH} min chars)`
+        : `Biography is too long (${bioLength}/${MAX_BIO_LENGTH} max chars)`;
+      
+      // Show warning but allow save
+      toast.warning(warning, { duration: 5000 });
     }
 
     setIsSaving(true);
@@ -358,12 +415,43 @@ export default function ExecutiveEdit() {
             </Card>
 
             <Card>
-              <CardHeader>
+              <CardHeader className="flex flex-row items-center justify-between">
                 <CardTitle className="text-sm">Biography</CardTitle>
+                <div className="flex items-center gap-2">
+                  <SEOIndicator
+                    length={formData.bio.length}
+                    min={MIN_BIO_LENGTH}
+                    max={MAX_BIO_LENGTH}
+                    label="Biography Length"
+                  />
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGenerateBio}
+                    disabled={isGeneratingBio || !formData.name || !formData.company_name}
+                  >
+                    {isGeneratingBio ? (
+                      <>
+                        <Loader2 className="mr-1.5 h-3.5 w-3.5 animate-spin" />
+                        Generating...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="mr-1.5 h-3.5 w-3.5" />
+                        Generate Bio
+                      </>
+                    )}
+                  </Button>
+                </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Full Biography (Markdown supported)</Label>
+                  <Label htmlFor="bio">
+                    Full Biography 
+                    <span className="text-muted-foreground ml-1 font-normal">
+                      (Target: {MIN_BIO_LENGTH}-{MAX_BIO_LENGTH} chars)
+                    </span>
+                  </Label>
                   <Textarea
                     id="bio"
                     value={formData.bio}
@@ -464,11 +552,18 @@ export default function ExecutiveEdit() {
                     {formData.photo_url ? "Uploaded" : "Missing"}
                   </span>
                 </div>
-                <div className="flex justify-between">
+                <div className="flex justify-between items-center">
                   <span>Biography</span>
-                  <span className={formData.bio ? "text-emerald-500" : "text-amber-500"}>
-                    {formData.bio ? `${formData.bio.length} chars` : "Empty"}
-                  </span>
+                  {formData.bio ? (
+                    <SEOIndicator
+                      length={formData.bio.length}
+                      min={MIN_BIO_LENGTH}
+                      max={MAX_BIO_LENGTH}
+                      label="Bio SEO Status"
+                    />
+                  ) : (
+                    <span className="text-amber-500">Empty</span>
+                  )}
                 </div>
                 <div className="flex justify-between">
                   <span>LinkedIn</span>
