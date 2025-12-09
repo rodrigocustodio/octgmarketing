@@ -64,7 +64,7 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Company</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Global Leaders</h4>
             <ul className="space-y-2">
               {footerLinks.company.map((link) => (
                 <li key={link.href}>
