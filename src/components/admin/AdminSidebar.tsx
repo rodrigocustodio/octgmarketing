@@ -11,7 +11,8 @@ import {
   Globe,
   PenSquare,
   FilePlus,
-  Users
+  Users,
+  Building2
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -56,6 +57,11 @@ const navItems = [
     title: "CEO Directory",
     href: "/admin/executives",
     icon: Users,
+  },
+  {
+    title: "Companies",
+    href: "/admin/companies",
+    icon: Building2,
   },
   {
     title: "Settings",

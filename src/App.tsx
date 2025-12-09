@@ -32,6 +32,8 @@ import CEODirectory from "./pages/CEODirectory";
 import CEODetail from "./pages/CEODetail";
 import Executives from "./pages/admin/Executives";
 import ExecutiveEdit from "./pages/admin/ExecutiveEdit";
+import Companies from "./pages/admin/Companies";
+import CompanyEdit from "./pages/admin/CompanyEdit";
 
 const queryClient = new QueryClient();
 
@@ -70,6 +72,8 @@ const App = () => (
                 <Route path="/admin/create" element={<ProtectedRoute><CreateArticle /></ProtectedRoute>} />
                 <Route path="/admin/executives" element={<ProtectedRoute><Executives /></ProtectedRoute>} />
                 <Route path="/admin/executives/:id" element={<ProtectedRoute><ExecutiveEdit /></ProtectedRoute>} />
+                <Route path="/admin/companies" element={<ProtectedRoute><Companies /></ProtectedRoute>} />
+                <Route path="/admin/companies/:id" element={<ProtectedRoute><CompanyEdit /></ProtectedRoute>} />
                 <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
