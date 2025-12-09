@@ -5,6 +5,7 @@ import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PriceTicker } from "./PriceTicker";
 import { SearchDialog } from "@/components/search/SearchDialog";
+import pipeIcon from "@/assets/logo-side-icon.png";
 
 const regions = [
   { name: "Americas", slug: "americas" },
@@ -37,6 +38,7 @@ export function Header() {
       <header className="sticky top-0 z-50 w-full bg-background/98 backdrop-blur-md supports-[backdrop-filter]:bg-background/90 shadow-sm">
         <div className="container flex h-16 items-center justify-between">
           <Link to="/" className="flex items-center gap-2">
+            <img src={pipeIcon} alt="" className="h-7 w-7" />
             <div>
               <span className="font-display text-xl font-bold tracking-tight">OCTG</span>
               <span className="ml-1 text-xl text-muted-foreground">Index</span>

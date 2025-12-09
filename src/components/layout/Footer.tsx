@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import pipeIcon from "@/assets/logo-side-icon.png";
 
 const footerLinks = {
   regions: [
@@ -84,9 +85,7 @@ export function Footer() {
         </div>
         <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded bg-accent">
-              <span className="font-display text-sm font-black text-accent-foreground">O</span>
-            </div>
+            <img src={pipeIcon} alt="" className="h-8 w-8" />
             <span className="font-display font-bold tracking-tight">OCTG Index</span>
           </div>
           <p className="text-xs text-muted-foreground">
