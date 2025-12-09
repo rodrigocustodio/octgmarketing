@@ -148,7 +148,7 @@ const Index = () => {
       <main>
         {/* Hero Section */}
         <section className="relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/80 to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
           <div 
             className="absolute inset-0 opacity-60"
             style={{
@@ -168,10 +168,10 @@ const Index = () => {
             ) : featuredArticle ? (
               <div className="max-w-4xl animate-fade-in-up">
                 <Badge variant="featured" className="mb-4">Featured Story</Badge>
-                <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">
+                <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-white">
                   {featuredArticle.title}
                 </h1>
-                <p className="text-xl text-muted-foreground mb-6 max-w-2xl">
+                <p className="text-xl text-white/80 mb-6 max-w-2xl">
                   {featuredArticle.subtitle}
                 </p>
                 <div className="flex flex-wrap gap-3">
@@ -190,10 +190,10 @@ const Index = () => {
             ) : (
               <div className="max-w-4xl">
                 <Badge variant="featured" className="mb-4">Coming Soon</Badge>
-                <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">
+                <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-white">
                   OCTG Index Intelligence
                 </h1>
-                <p className="text-xl text-muted-foreground mb-6 max-w-2xl">
+                <p className="text-xl text-white/80 mb-6 max-w-2xl">
                   Your source for Oil Country Tubular Goods industry news and analysis
                 </p>
                 <Link to="/directory">

@@ -77,22 +77,22 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
                       backgroundImage: `url(${featuredArticle.hero_image_url || placeholderImages[0]})`,
                     }}
                   />
-                  <div className="absolute inset-0 bg-gradient-to-t from-background via-background/60 to-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
                     {featuredArticle.region && (
                       <Badge className="bg-accent text-accent-foreground mb-4 uppercase tracking-wider text-xs">
                         {featuredArticle.region.name}
                       </Badge>
                     )}
-                    <h3 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-3 group-hover:text-accent transition-colors line-clamp-3">
+                    <h3 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-3 text-white group-hover:text-accent transition-colors line-clamp-3">
                       {featuredArticle.title}
                     </h3>
                     {featuredArticle.subtitle && (
-                      <p className="text-muted-foreground line-clamp-2 mb-4 text-sm sm:text-base">
+                      <p className="text-white/80 line-clamp-2 mb-4 text-sm sm:text-base">
                         {featuredArticle.subtitle}
                       </p>
                     )}
-                    <span className="text-sm text-muted-foreground">
+                    <span className="text-sm text-white/70">
                       {formatDate(featuredArticle.publish_date)}
                     </span>
                   </div>
