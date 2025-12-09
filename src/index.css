@@ -485,22 +485,22 @@
   }
 }
 
-/* Responsive ticker speed adjustments */
+/* Responsive ticker speed adjustments - slower on smaller screens for readability */
 @media (max-width: 768px) {
   .ticker-content {
-    animation-duration: 70s;
+    animation-duration: 150s; /* Mobile: slowest for readability */
   }
 }
 
 @media (min-width: 769px) and (max-width: 1279px) {
   .ticker-content {
-    animation-duration: 90s;
+    animation-duration: 120s; /* Tablet: medium speed */
   }
 }
 
-/* Large screens - slower for readability with more content */
+/* Large screens - faster since more content visible at once */
 @media (min-width: 1280px) {
   .ticker-content {
-    animation-duration: 120s;
+    animation-duration: 90s; /* Desktop: faster */
   }
 }
