@@ -488,7 +488,7 @@
 /* Responsive ticker speed adjustments - slower on smaller screens for readability */
 @media (max-width: 768px) {
   .ticker-content {
-    animation-duration: 400s; /* Mobile: very slow for comfortable reading */
+    animation-duration: 600s; /* Mobile: extremely slow for comfortable reading */
   }
 }
 
