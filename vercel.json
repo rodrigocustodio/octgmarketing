@@ -1,5 +1,23 @@
 {
   "trailingSlash": false,
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.octgindex.com" }],
+      "destination": "https://octgindex.com/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/cookies",
+      "destination": "/privacy",
+      "permanent": true
+    },
+    {
+      "source": "/articles",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
   "rewrites": [
     {
       "source": "/sitemap.xml",
