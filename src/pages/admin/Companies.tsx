@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useCompaniesAdmin } from "@/hooks/useCompanies";
+import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, Company } from "@/hooks/useCompanies";
 import { useRegions } from "@/hooks/useDirectory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -22,8 +22,10 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check } from "lucide-react";
 import { INDUSTRY_ROLES } from "@/hooks/useDirectory";
+import { useToast } from "@/hooks/use-toast";
+import { useQueryClient } from "@tanstack/react-query";
 
 const Companies = () => {
   const { data: companies, isLoading } = useCompaniesAdmin();
@@ -32,6 +34,59 @@ const Companies = () => {
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [descFilter, setDescFilter] = useState<string>("all");
+  const [generatingIds, setGeneratingIds] = useState<Set<string>>(new Set());
+  const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
+  
+  const generateDescription = useGenerateCompanyDescription();
+  const updateCompany = useUpdateCompany();
+  const { toast } = useToast();
+  const queryClient = useQueryClient();
+
+  const handleQuickGenerate = async (company: Company) => {
+    setGeneratingIds(prev => new Set(prev).add(company.id));
+    
+    try {
+      const result = await generateDescription.mutateAsync({
+        companyName: company.name,
+        website: company.website || undefined,
+      });
+      
+      await updateCompany.mutateAsync({
+        id: company.id,
+        data: { description: result.description },
+      });
+      
+      queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+      
+      setGeneratingIds(prev => {
+        const next = new Set(prev);
+        next.delete(company.id);
+        return next;
+      });
+      setCompletedIds(prev => new Set(prev).add(company.id));
+      
+      toast({ title: "Description generated and saved" });
+      
+      setTimeout(() => {
+        setCompletedIds(prev => {
+          const next = new Set(prev);
+          next.delete(company.id);
+          return next;
+        });
+      }, 3000);
+    } catch (error) {
+      setGeneratingIds(prev => {
+        const next = new Set(prev);
+        next.delete(company.id);
+        return next;
+      });
+      toast({ 
+        title: "Generation failed", 
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive" 
+      });
+    }
+  };
 
   const filteredCompanies = companies?.filter((company) => {
     const matchesSearch = company.name.toLowerCase().includes(search.toLowerCase());
@@ -224,10 +279,30 @@ const Companies = () => {
                         {company.regions?.name || <span className="text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell>
-                        <Badge variant={descStatus.variant} className="gap-1">
-                          <descStatus.icon className="h-3 w-3" />
-                          {descStatus.label}
-                        </Badge>
+                        <div className="flex items-center gap-2">
+                          <Badge variant={descStatus.variant} className="gap-1">
+                            <descStatus.icon className="h-3 w-3" />
+                            {descStatus.label}
+                          </Badge>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs"
+                            onClick={() => handleQuickGenerate(company)}
+                            disabled={generatingIds.has(company.id)}
+                          >
+                            {completedIds.has(company.id) ? (
+                              <Check className="h-4 w-4 text-green-500" />
+                            ) : generatingIds.has(company.id) ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <>
+                                <Sparkles className="h-3 w-3 mr-1" />
+                                GD
+                              </>
+                            )}
+                          </Button>
+                        </div>
                       </TableCell>
                       <TableCell>
                         <Button variant="ghost" size="sm" asChild>
