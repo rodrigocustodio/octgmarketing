@@ -50,6 +50,55 @@ const getCategoryLabel = (role: string) => {
   return INDUSTRY_ROLES.find(r => r.value === role)?.label || role;
 };
 
+// Generate FAQ content for AI search optimization
+const generateFAQs = (company: any, categoryLabel: string) => {
+  const faqs = [];
+  
+  faqs.push({
+    "@type": "Question",
+    name: `What does ${company.name} do?`,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: company.description || `${company.name} is a ${categoryLabel.toLowerCase()} company in the OCTG (Oil Country Tubular Goods) industry${company.country ? `, headquartered in ${company.country}` : ""}.`
+    }
+  });
+
+  if (company.headquarters || company.country) {
+    faqs.push({
+      "@type": "Question",
+      name: `Where is ${company.name} located?`,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: company.headquarters 
+          ? `${company.name} is headquartered in ${company.headquarters}${company.country ? `, ${company.country}` : ""}.`
+          : `${company.name} is located in ${company.country}.`
+      }
+    });
+  }
+
+  if (company.year_founded) {
+    faqs.push({
+      "@type": "Question",
+      name: `When was ${company.name} founded?`,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: `${company.name} was founded in ${company.year_founded}.`
+      }
+    });
+  }
+
+  faqs.push({
+    "@type": "Question",
+    name: `What industry does ${company.name} operate in?`,
+    acceptedAnswer: {
+      "@type": "Answer",
+      text: `${company.name} operates in the ${categoryLabel} sector of the OCTG (Oil Country Tubular Goods) industry, serving the oil and gas sector.`
+    }
+  });
+
+  return faqs;
+};
+
 export default function CompanyDetail() {
   const { slug } = useParams<{ slug: string }>();
   const { data: company, isLoading } = useCompanyBySlug(slug || "");
@@ -100,22 +149,95 @@ export default function CompanyDetail() {
 
   const categoryLabel = getCategoryLabel(company.industry_role || "");
 
-  // Schema.org structured data for Organization
-  const structuredData = {
+  // Enhanced Schema.org structured data for Organization
+  const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
+    "@id": `https://octgindex.com/directory/company/${slug}#organization`,
     name: company.name,
-    url: company.website || undefined,
+    url: company.website || `https://octgindex.com/directory/company/${slug}`,
     telephone: company.phone || undefined,
     email: company.email || undefined,
     foundingDate: company.year_founded ? String(company.year_founded) : undefined,
+    description: company.description || `${company.name} is a ${categoryLabel.toLowerCase()} company in the OCTG industry.`,
+    industry: "Oil Country Tubular Goods (OCTG)",
+    knowsAbout: ["OCTG", "Oil Country Tubular Goods", categoryLabel, "Oil and Gas", "Steel Manufacturing"],
+    areaServed: company.region?.name || "Global",
     address: company.headquarters ? {
       "@type": "PostalAddress",
       addressLocality: company.headquarters,
       addressCountry: company.country || undefined,
     } : undefined,
-    description: company.description || company.notes || undefined,
   };
+
+  // BreadcrumbList Schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://octgindex.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "OCTG Directory",
+        item: "https://octgindex.com/directory"
+      },
+      ...(company.region ? [{
+        "@type": "ListItem",
+        position: 3,
+        name: company.region.name,
+        item: `https://octgindex.com/directory/region/${company.region.slug}`
+      }] : []),
+      {
+        "@type": "ListItem",
+        position: company.region ? 4 : 3,
+        name: company.name,
+        item: `https://octgindex.com/directory/company/${slug}`
+      }
+    ]
+  };
+
+  // FAQPage Schema for AI search optimization
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: generateFAQs(company, categoryLabel)
+  };
+
+  // WebPage Schema with speakable content
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `https://octgindex.com/directory/company/${slug}`,
+    name: `${company.name} - OCTG ${categoryLabel}`,
+    description: company.description || `${company.name} is a ${categoryLabel.toLowerCase()} company in the OCTG industry.`,
+    url: `https://octgindex.com/directory/company/${slug}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "OCTG Index",
+      url: "https://octgindex.com"
+    },
+    about: {
+      "@id": `https://octgindex.com/directory/company/${slug}#organization`
+    },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: [".company-description", ".company-info"]
+    }
+  };
+
+  // Combined structured data
+  const structuredData = [
+    organizationSchema,
+    breadcrumbSchema,
+    faqSchema,
+    webPageSchema
+  ];
 
   return (
     <>
@@ -214,7 +336,7 @@ export default function CompanyDetail() {
                 <CardHeader>
                   <CardTitle>Company Information</CardTitle>
                 </CardHeader>
-                <CardContent>
+                <CardContent className="company-info">
                   <div className="grid sm:grid-cols-2 gap-6">
                     {company.year_founded && (
                       <div className="flex items-start gap-3">
@@ -278,15 +400,48 @@ export default function CompanyDetail() {
               {company.description && (
                 <Card>
                   <CardHeader>
-                    <CardTitle>About</CardTitle>
+                    <CardTitle>About {company.name}</CardTitle>
                   </CardHeader>
                   <CardContent>
-                    <p className="text-muted-foreground leading-relaxed">
+                    <p className="company-description text-muted-foreground leading-relaxed">
                       {company.description}
                     </p>
                   </CardContent>
                 </Card>
               )}
+
+              {/* FAQ Section for AI Search */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Frequently Asked Questions</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  <div>
+                    <h3 className="font-medium mb-2">What does {company.name} do?</h3>
+                    <p className="text-muted-foreground text-sm">
+                      {company.description || `${company.name} is a ${categoryLabel.toLowerCase()} company in the OCTG (Oil Country Tubular Goods) industry${company.country ? `, headquartered in ${company.country}` : ""}.`}
+                    </p>
+                  </div>
+                  {(company.headquarters || company.country) && (
+                    <div>
+                      <h3 className="font-medium mb-2">Where is {company.name} located?</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {company.headquarters 
+                          ? `${company.name} is headquartered in ${company.headquarters}${company.country ? `, ${company.country}` : ""}.`
+                          : `${company.name} is located in ${company.country}.`}
+                      </p>
+                    </div>
+                  )}
+                  {company.year_founded && (
+                    <div>
+                      <h3 className="font-medium mb-2">When was {company.name} founded?</h3>
+                      <p className="text-muted-foreground text-sm">
+                        {company.name} was founded in {company.year_founded}.
+                      </p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
             </div>
 
             {/* Right Column - Sidebar */}

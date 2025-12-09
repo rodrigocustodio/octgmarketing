@@ -1,5 +1,6 @@
 import { useState, useMemo } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
 import { SEOHead } from "@/components/SEOHead";
 import { Footer } from "@/components/layout/Footer";
@@ -90,6 +91,94 @@ export default function Directory() {
 
   const hasFilters = searchQuery || selectedRegion || selectedCategory;
 
+  // WebPage and ItemList Schema for AI search optimization
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": "https://octgindex.com/directory",
+    name: "OCTG Industry Directory - Global Companies & Suppliers",
+    description: "Comprehensive directory of 200+ OCTG companies worldwide. Find mills, manufacturers, distributors, inspection services, drilling contractors, and logistics providers across all regions.",
+    url: "https://octgindex.com/directory",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "OCTG Index",
+      url: "https://octgindex.com"
+    },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: [".directory-intro", ".directory-stats"]
+    }
+  };
+
+  // ItemList Schema for directory listings
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "OCTG Companies Directory",
+    description: "Complete listing of OCTG industry companies worldwide",
+    numberOfItems: stats?.totalCompanies || 200,
+    itemListElement: companies?.slice(0, 20).map((company, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://octgindex.com/directory/company/${company.slug}`,
+      name: company.name
+    })) || []
+  };
+
+  // BreadcrumbList Schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://octgindex.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "OCTG Directory",
+        item: "https://octgindex.com/directory"
+      }
+    ]
+  };
+
+  // FAQPage Schema
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is the OCTG Industry Directory?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The OCTG Industry Directory is a comprehensive database of ${stats?.totalCompanies || 200}+ companies in the Oil Country Tubular Goods industry, including mills, manufacturers, inspection services, drilling contractors, and logistics providers across ${stats?.regionsWithCompanies || 6} global regions.`
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What types of OCTG companies are listed?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The directory includes Mills & Manufacturers, Yards & Threading, Inspection Services, Drilling Contractors, Logistics & Transportation, Software & Technology, and Trading & Distribution companies."
+        }
+      },
+      {
+        "@type": "Question",
+        name: "How many OCTG companies are in the directory?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The directory currently lists ${stats?.totalCompanies || 200}+ OCTG companies from around the world, spanning ${stats?.categoriesWithCompanies || 7} industry categories and ${stats?.regionsWithCompanies || 6} geographic regions.`
+        }
+      }
+    ]
+  };
+
+  const structuredData = [webPageSchema, itemListSchema, breadcrumbSchema, faqSchema];
+
   return (
     <>
       <SEOHead
@@ -97,6 +186,12 @@ export default function Directory() {
         description="Comprehensive directory of 200+ OCTG companies worldwide. Find mills, manufacturers, distributors, inspection services, drilling contractors, and logistics providers across all regions."
         canonical="https://octgindex.com/directory"
       />
+
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
 
       <Header />
       
@@ -116,13 +211,15 @@ export default function Directory() {
               </BreadcrumbList>
             </Breadcrumb>
 
-            <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
-              OCTG Industry Directory
-            </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mb-8">
-              The definitive guide to global OCTG companies. Search mills, manufacturers, 
-              distributors, and service providers across all regions.
-            </p>
+            <div className="directory-intro">
+              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold mb-4">
+                OCTG Industry Directory
+              </h1>
+              <p className="text-lg text-muted-foreground max-w-2xl mb-8">
+                The definitive guide to global OCTG companies. Search mills, manufacturers, 
+                distributors, and service providers across all regions.
+              </p>
+            </div>
 
             {/* Search Bar */}
             <div className="relative max-w-xl">
@@ -141,7 +238,7 @@ export default function Directory() {
         {/* Stats Section */}
         <section className="border-b border-border bg-muted/20">
           <div className="container py-6">
-            <div className="flex flex-wrap gap-6 md:gap-12 text-center md:text-left">
+            <div className="directory-stats flex flex-wrap gap-6 md:gap-12 text-center md:text-left">
               {statsLoading ? (
                 <>
                   <Skeleton className="h-12 w-32" />

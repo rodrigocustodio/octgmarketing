@@ -1,4 +1,5 @@
 import { Link, useParams } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/SEOHead";
@@ -47,7 +48,7 @@ const getCategoryLabel = (role: string) => {
   return INDUSTRY_ROLES.find(r => r.value === role)?.label || role;
 };
 
-const getCategoryDescription = (role: string) => {
+const getCategoryDescriptionText = (role: string) => {
   switch (role) {
     case "mill": return "Seamless and welded OCTG manufacturers producing casing, tubing, and drill pipe.";
     case "yard": return "Threading facilities, repair shops, and coupling manufacturers.";
@@ -66,7 +67,7 @@ export default function DirectoryCategory() {
   const { data: regions } = useRegions();
 
   const categoryLabel = getCategoryLabel(slug || "");
-  const categoryDescription = getCategoryDescription(slug || "");
+  const categoryDescription = getCategoryDescriptionText(slug || "");
   const companyCount = companies?.length || 0;
 
   // Group companies by region
@@ -84,6 +85,92 @@ export default function DirectoryCategory() {
   const getRegionSlug = (regionId: string) => {
     return regions?.find(r => r.id === regionId)?.slug || "";
   };
+
+  // WebPage Schema
+  const webPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `https://octgindex.com/directory/category/${slug}`,
+    name: `${categoryLabel} Companies - OCTG Directory`,
+    description: `${categoryDescription} ${companyCount} companies listed globally.`,
+    url: `https://octgindex.com/directory/category/${slug}`,
+    isPartOf: {
+      "@type": "WebSite",
+      name: "OCTG Index",
+      url: "https://octgindex.com"
+    },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: [".category-hero", ".category-description"]
+    }
+  };
+
+  // ItemList Schema
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: `${categoryLabel} Companies`,
+    description: `${categoryDescription}`,
+    numberOfItems: companyCount,
+    itemListElement: companies?.slice(0, 20).map((company, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://octgindex.com/directory/company/${company.slug}`,
+      name: company.name
+    })) || []
+  };
+
+  // BreadcrumbList Schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://octgindex.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "OCTG Directory",
+        item: "https://octgindex.com/directory"
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: categoryLabel,
+        item: `https://octgindex.com/directory/category/${slug}`
+      }
+    ]
+  };
+
+  // FAQPage Schema
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: `What are OCTG ${categoryLabel}?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: categoryDescription
+        }
+      },
+      {
+        "@type": "Question",
+        name: `How many ${categoryLabel.toLowerCase()} companies are listed?`,
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The OCTG Index directory lists ${companyCount} ${categoryLabel.toLowerCase()} companies operating across multiple global regions.`
+        }
+      }
+    ]
+  };
+
+  const structuredData = [webPageSchema, itemListSchema, breadcrumbSchema, faqSchema];
 
   if (isLoading) {
     return (
@@ -132,11 +219,17 @@ export default function DirectoryCategory() {
         canonical={`https://octgindex.com/directory/category/${slug}`}
       />
 
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+
       <Header />
       
       <main className="min-h-screen bg-background">
         {/* Hero Section */}
-        <section className="bg-gradient-to-br from-background via-muted/30 to-background border-b border-border">
+        <section className="category-hero bg-gradient-to-br from-background via-muted/30 to-background border-b border-border">
           <div className="container py-12 md:py-16">
             <Breadcrumb className="mb-6">
               <BreadcrumbList>
@@ -162,7 +255,7 @@ export default function DirectoryCategory() {
                 {categoryLabel}
               </h1>
             </div>
-            <p className="text-lg text-muted-foreground max-w-2xl">
+            <p className="category-description text-lg text-muted-foreground max-w-2xl">
               {categoryDescription} {companyCount} companies listed globally.
             </p>
           </div>

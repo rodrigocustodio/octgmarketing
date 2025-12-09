@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/SEOHead";
@@ -7,7 +8,15 @@ import { useExecutivesByRegion, useExecutiveStats } from "@/hooks/useExecutives"
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Building2, MapPin } from "lucide-react";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
+import { User, Building2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 
 const REGIONS = [
@@ -24,6 +33,95 @@ export default function CEODirectory() {
   const { data: executives, isLoading } = useExecutivesByRegion(selectedRegion);
   const { data: stats } = useExecutiveStats();
 
+  // CollectionPage Schema for AI search optimization
+  const collectionPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": "https://octgindex.com/ceo-directory",
+    name: "OCTG Industry Leadership Directory",
+    description: `Meet the CEOs leading ${stats?.total || 49} publicly traded companies in the OCTG industry. Executive profiles spanning steel manufacturing, oilfield services, and drilling.`,
+    url: "https://octgindex.com/ceo-directory",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "OCTG Index",
+      url: "https://octgindex.com"
+    },
+    speakable: {
+      "@type": "SpeakableSpecification",
+      cssSelector: [".directory-hero", ".directory-stats"]
+    }
+  };
+
+  // ItemList Schema for CEO listings
+  const itemListSchema = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "OCTG Industry Executives",
+    description: "Complete listing of CEOs and executives in the OCTG industry",
+    numberOfItems: stats?.total || 49,
+    itemListElement: executives?.slice(0, 20).map((exec, index) => ({
+      "@type": "ListItem",
+      position: index + 1,
+      url: `https://octgindex.com/ceo/${exec.slug}`,
+      name: exec.name,
+      description: `${exec.title} at ${exec.company_name}`
+    })) || []
+  };
+
+  // BreadcrumbList Schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://octgindex.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "CEO Directory",
+        item: "https://octgindex.com/ceo-directory"
+      }
+    ]
+  };
+
+  // FAQPage Schema
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: [
+      {
+        "@type": "Question",
+        name: "What is the OCTG CEO Directory?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The OCTG CEO Directory is a comprehensive database of ${stats?.total || 49} chief executives leading major publicly traded companies in the Oil Country Tubular Goods industry, including steel manufacturers, oilfield service companies, and drilling contractors.`
+        }
+      },
+      {
+        "@type": "Question",
+        name: "How many OCTG company CEOs are listed?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: `The directory features ${stats?.total || 49} CEOs from publicly traded OCTG companies across ${REGIONS.length - 1} global regions: Americas (${stats?.byRegion?.Americas || 18}), Europe (${stats?.byRegion?.Europe || 11}), Asia-Pacific (${stats?.byRegion?.["Asia-Pacific"] || 7}), and Australia (${stats?.byRegion?.Australia || 1}).`
+        }
+      },
+      {
+        "@type": "Question",
+        name: "What industries do these CEOs represent?",
+        acceptedAnswer: {
+          "@type": "Answer",
+          text: "The CEOs in this directory lead companies across steel manufacturing, OCTG production, oilfield services, drilling operations, energy exploration, and related sectors of the oil and gas industry."
+        }
+      }
+    ]
+  };
+
+  const structuredData = [collectionPageSchema, itemListSchema, breadcrumbSchema, faqSchema];
+
   return (
     <>
       <SEOHead
@@ -32,12 +130,30 @@ export default function CEODirectory() {
         canonical="https://octgindex.com/ceo-directory"
       />
 
+      <Helmet>
+        <script type="application/ld+json">
+          {JSON.stringify(structuredData)}
+        </script>
+      </Helmet>
+
       <div className="min-h-screen flex flex-col bg-background">
         <Header />
 
         {/* Hero Section */}
-        <section className="relative py-16 md:py-24 bg-gradient-to-b from-card to-background border-b border-border">
+        <section className="directory-hero relative py-16 md:py-24 bg-gradient-to-b from-card to-background border-b border-border">
           <div className="container mx-auto px-4">
+            <Breadcrumb className="mb-6">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>CEO Directory</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
             <div className="max-w-3xl">
               <Badge variant="outline" className="mb-4">
                 Leadership Directory
@@ -53,7 +169,7 @@ export default function CEODirectory() {
             </div>
 
             {/* Stats */}
-            <div className="flex flex-wrap gap-6 mt-8">
+            <div className="directory-stats flex flex-wrap gap-6 mt-8">
               {REGIONS.slice(1).map((region) => (
                 <div key={region.value} className="text-center">
                   <div className="text-2xl font-bold text-foreground">
@@ -112,7 +228,7 @@ export default function CEODirectory() {
                         {executive.photo_url ? (
                           <img
                             src={executive.photo_url}
-                            alt={executive.name}
+                            alt={`${executive.name}, ${executive.title} at ${executive.company_name}`}
                             className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
