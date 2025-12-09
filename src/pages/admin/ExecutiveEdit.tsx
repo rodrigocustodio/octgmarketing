@@ -6,6 +6,7 @@ import {
   useUpdateExecutive,
   useCreateExecutive,
 } from "@/hooks/useExecutives";
+import { useSearchTopic } from "@/hooks/usePipeline";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -19,7 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { ArrowLeft, Save, Loader2, User } from "lucide-react";
+import { ArrowLeft, Save, Loader2, User, Newspaper } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -40,6 +41,7 @@ export default function ExecutiveEdit() {
   const { data: executive, isLoading } = useExecutiveById(id || "");
   const updateExecutive = useUpdateExecutive();
   const createExecutive = useCreateExecutive();
+  const searchTopic = useSearchTopic();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -55,6 +57,39 @@ export default function ExecutiveEdit() {
   });
   const [isUploading, setIsUploading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [isSearchingNews, setIsSearchingNews] = useState(false);
+
+  const handleFindNews = async () => {
+    if (!formData.name || !formData.company_name) {
+      toast.error("Please fill in CEO name and company name first");
+      return;
+    }
+
+    setIsSearchingNews(true);
+    toast.loading("Searching for news...", { id: "news-search" });
+
+    try {
+      const searchQuery = `"${formData.name}" ${formData.company_name} CEO executive OCTG`;
+      const result = await searchTopic.mutateAsync(searchQuery);
+
+      if (result.articlesInserted > 0) {
+        toast.success(
+          `Found ${result.articlesInserted} news articles. Go to Pipeline to generate drafts.`,
+          { id: "news-search" }
+        );
+      } else {
+        toast.info(
+          "No new articles found. Try again later or check the Pipeline.",
+          { id: "news-search" }
+        );
+      }
+    } catch (error: any) {
+      console.error("News search error:", error);
+      toast.error(error.message || "Failed to search for news", { id: "news-search" });
+    } finally {
+      setIsSearchingNews(false);
+    }
+  };
 
   useEffect(() => {
     if (executive && !isNew) {
@@ -340,6 +375,38 @@ export default function ExecutiveEdit() {
                     className="font-mono text-sm"
                   />
                 </div>
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm">Related News</CardTitle>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Search for recent news articles about {formData.name || "this executive"} and {formData.company_name || "their company"}.
+                </p>
+                <Button
+                  variant="outline"
+                  className="w-full"
+                  onClick={handleFindNews}
+                  disabled={isSearchingNews || !formData.name || !formData.company_name}
+                >
+                  {isSearchingNews ? (
+                    <>
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                      Searching...
+                    </>
+                  ) : (
+                    <>
+                      <Newspaper className="mr-2 h-4 w-4" />
+                      Find News
+                    </>
+                  )}
+                </Button>
+                <p className="text-xs text-muted-foreground">
+                  Found articles will appear in the Pipeline for draft generation.
+                </p>
               </CardContent>
             </Card>
           </div>
