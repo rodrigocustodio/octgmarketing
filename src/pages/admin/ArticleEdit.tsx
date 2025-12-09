@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -41,6 +41,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import { ContentGallery } from "@/components/admin/ContentGallery";
 
 const ArticleEdit = () => {
   const { id } = useParams();
@@ -61,6 +62,8 @@ const ArticleEdit = () => {
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isGeneratingImage, setIsGeneratingImage] = useState(false);
+  const [isDroppingImage, setIsDroppingImage] = useState(false);
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Fetch article
   const { data: article, isLoading } = useQuery({
@@ -354,6 +357,44 @@ const ArticleEdit = () => {
     );
   };
 
+  // Handle drop on textarea
+  const handleContentDrop = (e: React.DragEvent<HTMLTextAreaElement>) => {
+    const isGalleryImage = e.dataTransfer.getData("application/x-gallery-image");
+    const imageUrl = e.dataTransfer.getData("text/plain");
+    
+    if (isGalleryImage && imageUrl) {
+      e.preventDefault();
+      
+      const textarea = textareaRef.current;
+      if (!textarea) return;
+
+      const cursorPos = textarea.selectionStart || 0;
+      const textBefore = formData.body.substring(0, cursorPos);
+      const textAfter = formData.body.substring(cursorPos);
+      const markdown = `\n![Image](${imageUrl})\n`;
+
+      setFormData((prev) => ({
+        ...prev,
+        body: textBefore + markdown + textAfter,
+      }));
+
+      setIsDroppingImage(false);
+      toast.success("Image inserted into content");
+    }
+  };
+
+  const handleContentDragOver = (e: React.DragEvent<HTMLTextAreaElement>) => {
+    const isGalleryImage = e.dataTransfer.types.includes("application/x-gallery-image");
+    if (isGalleryImage) {
+      e.preventDefault();
+      setIsDroppingImage(true);
+    }
+  };
+
+  const handleContentDragLeave = () => {
+    setIsDroppingImage(false);
+  };
+
   if (isLoading) {
     return (
       <AdminLayout>
@@ -496,12 +537,18 @@ const ArticleEdit = () => {
                   </TabsList>
                   <TabsContent value="edit">
                     <Textarea
+                      ref={textareaRef}
                       value={formData.body}
                       onChange={(e) =>
                         setFormData((prev) => ({ ...prev, body: e.target.value }))
                       }
-                      placeholder="Write your article content in markdown..."
-                      className="min-h-[400px] font-mono text-sm"
+                      onDrop={handleContentDrop}
+                      onDragOver={handleContentDragOver}
+                      onDragLeave={handleContentDragLeave}
+                      placeholder="Write your article content in markdown... Drag images from the gallery below!"
+                      className={`min-h-[400px] font-mono text-sm transition-colors ${
+                        isDroppingImage ? "border-primary border-2 bg-primary/5" : ""
+                      }`}
                     />
                   </TabsContent>
                   <TabsContent value="preview">
@@ -650,6 +697,11 @@ const ArticleEdit = () => {
                 />
               </CardContent>
             </Card>
+
+            {/* Content Gallery */}
+            {!isNew && id && (
+              <ContentGallery articleId={id} />
+            )}
 
             {/* Region */}
             <Card>
