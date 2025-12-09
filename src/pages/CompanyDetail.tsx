@@ -265,14 +265,14 @@ export default function CompanyDetail() {
               </Card>
 
               {/* About */}
-              {(company.notes || company.description) && (
+              {company.description && (
                 <Card>
                   <CardHeader>
                     <CardTitle>About</CardTitle>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground leading-relaxed">
-                      {company.notes || company.description}
+                      {company.description}
                     </p>
                   </CardContent>
                 </Card>
