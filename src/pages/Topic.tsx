@@ -15,6 +15,7 @@ import {
 import { useArticlesByTopic, useTopics } from "@/hooks/useArticles";
 import { format } from "date-fns";
 import heroImage from "@/assets/hero-octg.jpg";
+import { generateTopicTitle, generateTopicDescription } from "@/lib/seo-utils";
 
 function formatArticleDate(dateString: string | null): string {
   if (!dateString) return "";
@@ -91,8 +92,8 @@ const Topic = () => {
   return (
     <>
       <SEOHead
-        title={`${topic.name} | OCTG Index`}
-        description={description}
+        title={generateTopicTitle(topic.name)}
+        description={generateTopicDescription(topic.name, description)}
         canonical={canonicalUrl}
       />
 

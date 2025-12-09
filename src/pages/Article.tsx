@@ -20,6 +20,7 @@ import { useArticleBySlug, useRelatedArticles } from "@/hooks/useArticles";
 import { markdownToHtml } from "@/lib/markdown";
 import { format } from "date-fns";
 import heroImage from "@/assets/hero-octg.jpg";
+import { generateArticleTitle, generateArticleDescription } from "@/lib/seo-utils";
 
 function formatArticleDate(dateString: string | null): string {
   if (!dateString) return "";
@@ -102,8 +103,8 @@ const Article = () => {
   return (
     <>
       <SEOHead
-        title={`${article.title} | OCTG Index`}
-        description={article.subtitle || "OCTG Index - Industry news and analysis"}
+        title={generateArticleTitle(article.title)}
+        description={generateArticleDescription(article.subtitle, article.body)}
         canonical={canonicalUrl}
         image={article.hero_image_url || undefined}
         type="article"

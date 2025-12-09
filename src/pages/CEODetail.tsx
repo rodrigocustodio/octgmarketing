@@ -16,6 +16,7 @@ import {
   Linkedin,
   ExternalLink,
 } from "lucide-react";
+import { generateCEOTitle, generateCEODescription } from "@/lib/seo-utils";
 
 const regionColors: Record<string, string> = {
   Americas: "bg-blue-500/20 text-blue-400 border-blue-500/30",
@@ -89,8 +90,8 @@ export default function CEODetail() {
   return (
     <>
       <SEOHead
-        title={`${executive.name} | ${executive.company_name} CEO`}
-        description={`${executive.name} is ${executive.title} of ${executive.company_name}. ${executive.bio?.slice(0, 120)}...`}
+        title={generateCEOTitle(executive.name, executive.title, executive.company_name)}
+        description={generateCEODescription(executive.name, executive.title, executive.company_name, executive.bio)}
         canonical={`https://octgindex.com/ceo/${executive.slug}`}
         image={executive.photo_url || undefined}
       />
