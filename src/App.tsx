@@ -38,6 +38,7 @@ import Executives from "./pages/admin/Executives";
 import ExecutiveEdit from "./pages/admin/ExecutiveEdit";
 import Companies from "./pages/admin/Companies";
 import CompanyEdit from "./pages/admin/CompanyEdit";
+import OctgDirectory from "./pages/OctgDirectory";
 
 const queryClient = new QueryClient();
 
@@ -63,6 +64,7 @@ const App = () => (
                 <Route path="/directory/company/:slug" element={<CompanyDetail />} />
                 <Route path="/ceo-directory" element={<CEODirectory />} />
                 <Route path="/ceo/:slug" element={<CEODetail />} />
+                <Route path="/octg-directory" element={<OctgDirectory />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsAndConditions />} />
                 <Route path="/newsletter-terms" element={<NewsletterTerms />} />

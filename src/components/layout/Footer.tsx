@@ -10,21 +10,17 @@ const footerLinks = {
     { name: "Asia-Pacific", href: "/region/asia-pacific" },
     { name: "Australia", href: "/region/australia" },
   ],
-  topics: [
-    { name: "Mills & Manufacturing", href: "/topic/mills-manufacturing" },
-    { name: "Yards & Supply Chain", href: "/topic/yards-supply-chain" },
-    { name: "Pricing & Market", href: "/topic/pricing-market" },
-    { name: "Projects & Contracts", href: "/topic/projects-contracts" },
-    { name: "Careers & People", href: "/topic/careers-people" },
-    { name: "Companies & Strategy", href: "/topic/companies-strategy" },
-    { name: "HSE & Regulations", href: "/topic/hse-regulations" },
-    { name: "Ports & Terminals", href: "/topic/ports-terminals" },
-    { name: "Rigs & Wellsite", href: "/topic/rigs-wellsite" },
-    { name: "Technology & Digitalization", href: "/topic/technology-digitalization" },
+  products: [
+    { name: "All Products", href: "/octg-directory" },
+    { name: "Pipe Types", href: "/octg-directory/pipe-types" },
+    { name: "Material Grades", href: "/octg-directory/grades" },
+    { name: "Connections", href: "/octg-directory/connections" },
+    { name: "Accessories", href: "/octg-directory/accessories" },
   ],
-  company: [
-    { name: "OCTG Industry Directory", href: "/directory" },
+  directories: [
+    { name: "Company Directory", href: "/directory" },
     { name: "CEO Directory", href: "/ceo-directory" },
+    { name: "Product Directory", href: "/octg-directory" },
   ],
   legal: [
     { name: "Privacy Policy", href: "/privacy" },
@@ -52,9 +48,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Topics</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Products</h4>
             <ul className="space-y-2">
-              {footerLinks.topics.map((link) => (
+              {footerLinks.products.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.name}
@@ -64,9 +60,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Global Leaders</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Directories</h4>
             <ul className="space-y-2">
-              {footerLinks.company.map((link) => (
+              {footerLinks.directories.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.name}
