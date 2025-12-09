@@ -32,6 +32,17 @@ const REGION_OPTIONS = [
   { value: "Australia", label: "Australia" },
 ];
 
+const SEARCH_PRESETS = [
+  { label: "OCTG News", query: "OCTG pipe tube casing news announcements" },
+  { label: "Steel Prices", query: "steel pipe prices market pricing trends" },
+  { label: "Drilling Activity", query: "drilling rig count oil gas exploration" },
+  { label: "Tariffs & Trade", query: "steel tariffs import sanctions trade policy" },
+  { label: "Pipeline Projects", query: "pipeline construction contracts offshore" },
+  { label: "M&A Deals", query: "mergers acquisitions steel oil gas companies" },
+  { label: "Mill Updates", query: "steel mill production capacity expansion" },
+  { label: "Shale & Permian", query: "shale Permian basin fracking production" },
+];
+
 const Pipeline = () => {
   const [selectedRegion, setSelectedRegion] = useState<string>("all");
   const [topicQuery, setTopicQuery] = useState<string>("");
@@ -52,6 +63,11 @@ const Pipeline = () => {
     if (topicQuery.trim()) {
       searchTopic.mutate(topicQuery.trim());
     }
+  };
+
+  const handlePresetClick = (query: string) => {
+    setTopicQuery(query);
+    searchTopic.mutate(query);
   };
 
   return (
@@ -111,9 +127,25 @@ const Pipeline = () => {
                   )}
                 </Button>
               </div>
-              <p className="text-xs text-muted-foreground">
-                Examples: "steel tariffs import sanctions", "drilling rig count shale", "offshore pipeline contracts Middle East"
-              </p>
+              
+              {/* Quick Search Presets */}
+              <div className="space-y-2">
+                <p className="text-xs text-muted-foreground">Quick searches:</p>
+                <div className="flex flex-wrap gap-2">
+                  {SEARCH_PRESETS.map((preset) => (
+                    <Button
+                      key={preset.label}
+                      variant="outline"
+                      size="sm"
+                      onClick={() => handlePresetClick(preset.query)}
+                      disabled={searchTopic.isPending}
+                      className="text-xs hover:bg-accent hover:text-accent-foreground"
+                    >
+                      {preset.label}
+                    </Button>
+                  ))}
+                </div>
+              </div>
             </CardContent>
           </Card>
 
