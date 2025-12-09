@@ -125,7 +125,7 @@ export default function TermsAndConditions() {
             </p>
             <p className="text-foreground/90 leading-relaxed mt-4">
               <strong>OCTG Marketing Group</strong><br />
-              Email: legal@octgindex.com
+              Email: info@octgindex.com
             </p>
           </section>
         </article>

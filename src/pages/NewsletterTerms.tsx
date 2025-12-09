@@ -85,7 +85,7 @@ export default function NewsletterTerms() {
             </p>
             <ul className="list-disc pl-6 mb-4 text-foreground/90">
               <li>Clicking the "Unsubscribe" link at the bottom of any newsletter email</li>
-              <li>Contacting us directly at newsletter@octgindex.com</li>
+              <li>Contacting us directly at info@octgindex.com</li>
             </ul>
             <p className="text-foreground/90 leading-relaxed">
               Unsubscribe requests are processed immediately. You may continue to receive emails that were already in queue at the time of your request, but no new emails will be sent after processing.
@@ -130,7 +130,7 @@ export default function NewsletterTerms() {
             </p>
             <p className="text-foreground/90 leading-relaxed mt-4">
               <strong>OCTG Marketing Group</strong><br />
-              Email: newsletter@octgindex.com
+              Email: info@octgindex.com
             </p>
           </section>
         </article>
