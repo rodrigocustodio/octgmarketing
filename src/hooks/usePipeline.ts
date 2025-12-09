@@ -182,3 +182,32 @@ export function useGenerateFromContent() {
     },
   });
 }
+
+export function useFixArticleEndings() {
+  const { toast } = useToast();
+
+  return useMutation({
+    mutationFn: async (options?: { table?: 'articles' | 'drafts' | 'both'; dryRun?: boolean }) => {
+      const { data, error } = await supabase.functions.invoke("fix-article-endings", {
+        method: "POST",
+        body: options || { table: 'both', dryRun: false },
+      });
+      
+      if (error) throw error;
+      return data;
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "Article Endings Fixed",
+        description: `Updated ${data.articlesFixed} articles and ${data.draftsFixed} drafts.`,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Fix Failed",
+        description: error.message,
+        variant: "destructive",
+      });
+    },
+  });
+}
