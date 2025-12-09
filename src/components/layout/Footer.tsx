@@ -16,10 +16,8 @@ const footerLinks = {
     { name: "Projects & Contracts", href: "/topic/projects-contracts" },
   ],
   company: [
-    { name: "About Us", href: "/about" },
-    { name: "Contact", href: "/contact" },
-    { name: "Advertise", href: "/advertise" },
-    { name: "Careers", href: "/careers" },
+    { name: "Directory", href: "/directory" },
+    { name: "CEO Directory", href: "/ceo-directory" },
   ],
   legal: [
     { name: "Privacy Policy", href: "/privacy" },
