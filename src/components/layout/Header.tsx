@@ -52,7 +52,10 @@ export function Header() {
               </Link>
             ))}
             <Link to="/directory">
-              <Button variant="nav" size="sm">OCTG Directory</Button>
+              <Button variant="nav" size="sm">Companies</Button>
+            </Link>
+            <Link to="/octg-directory">
+              <Button variant="nav" size="sm">Products</Button>
             </Link>
             <Link to="/ceo-directory">
               <Button variant="nav" size="sm">Leadership</Button>
@@ -104,7 +107,10 @@ export function Header() {
                 </Link>
               ))}
               <Link to="/directory" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="nav" className="w-full justify-start">OCTG Directory</Button>
+                <Button variant="nav" className="w-full justify-start">Companies</Button>
+              </Link>
+              <Link to="/octg-directory" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="nav" className="w-full justify-start">Products</Button>
               </Link>
               <Link to="/ceo-directory" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="nav" className="w-full justify-start">Leadership</Button>
