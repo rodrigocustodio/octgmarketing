@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, Company } from "@/hooks/useCompanies";
@@ -22,7 +22,8 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check } from "lucide-react";
+import { Progress } from "@/components/ui/progress";
+import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check, Square } from "lucide-react";
 import { INDUSTRY_ROLES } from "@/hooks/useDirectory";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -37,10 +38,18 @@ const Companies = () => {
   const [generatingIds, setGeneratingIds] = useState<Set<string>>(new Set());
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   
+  // Bulk generation state
+  const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ completed: 0, total: 0, current: "" });
+  const shouldStopBulk = useRef(false);
+  
   const generateDescription = useGenerateCompanyDescription();
   const updateCompany = useUpdateCompany();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Count missing descriptions
+  const missingCount = companies?.filter(c => !c.description || c.description.length === 0).length || 0;
 
   const handleQuickGenerate = async (company: Company) => {
     setGeneratingIds(prev => new Set(prev).add(company.id));
@@ -88,6 +97,65 @@ const Companies = () => {
     }
   };
 
+  const handleBulkGenerate = async () => {
+    const missingCompanies = companies?.filter(c => !c.description || c.description.length === 0) || [];
+    
+    if (missingCompanies.length === 0) return;
+    
+    setIsBulkGenerating(true);
+    setBulkProgress({ completed: 0, total: missingCompanies.length, current: "" });
+    shouldStopBulk.current = false;
+    
+    let successCount = 0;
+    let failCount = 0;
+    
+    for (const company of missingCompanies) {
+      if (shouldStopBulk.current) {
+        toast({ title: "Bulk generation stopped", description: `Completed ${successCount} of ${missingCompanies.length}` });
+        break;
+      }
+      
+      setBulkProgress(prev => ({ ...prev, current: company.name }));
+      
+      try {
+        const result = await generateDescription.mutateAsync({
+          companyName: company.name,
+          website: company.website || undefined,
+        });
+        
+        await updateCompany.mutateAsync({
+          id: company.id,
+          data: { description: result.description },
+        });
+        
+        successCount++;
+      } catch (error) {
+        console.error(`Failed to generate for ${company.name}:`, error);
+        failCount++;
+      }
+      
+      setBulkProgress(prev => ({ ...prev, completed: prev.completed + 1 }));
+      
+      // Small delay between requests to avoid rate limiting
+      await new Promise(resolve => setTimeout(resolve, 500));
+    }
+    
+    // Refresh data and cleanup
+    queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+    setIsBulkGenerating(false);
+    
+    if (!shouldStopBulk.current) {
+      toast({ 
+        title: "Bulk generation complete", 
+        description: `Generated ${successCount} descriptions${failCount > 0 ? `, ${failCount} failed` : ""}` 
+      });
+    }
+  };
+
+  const handleStopBulk = () => {
+    shouldStopBulk.current = true;
+  };
+
   const filteredCompanies = companies?.filter((company) => {
     const matchesSearch = company.name.toLowerCase().includes(search.toLowerCase());
     const matchesRegion = regionFilter === "all" || company.region_id === regionFilter;
@@ -120,13 +188,50 @@ const Companies = () => {
               Manage company profiles and descriptions
             </p>
           </div>
-          <Button asChild>
-            <Link to="/admin/companies/new">
-              <Plus className="h-4 w-4 mr-2" />
-              Add Company
-            </Link>
-          </Button>
+          <div className="flex items-center gap-2">
+            {isBulkGenerating ? (
+              <Button
+                variant="destructive"
+                onClick={handleStopBulk}
+              >
+                <Square className="h-4 w-4 mr-2" />
+                Stop
+              </Button>
+            ) : (
+              <Button
+                variant="outline"
+                onClick={handleBulkGenerate}
+                disabled={missingCount === 0}
+                className="bg-accent/20 text-accent hover:bg-accent/30 border-accent/30"
+              >
+                <Sparkles className="h-4 w-4 mr-2" />
+                Generate All Missing ({missingCount})
+              </Button>
+            )}
+            <Button asChild>
+              <Link to="/admin/companies/new">
+                <Plus className="h-4 w-4 mr-2" />
+                Add Company
+              </Link>
+            </Button>
+          </div>
         </div>
+
+        {/* Bulk Progress Bar */}
+        {isBulkGenerating && (
+          <div className="bg-card border border-border rounded-lg p-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-sm font-medium flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin" />
+                Generating: {bulkProgress.current}
+              </span>
+              <span className="text-sm text-muted-foreground">
+                {bulkProgress.completed} / {bulkProgress.total}
+              </span>
+            </div>
+            <Progress value={(bulkProgress.completed / bulkProgress.total) * 100} />
+          </div>
+        )}
 
         {/* Stats */}
         {companies && (
@@ -293,7 +398,7 @@ const Companies = () => {
                                 : "bg-accent/20 text-accent hover:bg-accent/30"
                             }`}
                             onClick={() => handleQuickGenerate(company)}
-                            disabled={generatingIds.has(company.id)}
+                            disabled={generatingIds.has(company.id) || isBulkGenerating}
                           >
                             {completedIds.has(company.id) ? (
                               <Check className="h-4 w-4 text-green-500" />
