@@ -21,6 +21,8 @@ export function getYouTubeVideoId(url: string): string | null {
     /(?:youtube\.com\/embed\/)([a-zA-Z0-9_-]{11})/,
     // Live URL: youtube.com/live/VIDEO_ID
     /(?:youtube\.com\/live\/)([a-zA-Z0-9_-]{11})/,
+    // Shorts URL: youtube.com/shorts/VIDEO_ID
+    /(?:youtube\.com\/shorts\/)([a-zA-Z0-9_-]{11})/,
   ];
 
   for (const pattern of patterns) {
@@ -58,8 +60,8 @@ export function getVideoEmbed(url: string): VideoEmbed | null {
     };
   }
 
-  // Check Bunny.net Stream iframe embed URLs
-  if (url.includes('mediadelivery.net/embed') || url.includes('bunnycdn.com/embed')) {
+  // Check Bunny.net Stream iframe embed URLs (both /embed/ and /play/)
+  if (url.includes('mediadelivery.net/embed') || url.includes('mediadelivery.net/play') || url.includes('bunnycdn.com/embed')) {
     return {
       type: 'bunny-iframe',
       embedUrl: url
