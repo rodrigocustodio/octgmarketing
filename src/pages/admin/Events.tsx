@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useMemo, useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -14,20 +14,25 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Calendar, Plus, Search, Edit, Trash2, Star, StarOff } from "lucide-react";
-import { useEvents, useDeleteEvent, useUpdateEvent } from "@/hooks/useEvents";
+import { Calendar, Plus, Search, Edit, Trash2, Star, StarOff, Sparkles, Loader2, Check, Square } from "lucide-react";
+import { useEvents, useDeleteEvent, useUpdateEvent, Event } from "@/hooks/useEvents";
 import { format } from "date-fns";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 function isUpcoming(startDate: string): boolean {
   return new Date(startDate) >= new Date(new Date().toDateString());
 }
 
 const AdminEvents = () => {
-  const { data: events, isLoading } = useEvents();
+  const { data: events, isLoading, refetch } = useEvents();
   const deleteEvent = useDeleteEvent();
   const updateEvent = useUpdateEvent();
   const [searchQuery, setSearchQuery] = useState("");
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
+  const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, currentName: "" });
+  const stopBulkRef = useRef(false);
 
   const filteredEvents = useMemo(() => {
     if (!events) return [];
@@ -40,13 +45,14 @@ const AdminEvents = () => {
     );
   }, [events, searchQuery]);
 
-  const { upcomingCount, pastCount, featuredCount } = useMemo(() => {
-    if (!events) return { upcomingCount: 0, pastCount: 0, featuredCount: 0 };
+  const { upcomingCount, pastCount, featuredCount, missingDescCount } = useMemo(() => {
+    if (!events) return { upcomingCount: 0, pastCount: 0, featuredCount: 0, missingDescCount: 0 };
 
     return {
       upcomingCount: events.filter((e) => isUpcoming(e.start_date)).length,
       pastCount: events.filter((e) => !isUpcoming(e.start_date)).length,
       featuredCount: events.filter((e) => e.is_featured).length,
+      missingDescCount: events.filter((e) => !e.description || e.description.length < 100).length,
     };
   }, [events]);
 
@@ -70,6 +76,99 @@ const AdminEvents = () => {
     }
   };
 
+  const handleGenerateDescription = async (event: Event) => {
+    setGeneratingId(event.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-event-description', {
+        body: {
+          eventName: event.name,
+          location: event.location,
+          website: event.website,
+          venue: event.venue,
+          startDate: event.start_date,
+          endDate: event.end_date,
+        },
+      });
+
+      if (error) throw error;
+      if (!data.success) throw new Error(data.error);
+
+      await updateEvent.mutateAsync({ id: event.id, description: data.description });
+      toast.success(`Description generated for ${event.name}`);
+    } catch (error: any) {
+      console.error('Generation error:', error);
+      toast.error(error.message || "Failed to generate description");
+    } finally {
+      setGeneratingId(null);
+    }
+  };
+
+  const handleBulkGenerate = async () => {
+    const eventsToProcess = events?.filter((e) => !e.description || e.description.length < 100) || [];
+    
+    if (eventsToProcess.length === 0) {
+      toast.info("All events already have descriptions");
+      return;
+    }
+
+    setIsBulkGenerating(true);
+    stopBulkRef.current = false;
+    setBulkProgress({ current: 0, total: eventsToProcess.length, currentName: "" });
+
+    const batchSize = 10;
+    let processed = 0;
+
+    for (let i = 0; i < eventsToProcess.length; i += batchSize) {
+      if (stopBulkRef.current) break;
+
+      const batch = eventsToProcess.slice(i, i + batchSize);
+      
+      for (const event of batch) {
+        if (stopBulkRef.current) break;
+
+        processed++;
+        setBulkProgress({ current: processed, total: eventsToProcess.length, currentName: event.name });
+
+        try {
+          const { data, error } = await supabase.functions.invoke('generate-event-description', {
+            body: {
+              eventName: event.name,
+              location: event.location,
+              website: event.website,
+              venue: event.venue,
+              startDate: event.start_date,
+              endDate: event.end_date,
+            },
+          });
+
+          if (!error && data.success) {
+            await updateEvent.mutateAsync({ id: event.id, description: data.description });
+          }
+        } catch (error) {
+          console.error('Bulk generation error for', event.name, error);
+        }
+
+        // Delay between items
+        await new Promise((resolve) => setTimeout(resolve, 500));
+      }
+
+      // Pause between batches
+      if (i + batchSize < eventsToProcess.length && !stopBulkRef.current) {
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+      }
+    }
+
+    setIsBulkGenerating(false);
+    setBulkProgress({ current: 0, total: 0, currentName: "" });
+    refetch();
+    toast.success(`Generated descriptions for ${processed} events`);
+  };
+
+  const handleStopBulk = () => {
+    stopBulkRef.current = true;
+    toast.info("Stopping bulk generation...");
+  };
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -79,16 +178,54 @@ const AdminEvents = () => {
             <h1 className="font-display text-3xl font-bold tracking-tight">Events</h1>
             <p className="text-muted-foreground">Manage industry events and conferences</p>
           </div>
-          <Link to="/admin/events/new">
-            <Button>
-              <Plus className="h-4 w-4 mr-2" />
-              Add Event
-            </Button>
-          </Link>
+          <div className="flex items-center gap-2">
+            {isBulkGenerating ? (
+              <Button variant="outline" onClick={handleStopBulk}>
+                <Square className="h-4 w-4 mr-2" />
+                Stop
+              </Button>
+            ) : (
+              missingDescCount > 0 && (
+                <Button variant="outline" onClick={handleBulkGenerate} className="bg-accent/20 hover:bg-accent/30 border-accent/30">
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate All Missing ({missingDescCount})
+                </Button>
+              )
+            )}
+            <Link to="/admin/events/new">
+              <Button>
+                <Plus className="h-4 w-4 mr-2" />
+                Add Event
+              </Button>
+            </Link>
+          </div>
         </div>
 
+        {/* Bulk Progress */}
+        {isBulkGenerating && (
+          <Card className="border-accent/30 bg-accent/5">
+            <CardContent className="py-4">
+              <div className="flex items-center gap-4">
+                <Loader2 className="h-5 w-5 animate-spin text-accent" />
+                <div className="flex-1">
+                  <p className="font-medium">Generating: {bulkProgress.currentName}</p>
+                  <p className="text-sm text-muted-foreground">
+                    {bulkProgress.current} of {bulkProgress.total} events
+                  </p>
+                </div>
+                <div className="w-32 bg-muted rounded-full h-2">
+                  <div 
+                    className="bg-accent h-2 rounded-full transition-all" 
+                    style={{ width: `${(bulkProgress.current / bulkProgress.total) * 100}%` }}
+                  />
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Stats Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
           <Card>
             <CardContent className="pt-6">
               <div className="flex items-center justify-between">
@@ -119,6 +256,17 @@ const AdminEvents = () => {
                   <p className="text-2xl font-bold">{featuredCount}</p>
                 </div>
                 <Star className="h-8 w-8 text-accent" />
+              </div>
+            </CardContent>
+          </Card>
+          <Card>
+            <CardContent className="pt-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">Need Description</p>
+                  <p className="text-2xl font-bold">{missingDescCount}</p>
+                </div>
+                <Sparkles className="h-8 w-8 text-accent" />
               </div>
             </CardContent>
           </Card>
@@ -154,6 +302,7 @@ const AdminEvents = () => {
                     <TableHead>Event</TableHead>
                     <TableHead>Date</TableHead>
                     <TableHead>Location</TableHead>
+                    <TableHead>Description</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
@@ -161,6 +310,9 @@ const AdminEvents = () => {
                 <TableBody>
                   {filteredEvents.map((event) => {
                     const upcoming = isUpcoming(event.start_date);
+                    const hasDescription = event.description && event.description.length >= 100;
+                    const isGeneratingThis = generatingId === event.id;
+
                     return (
                       <TableRow key={event.id}>
                         <TableCell>
@@ -192,6 +344,15 @@ const AdminEvents = () => {
                           <p className="text-sm line-clamp-1">{event.location}</p>
                         </TableCell>
                         <TableCell>
+                          {hasDescription ? (
+                            <span className="text-xs text-green-600 dark:text-green-400">
+                              {event.description!.length} chars
+                            </span>
+                          ) : (
+                            <span className="text-xs text-muted-foreground">Missing</span>
+                          )}
+                        </TableCell>
+                        <TableCell>
                           <div className="flex flex-wrap gap-1">
                             {upcoming ? (
                               <Badge variant="default" className="text-xs">Upcoming</Badge>
@@ -204,11 +365,27 @@ const AdminEvents = () => {
                           </div>
                         </TableCell>
                         <TableCell className="text-right">
-                          <div className="flex items-center justify-end gap-2">
+                          <div className="flex items-center justify-end gap-1">
                             <Button
                               variant="ghost"
                               size="icon"
-                              onClick={() => handleToggleFeatured(event.id, event.is_featured)}
+                              onClick={() => handleGenerateDescription(event)}
+                              disabled={isGeneratingThis || isBulkGenerating}
+                              title="Generate description"
+                              className={hasDescription ? "text-green-600" : "bg-accent/20 hover:bg-accent/30"}
+                            >
+                              {isGeneratingThis ? (
+                                <Loader2 className="h-4 w-4 animate-spin" />
+                              ) : hasDescription ? (
+                                <Check className="h-4 w-4" />
+                              ) : (
+                                <Sparkles className="h-4 w-4" />
+                              )}
+                            </Button>
+                            <Button
+                              variant="ghost"
+                              size="icon"
+                              onClick={() => handleToggleFeatured(event.id, event.is_featured || false)}
                               title={event.is_featured ? "Remove from featured" : "Mark as featured"}
                             >
                               {event.is_featured ? (
