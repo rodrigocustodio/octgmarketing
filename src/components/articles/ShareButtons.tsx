@@ -14,21 +14,20 @@ interface ShareButtonsProps {
 const ShareButtons = ({ url, title, subtitle, slug }: ShareButtonsProps) => {
   const [copied, setCopied] = useState(false);
   
-  // Use /og/ proxy path for social sharing - this routes through vercel.json rewrites
-  // to the serve-og edge function, ensuring crawlers get proper OG meta tags
-  // while keeping the domain as octgindex.com (not supabase.co)
-  const ogUrl = slug 
-    ? `https://octgindex.com/og/article/${slug}`
+  // Use direct article URL for social sharing - React Helmet sets OG meta tags
+  // and crawlers can fetch them. The /og/ proxy path was causing issues.
+  const shareUrl = slug 
+    ? `https://octgindex.com/article/${slug}`
     : url;
   
-  const encodedUrl = encodeURIComponent(ogUrl);
+  const encodedUrl = encodeURIComponent(shareUrl);
   const encodedTitle = encodeURIComponent(title);
   const encodedText = encodeURIComponent(`${title}${subtitle ? ` - ${subtitle}` : ''}`);
 
   const shareLinks = {
-    linkedin: `https://www.linkedin.com/sharing/share-offsite/?url=${encodedUrl}`,
+    linkedin: `https://www.linkedin.com/shareArticle?mini=true&url=${encodedUrl}&title=${encodedTitle}`,
     twitter: `https://twitter.com/intent/tweet?url=${encodedUrl}&text=${encodedText}`,
-    facebook: `https://www.facebook.com/sharer/sharer.php?u=${encodedUrl}`,
+    facebook: `https://www.facebook.com/sharer.php?u=${encodedUrl}`,
     email: `mailto:?subject=${encodedTitle}&body=${encodedText}%0A%0A${encodedUrl}`,
   };
 
