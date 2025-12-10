@@ -21,7 +21,7 @@ import {
 } from "lucide-react";
 import { EventGalleryLightbox } from "@/components/events/EventGalleryLightbox";
 import { useEvent } from "@/hooks/useEvents";
-import { getYouTubeEmbedUrl } from "@/lib/youtube-utils";
+import { getVideoEmbed } from "@/lib/video-utils";
 import { format } from "date-fns";
 
 function formatEventDate(startDate: string, endDate: string | null): string {
@@ -92,7 +92,7 @@ const EventDetail = () => {
 
   const isPast = !isUpcoming(event.start_date);
 
-  const youtubeEmbedUrl = event.video_url ? getYouTubeEmbedUrl(event.video_url) : null;
+  const videoEmbed = event.video_url ? getVideoEmbed(event.video_url) : null;
 
   // Schema.org Event structured data
   const eventSchema = {
@@ -121,10 +121,10 @@ const EventDetail = () => {
     ...(event.gallery_images && event.gallery_images.length > 0 && {
       image: [event.image_url, ...event.gallery_images].filter(Boolean),
     }),
-    ...(youtubeEmbedUrl && {
+    ...(videoEmbed && {
       video: {
         "@type": "VideoObject",
-        embedUrl: youtubeEmbedUrl,
+        embedUrl: videoEmbed.embedUrl,
       },
     }),
   };
@@ -191,8 +191,8 @@ const EventDetail = () => {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-8">
-                {/* YouTube Video Player - positioned at top if exists */}
-                {youtubeEmbedUrl && (
+                {/* Video Player - positioned at top if exists */}
+                {videoEmbed && (
                   <Card>
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
@@ -202,13 +202,21 @@ const EventDetail = () => {
                     </CardHeader>
                     <CardContent>
                       <AspectRatio ratio={16 / 9}>
-                        <iframe
-                          src={youtubeEmbedUrl}
-                          title={`${event.name} video`}
-                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                          allowFullScreen
-                          className="w-full h-full rounded-lg"
-                        />
+                        {videoEmbed.type === 'bunny-direct' ? (
+                          <video
+                            src={videoEmbed.embedUrl}
+                            controls
+                            className="w-full h-full rounded-lg object-cover"
+                          />
+                        ) : (
+                          <iframe
+                            src={videoEmbed.embedUrl}
+                            title={`${event.name} video`}
+                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            allowFullScreen
+                            className="w-full h-full rounded-lg"
+                          />
+                        )}
                       </AspectRatio>
                     </CardContent>
                   </Card>
