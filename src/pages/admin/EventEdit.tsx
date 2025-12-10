@@ -380,16 +380,16 @@ const EventEdit = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="video_url">YouTube Video URL</Label>
+                  <Label htmlFor="video_url">Video URL</Label>
                   <Input
                     id="video_url"
                     type="url"
                     value={formData.video_url}
                     onChange={(e) => setFormData((prev) => ({ ...prev, video_url: e.target.value }))}
-                    placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                    placeholder="YouTube or Bunny.net Stream URL"
                   />
                   <p className="text-xs text-muted-foreground">
-                    Supports youtube.com/watch, youtu.be, and embed URLs
+                    Supports: YouTube (youtube.com, youtu.be) or Bunny.net Stream (iframe.mediadelivery.net, .b-cdn.net)
                   </p>
                 </div>
               </CardContent>
