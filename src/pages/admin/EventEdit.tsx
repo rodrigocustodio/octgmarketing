@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, Save, Trash2, Calendar, Sparkles, Loader2, ImageIcon } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { EventGallery } from "@/components/admin/EventGallery";
 import { useEventById, useCreateEvent, useUpdateEvent, useDeleteEvent } from "@/hooks/useEvents";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -50,6 +51,7 @@ const EventEdit = () => {
     end_date: "",
     website: "",
     image_url: "",
+    gallery_images: [] as string[],
     region_id: "",
     attendees_count: "",
     exhibitors_count: "",
@@ -78,6 +80,7 @@ const EventEdit = () => {
         end_date: event.end_date || "",
         website: event.website || "",
         image_url: event.image_url || "",
+        gallery_images: event.gallery_images || [],
         region_id: event.region_id || "",
         attendees_count: event.attendees_count || "",
         exhibitors_count: event.exhibitors_count || "",
@@ -174,6 +177,7 @@ const EventEdit = () => {
         end_date: formData.end_date || null,
         website: formData.website || null,
         image_url: formData.image_url || null,
+        gallery_images: formData.gallery_images.length > 0 ? formData.gallery_images : null,
         region_id: formData.region_id || null,
         attendees_count: formData.attendees_count || null,
         exhibitors_count: formData.exhibitors_count || null,
@@ -467,6 +471,12 @@ const EventEdit = () => {
                 </p>
               </CardContent>
             </Card>
+
+            <EventGallery
+              eventSlug={formData.slug || id || "new"}
+              images={formData.gallery_images}
+              onChange={(imgs) => setFormData((prev) => ({ ...prev, gallery_images: imgs }))}
+            />
           </div>
         </div>
       </form>

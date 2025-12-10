@@ -14,8 +14,10 @@ import {
   ExternalLink, 
   Globe,
   ArrowLeft,
-  Share2
+  Share2,
+  Images
 } from "lucide-react";
+import { EventGalleryLightbox } from "@/components/events/EventGalleryLightbox";
 import { useEvent } from "@/hooks/useEvents";
 import { format } from "date-fns";
 
@@ -111,6 +113,9 @@ const EventDetail = () => {
     eventStatus: isPast ? "https://schema.org/EventCancelled" : "https://schema.org/EventScheduled",
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     ...(event.image_url && { image: event.image_url }),
+    ...(event.gallery_images && event.gallery_images.length > 0 && {
+      image: [event.image_url, ...event.gallery_images].filter(Boolean),
+    }),
   };
 
   return (
@@ -185,6 +190,21 @@ const EventDetail = () => {
                     </p>
                   </CardContent>
                 </Card>
+
+                {/* Event Gallery */}
+                {event.gallery_images && event.gallery_images.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Images className="h-5 w-5" />
+                        Event Photos
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <EventGalleryLightbox images={event.gallery_images} />
+                    </CardContent>
+                  </Card>
+                )}
 
                 {event.website && !isPast && (
                   <div className="flex gap-4">
