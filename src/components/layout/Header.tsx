@@ -63,6 +63,9 @@ export function Header() {
             <Link to="/events">
               <Button variant="nav" size="sm">Events</Button>
             </Link>
+            <Link to="/pricing-index">
+              <Button variant="nav" size="sm">Pricing</Button>
+            </Link>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -120,6 +123,9 @@ export function Header() {
               </Link>
               <Link to="/events" onClick={() => setMobileMenuOpen(false)}>
                 <Button variant="nav" className="w-full justify-start">Events</Button>
+              </Link>
+              <Link to="/pricing-index" onClick={() => setMobileMenuOpen(false)}>
+                <Button variant="nav" className="w-full justify-start">Pricing</Button>
               </Link>
             </nav>
           </div>

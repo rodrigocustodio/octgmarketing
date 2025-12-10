@@ -29,6 +29,7 @@ import OctgCategory from "./pages/OctgCategory";
 import ProductDetail from "./pages/ProductDetail";
 import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
+import PricingIndex from "./pages/PricingIndex";
 
 // Admin pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -79,6 +80,7 @@ const App = () => (
                 <Route path="/octg-directory/:categorySlug/:productSlug" element={<ProductDetail />} />
                 <Route path="/events" element={<Events />} />
                 <Route path="/events/:slug" element={<EventDetail />} />
+                <Route path="/pricing-index" element={<PricingIndex />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsAndConditions />} />
                 <Route path="/newsletter-terms" element={<NewsletterTerms />} />
