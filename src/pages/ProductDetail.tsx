@@ -11,6 +11,7 @@ import {
   CircleDot,
   ExternalLink
 } from "lucide-react";
+import bannerCasing from "@/assets/banner-casing.jpg";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/SEOHead";
@@ -267,69 +268,82 @@ export default function ProductDetail() {
 
       <Header />
 
-      <main className="container mx-auto px-4 py-8">
-        {/* Breadcrumbs */}
-        <Breadcrumb className="mb-8">
-          <BreadcrumbList>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/">Home</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            <BreadcrumbSeparator>
-              <ChevronRight className="h-4 w-4" />
-            </BreadcrumbSeparator>
-            <BreadcrumbItem>
-              <BreadcrumbLink asChild>
-                <Link to="/octg-directory">OCTG Products</Link>
-              </BreadcrumbLink>
-            </BreadcrumbItem>
-            {category && (
-              <>
-                <BreadcrumbSeparator>
-                  <ChevronRight className="h-4 w-4" />
-                </BreadcrumbSeparator>
-                <BreadcrumbItem>
-                  <BreadcrumbLink asChild>
-                    <Link to={`/octg-directory/${category.slug}`}>
-                      {category.name}
-                    </Link>
-                  </BreadcrumbLink>
-                </BreadcrumbItem>
-              </>
-            )}
-            <BreadcrumbSeparator>
-              <ChevronRight className="h-4 w-4" />
-            </BreadcrumbSeparator>
-            <BreadcrumbItem>
-              <BreadcrumbPage>{product.name}</BreadcrumbPage>
-            </BreadcrumbItem>
-          </BreadcrumbList>
-        </Breadcrumb>
+      {/* Hero Section with Banner */}
+      <section className="relative py-16 md:py-24 overflow-hidden border-b border-border">
+        {/* Background Image with Gradient Overlay */}
+        <div className="absolute inset-0">
+          <img 
+            src={product.hero_image_url || bannerCasing} 
+            alt="" 
+            className="w-full h-full object-cover object-center"
+          />
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/40" />
+        </div>
+        
+        <div className="container mx-auto px-4 relative z-10">
+          {/* Breadcrumbs */}
+          <Breadcrumb className="mb-6">
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/">Home</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link to="/octg-directory">OCTG Products</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              {category && (
+                <>
+                  <BreadcrumbSeparator>
+                    <ChevronRight className="h-4 w-4" />
+                  </BreadcrumbSeparator>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink asChild>
+                      <Link to={`/octg-directory/${category.slug}`}>{category.name}</Link>
+                    </BreadcrumbLink>
+                  </BreadcrumbItem>
+                </>
+              )}
+              <BreadcrumbSeparator>
+                <ChevronRight className="h-4 w-4" />
+              </BreadcrumbSeparator>
+              <BreadcrumbItem>
+                <BreadcrumbPage>{product.name}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </Breadcrumb>
 
-        {/* Hero Section */}
-        <div className="mb-10">
-          <div className="flex flex-wrap items-center gap-3 mb-4">
-            {product.api_standard && (
-              <Badge variant="secondary" className="text-sm">
-                {product.api_standard}
-              </Badge>
-            )}
-            {category && (
-              <Link to={`/octg-directory/${category.slug}`}>
-                <Badge variant="outline">
-                  {category.name}
+          <div className="max-w-3xl">
+            <div className="flex flex-wrap items-center gap-3 mb-4">
+              {product.api_standard && (
+                <Badge variant="secondary" className="text-sm">
+                  {product.api_standard}
                 </Badge>
-              </Link>
+              )}
+              {category && (
+                <Link to={`/octg-directory/${category.slug}`}>
+                  <Badge variant="outline">
+                    {category.name}
+                  </Badge>
+                </Link>
+              )}
+            </div>
+            <h1 className="text-4xl md:text-5xl font-bold tracking-tight mb-4">{product.name}</h1>
+            {product.short_description && (
+              <p className="text-xl text-muted-foreground max-w-3xl">
+                {product.short_description}
+              </p>
             )}
           </div>
-          <h1 className="text-4xl md:text-5xl font-bold mb-4">{product.name}</h1>
-          {product.short_description && (
-            <p className="text-xl text-muted-foreground max-w-3xl">
-              {product.short_description}
-            </p>
-          )}
         </div>
+      </section>
+
+      <main className="container mx-auto px-4 py-8">
 
         {/* Main Content Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
