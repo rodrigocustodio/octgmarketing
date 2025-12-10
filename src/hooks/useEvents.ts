@@ -150,9 +150,10 @@ export function useUpdateEvent() {
       if (error) throw error;
       return data;
     },
-    onSuccess: (_, variables) => {
+    onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["events"] });
-      queryClient.invalidateQueries({ queryKey: ["event", variables.id] });
+      queryClient.invalidateQueries({ queryKey: ["event"] });
+      queryClient.invalidateQueries({ queryKey: ["event-by-id"] });
       queryClient.invalidateQueries({ queryKey: ["upcoming-events"] });
     },
   });
