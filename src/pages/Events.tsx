@@ -189,7 +189,7 @@ const Events = () => {
             />
             
             {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/70" />
+            <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/90 to-black/85" />
             
             {/* Content */}
             <div className="container relative z-10">
