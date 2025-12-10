@@ -9,7 +9,8 @@ import {
   Package,
   Wrench,
   CircleDot,
-  ExternalLink
+  ExternalLink,
+  Images
 } from "lucide-react";
 import bannerCasing from "@/assets/banner-casing.jpg";
 import { Header } from "@/components/layout/Header";
@@ -622,6 +623,31 @@ export default function ProductDetail() {
                 </div>
               </CardContent>
             </Card>
+
+            {/* Photo Gallery */}
+            {product.gallery_images && (product.gallery_images as string[]).length > 0 && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Images className="w-5 h-5 text-primary" />
+                    Photo Gallery
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="grid grid-cols-2 gap-2">
+                    {(product.gallery_images as string[]).slice(0, 4).map((imageUrl, index) => (
+                      <div key={index} className="aspect-square rounded-lg overflow-hidden bg-muted">
+                        <img 
+                          src={imageUrl} 
+                          alt={`${product.name} photo ${index + 1}`}
+                          className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            )}
           </div>
         </div>
       </main>
