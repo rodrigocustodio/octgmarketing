@@ -64,7 +64,7 @@ function TopicRow({ slug, name, icon: Icon, articles }: TopicRowProps) {
                   {article.region && (
                     <Badge variant="region" className="mb-2 text-xs">{article.region.name}</Badge>
                   )}
-                  <h4 className="font-display font-bold text-sm text-white line-clamp-2 group-hover:text-accent transition-colors">
+                  <h4 className="font-display font-bold text-sm text-white line-clamp-2">
                     {article.title}
                   </h4>
                   <p className="text-xs text-white/70 mt-1">

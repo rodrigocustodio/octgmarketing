@@ -60,7 +60,7 @@ export function BreakingNewsRow({ articles }: BreakingNewsRowProps) {
                     )}
                     <span className="text-[10px] text-muted-foreground">{formatDate(article.publish_date)}</span>
                   </div>
-                  <h3 className="font-display text-sm font-semibold line-clamp-2 group-hover:text-accent transition-colors">
+                  <h3 className="font-display text-sm font-semibold line-clamp-2">
                     {article.title}
                   </h3>
                 </div>
