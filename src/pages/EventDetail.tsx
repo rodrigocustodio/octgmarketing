@@ -126,53 +126,38 @@ const EventDetail = () => {
         <Header />
 
         <main>
-          {/* Hero with optional background image */}
+          {/* Hero with background image - always use ADIPEC as default */}
           <section 
             className="relative py-10 md:py-14"
-            style={event.image_url ? {
-              backgroundImage: `url(${event.image_url})`,
+            style={{
+              backgroundImage: `url(${event.image_url || '/images/events-hero-default.jpg'})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
-            } : undefined}
+            }}
           >
-            {/* Dark overlay for text readability when image exists */}
-            {event.image_url && (
-              <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
-            )}
-            
-            {/* Fallback gradient when no image */}
-            {!event.image_url && (
-              <div className="absolute inset-0 bg-gradient-to-b from-card to-background" />
-            )}
+            {/* Dark gradient overlay for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/70 to-black/50" />
 
             <div className="container relative z-10">
               <Link 
                 to="/events" 
-                className={`inline-flex items-center mb-6 transition-colors ${
-                  event.image_url 
-                    ? "text-white/70 hover:text-white" 
-                    : "text-muted-foreground hover:text-foreground"
-                }`}
+                className="inline-flex items-center mb-6 transition-colors text-white/70 hover:text-white"
               >
                 <ArrowLeft className="mr-2 h-4 w-4" />
                 Back to Events
               </Link>
 
               <div className="flex flex-wrap gap-3 mb-4">
-                {isPast && <Badge variant="outline" className={event.image_url ? "border-white/30 text-white" : ""}>Event Passed</Badge>}
+                {isPast && <Badge variant="outline" className="border-white/30 text-white">Event Passed</Badge>}
                 {event.is_featured && !isPast && <Badge variant="featured">Featured Event</Badge>}
                 {event.region?.name && <Badge variant="secondary">{event.region.name}</Badge>}
               </div>
 
-              <h1 className={`font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4 ${
-                event.image_url ? "text-white" : ""
-              }`}>
+              <h1 className="font-display text-3xl md:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-white">
                 {event.name}
               </h1>
 
-              <div className={`flex flex-wrap items-center gap-6 text-lg ${
-                event.image_url ? "text-white/80" : "text-muted-foreground"
-              }`}>
+              <div className="flex flex-wrap items-center gap-6 text-lg text-white/80">
                 <div className="flex items-center gap-2">
                   <Calendar className="h-5 w-5" />
                   <span>{formatEventDate(event.start_date, event.end_date)}</span>
