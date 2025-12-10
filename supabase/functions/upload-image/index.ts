@@ -83,9 +83,11 @@ serve(async (req) => {
       extension = 'webp';
     }
 
-    // Generate file name if not provided
-    const finalFileName = fileName || `${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
-    const filePath = `${folder}/${finalFileName}`;
+    // Sanitize and generate file name - replace spaces/special chars with hyphens
+    const sanitizedFileName = fileName 
+      ? fileName.toLowerCase().replace(/[^a-z0-9.]+/g, '-').replace(/(^-|-$)/g, '')
+      : `${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
+    const filePath = `${folder}/${sanitizedFileName}`;
 
     console.log(`Uploading image to Bunny CDN: ${filePath}`);
 
