@@ -172,8 +172,8 @@ const Events = () => {
   return (
     <>
       <SEOHead
-        title="Industry Events Calendar 2026 | OCTG Index"
-        description="Browse 60+ major oil, gas, and energy industry events worldwide including ADIPEC, OTC, CERAWeek, Gastech, and World Petroleum Congress. Find conferences, exhibitions, and networking opportunities."
+        title="Oil & Gas Events 2026 | OCTG Industry Calendar"
+        description="Find 60+ oil, gas, and OCTG industry events for 2026. Discover energy conferences, petroleum exhibitions, and pipe & tube trade shows including ADIPEC, OTC, and Gastech."
         canonical="https://octgindex.com/events"
       />
       <div className="min-h-screen bg-background">
