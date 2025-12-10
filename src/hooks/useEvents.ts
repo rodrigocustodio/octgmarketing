@@ -88,6 +88,27 @@ export function useEvent(slug: string) {
   });
 }
 
+// Fetch single event by ID (for admin editing)
+export function useEventById(id: string) {
+  return useQuery({
+    queryKey: ["event-by-id", id],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select(`
+          *,
+          region:regions(id, name, slug)
+        `)
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) throw error;
+      return data as Event | null;
+    },
+    enabled: !!id,
+  });
+}
+
 // Create event
 export function useCreateEvent() {
   const queryClient = useQueryClient();
