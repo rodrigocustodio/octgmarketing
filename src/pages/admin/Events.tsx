@@ -14,7 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Calendar, Plus, Search, Edit, Trash2, Star, StarOff, Sparkles, Loader2, Check, Square } from "lucide-react";
+import { Calendar, Plus, Search, Edit, Trash2, Star, StarOff, Sparkles, Loader2, Check, Square, RefreshCw } from "lucide-react";
 import { useEvents, useDeleteEvent, useUpdateEvent, Event } from "@/hooks/useEvents";
 import { format } from "date-fns";
 import { toast } from "sonner";
@@ -31,6 +31,7 @@ const AdminEvents = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [generatingId, setGeneratingId] = useState<string | null>(null);
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+  const [bulkMode, setBulkMode] = useState<'missing' | 'all'>('missing');
   const [bulkProgress, setBulkProgress] = useState({ current: 0, total: 0, currentName: "" });
   const stopBulkRef = useRef(false);
 
@@ -103,15 +104,14 @@ const AdminEvents = () => {
     }
   };
 
-  const handleBulkGenerate = async () => {
-    const eventsToProcess = events?.filter((e) => !e.description || e.description.length < 100) || [];
-    
+  const processBulkGeneration = async (eventsToProcess: Event[], mode: 'missing' | 'all') => {
     if (eventsToProcess.length === 0) {
-      toast.info("All events already have descriptions");
+      toast.info(mode === 'missing' ? "All events already have descriptions" : "No events to process");
       return;
     }
 
     setIsBulkGenerating(true);
+    setBulkMode(mode);
     stopBulkRef.current = false;
     setBulkProgress({ current: 0, total: eventsToProcess.length, currentName: "" });
 
@@ -161,7 +161,21 @@ const AdminEvents = () => {
     setIsBulkGenerating(false);
     setBulkProgress({ current: 0, total: 0, currentName: "" });
     refetch();
-    toast.success(`Generated descriptions for ${processed} events`);
+    toast.success(`${mode === 'all' ? 'Regenerated' : 'Generated'} descriptions for ${processed} events`);
+  };
+
+  const handleBulkGenerate = () => {
+    const eventsToProcess = events?.filter((e) => !e.description || e.description.length < 100) || [];
+    processBulkGeneration(eventsToProcess, 'missing');
+  };
+
+  const handleRegenerateAll = () => {
+    if (!events || events.length === 0) {
+      toast.info("No events to process");
+      return;
+    }
+    if (!confirm(`This will regenerate descriptions for ALL ${events.length} events. Continue?`)) return;
+    processBulkGeneration(events, 'all');
   };
 
   const handleStopBulk = () => {
@@ -182,15 +196,23 @@ const AdminEvents = () => {
             {isBulkGenerating ? (
               <Button variant="outline" onClick={handleStopBulk}>
                 <Square className="h-4 w-4 mr-2" />
-                Stop
+                Stop ({bulkProgress.current}/{bulkProgress.total})
               </Button>
             ) : (
-              missingDescCount > 0 && (
-                <Button variant="outline" onClick={handleBulkGenerate} className="bg-accent/20 hover:bg-accent/30 border-accent/30">
-                  <Sparkles className="h-4 w-4 mr-2" />
-                  Generate All Missing ({missingDescCount})
-                </Button>
-              )
+              <>
+                {missingDescCount > 0 && (
+                  <Button variant="outline" onClick={handleBulkGenerate} className="bg-accent/20 hover:bg-accent/30 border-accent/30">
+                    <Sparkles className="h-4 w-4 mr-2" />
+                    Generate Missing ({missingDescCount})
+                  </Button>
+                )}
+                {events && events.length > 0 && (
+                  <Button variant="outline" onClick={handleRegenerateAll}>
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    Regenerate All ({events.length})
+                  </Button>
+                )}
+              </>
             )}
             <Link to="/admin/events/new">
               <Button>
