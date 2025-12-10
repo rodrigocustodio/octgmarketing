@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { useParams, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { 
-  ChevronRight, 
+  ChevronRight,
+  ChevronLeft,
   ArrowLeft, 
   Building2, 
   FileText, 
@@ -20,6 +22,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Button } from "@/components/ui/button";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -91,6 +94,25 @@ export default function ProductDetail() {
     4
   );
   const { data: executives } = useProductExecutives(product?.id);
+
+  // Lightbox state
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxIndex, setLightboxIndex] = useState(0);
+  const galleryImages = (product?.gallery_images as string[]) || [];
+
+  // Keyboard navigation for lightbox
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (!lightboxOpen || galleryImages.length === 0) return;
+      if (e.key === "ArrowLeft") {
+        setLightboxIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1));
+      } else if (e.key === "ArrowRight") {
+        setLightboxIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0));
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [lightboxOpen, galleryImages.length]);
 
   if (productLoading) {
     return <ProductDetailSkeleton />;
@@ -625,7 +647,7 @@ export default function ProductDetail() {
             </Card>
 
             {/* Photo Gallery */}
-            {product.gallery_images && (product.gallery_images as string[]).length > 0 && (
+            {galleryImages.length > 0 && (
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
@@ -635,12 +657,19 @@ export default function ProductDetail() {
                 </CardHeader>
                 <CardContent>
                   <div className="grid grid-cols-2 gap-2">
-                    {(product.gallery_images as string[]).slice(0, 4).map((imageUrl, index) => (
-                      <div key={index} className="aspect-square rounded-lg overflow-hidden bg-muted">
+                    {galleryImages.slice(0, 4).map((imageUrl, index) => (
+                      <div 
+                        key={index} 
+                        className="aspect-square rounded-lg overflow-hidden bg-muted cursor-pointer"
+                        onClick={() => {
+                          setLightboxIndex(index);
+                          setLightboxOpen(true);
+                        }}
+                      >
                         <img 
                           src={imageUrl} 
                           alt={`${product.name} photo ${index + 1}`}
-                          className="w-full h-full object-cover hover:scale-105 transition-transform cursor-pointer"
+                          className="w-full h-full object-cover hover:scale-105 transition-transform"
                         />
                       </div>
                     ))}
@@ -651,6 +680,52 @@ export default function ProductDetail() {
           </div>
         </div>
       </main>
+
+      {/* Lightbox Modal */}
+      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+        <DialogContent className="max-w-[90vw] max-h-[90vh] p-0 bg-black/95 border-none">
+          <DialogTitle className="sr-only">{product.name} Gallery</DialogTitle>
+          <div className="relative flex items-center justify-center min-h-[60vh]">
+            {/* Previous Button */}
+            {galleryImages.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute left-4 z-10 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20"
+                onClick={() => setLightboxIndex((prev) => (prev > 0 ? prev - 1 : galleryImages.length - 1))}
+              >
+                <ChevronLeft className="h-8 w-8 text-white" />
+              </Button>
+            )}
+
+            {/* Main Image */}
+            <img
+              src={galleryImages[lightboxIndex]}
+              alt={`${product.name} - Image ${lightboxIndex + 1}`}
+              className="max-w-full max-h-[80vh] object-contain"
+            />
+
+            {/* Next Button */}
+            {galleryImages.length > 1 && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-4 z-10 h-12 w-12 rounded-full bg-white/10 hover:bg-white/20"
+                onClick={() => setLightboxIndex((prev) => (prev < galleryImages.length - 1 ? prev + 1 : 0))}
+              >
+                <ChevronRight className="h-8 w-8 text-white" />
+              </Button>
+            )}
+
+            {/* Image Counter */}
+            {galleryImages.length > 1 && (
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/80 text-sm">
+                {lightboxIndex + 1} / {galleryImages.length}
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Footer />
     </div>
