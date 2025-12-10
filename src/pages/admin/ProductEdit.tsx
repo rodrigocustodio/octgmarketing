@@ -80,8 +80,9 @@ export default function ProductEdit() {
       // Upload to Bunny CDN
       const { data, error } = await supabase.functions.invoke("upload-image", {
         body: {
-          imageData: base64Data,
-          path: `octgindex/products/${id}/gallery/${index + 1}.${file.name.split(".").pop()}`,
+          imageBase64: base64Data,
+          fileName: `${index + 1}.${file.name.split(".").pop()}`,
+          folder: `octgindex/products/${id}/gallery`,
         },
       });
 
@@ -89,7 +90,7 @@ export default function ProductEdit() {
 
       // Update gallery array
       const newGallery = [...galleryImages];
-      newGallery[index] = data.url;
+      newGallery[index] = data.cdnUrl;
       setGalleryImages(newGallery);
 
       toast({ title: "Image uploaded", description: `Gallery image ${index + 1} uploaded successfully` });
