@@ -201,23 +201,26 @@ const EventDetail = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <AspectRatio ratio={16 / 9} className="w-full">
+                      {/* Use Bunny's recommended responsive CSS pattern */}
+                      <div className="relative w-full" style={{ paddingTop: '56.25%' }}>
                         {videoEmbed.type === 'bunny-direct' ? (
                           <video
                             src={videoEmbed.embedUrl}
                             controls
-                            className="absolute inset-0 w-full h-full rounded-lg object-cover"
+                            className="absolute top-0 left-0 w-full h-full rounded-lg object-cover"
                           />
                         ) : (
                           <iframe
                             src={videoEmbed.embedUrl}
                             title={`${event.name} video`}
-                            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                            loading="lazy"
+                            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
                             allowFullScreen
-                            className="absolute inset-0 w-full h-full rounded-lg border-0"
+                            className="absolute top-0 left-0 w-full h-full rounded-lg"
+                            style={{ border: 'none' }}
                           />
                         )}
-                      </AspectRatio>
+                      </div>
                     </CardContent>
                   </Card>
                 )}

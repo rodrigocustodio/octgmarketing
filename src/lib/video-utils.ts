@@ -62,9 +62,14 @@ export function getVideoEmbed(url: string): VideoEmbed | null {
 
   // Check Bunny.net Stream iframe embed URLs (both /embed/ and /play/)
   if (url.includes('mediadelivery.net/embed') || url.includes('mediadelivery.net/play') || url.includes('bunnycdn.com/embed')) {
+    // Convert /play/ URLs to /embed/ format (Bunny's official embed pattern)
+    let embedUrl = url;
+    if (url.includes('mediadelivery.net/play')) {
+      embedUrl = url.replace('mediadelivery.net/play', 'mediadelivery.net/embed');
+    }
     return {
       type: 'bunny-iframe',
-      embedUrl: url
+      embedUrl: embedUrl
     };
   }
 
