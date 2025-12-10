@@ -60,7 +60,7 @@ export function QuickReadsGrid({ articles }: QuickReadsGridProps) {
                     {formatDate(article.publish_date)}
                   </span>
                 </div>
-                <h3 className="font-display text-sm font-bold line-clamp-3 group-hover:text-accent transition-colors mb-2">
+                <h3 className="font-display text-sm font-bold line-clamp-3 group-hover:text-primary transition-colors mb-2">
                   {article.title}
                 </h3>
                 {article.subtitle && (

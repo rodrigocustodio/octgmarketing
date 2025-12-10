@@ -73,7 +73,7 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
                   </Badge>
                 </div>
                 <div className="absolute bottom-0 left-0 right-0 p-6">
-                  <h3 className="font-display text-xl lg:text-2xl font-bold text-white group-hover:text-accent transition-colors line-clamp-2">
+                <h3 className="font-display text-xl lg:text-2xl font-bold text-white line-clamp-2">
                     {featured.title}
                   </h3>
                 </div>
@@ -113,7 +113,7 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
                 {String(index + 1).padStart(2, '0')}
               </span>
               <div className="flex-1 min-w-0 space-y-2">
-                <h4 className="font-display font-semibold text-base group-hover:text-accent transition-colors line-clamp-2">
+                <h4 className="font-display font-semibold text-base group-hover:text-primary transition-colors line-clamp-2">
                   {article.title}
                 </h4>
                 {article.subtitle && (

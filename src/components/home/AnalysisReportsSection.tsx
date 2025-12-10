@@ -84,7 +84,7 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
                         {featuredArticle.region.name}
                       </Badge>
                     )}
-                    <h3 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-3 text-white group-hover:text-accent transition-colors line-clamp-3">
+                    <h3 className="font-display text-xl sm:text-2xl lg:text-3xl font-bold tracking-tight mb-3 text-white line-clamp-3">
                       {featuredArticle.title}
                     </h3>
                     {featuredArticle.subtitle && (
@@ -126,7 +126,7 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
                           {article.region.name}
                         </Badge>
                       )}
-                      <h4 className="font-semibold text-sm sm:text-base leading-snug mb-2 group-hover:text-accent transition-colors line-clamp-2">
+                      <h4 className="font-semibold text-sm sm:text-base leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-2">
                         {article.title}
                       </h4>
                       <span className="text-xs text-muted-foreground">
@@ -161,7 +161,7 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
                     </div>
                     {/* Content */}
                     <div className="flex-1 min-w-0 flex flex-col justify-center">
-                      <h4 className="font-semibold text-xs sm:text-sm leading-snug mb-1.5 group-hover:text-accent transition-colors line-clamp-2">
+                      <h4 className="font-semibold text-xs sm:text-sm leading-snug mb-1.5 line-clamp-2">
                         {article.title}
                       </h4>
                       <span className="text-[10px] sm:text-xs text-muted-foreground">
