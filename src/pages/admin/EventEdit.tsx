@@ -249,9 +249,18 @@ const EventEdit = () => {
                 Delete
               </Button>
             )}
-            <Button type="submit">
-              <Save className="h-4 w-4 mr-2" />
-              {isNew ? "Create Event" : "Save Changes"}
+            <Button type="submit" disabled={createEvent.isPending || updateEvent.isPending}>
+              {createEvent.isPending || updateEvent.isPending ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="h-4 w-4 mr-2" />
+                  {isNew ? "Create Event" : "Save Changes"}
+                </>
+              )}
             </Button>
           </div>
         </div>
