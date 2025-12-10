@@ -201,7 +201,7 @@ const EventDetail = () => {
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
-                      <AspectRatio ratio={16 / 9}>
+                      <AspectRatio ratio={16 / 9} className="w-full">
                         {videoEmbed.type === 'bunny-direct' ? (
                           <video
                             src={videoEmbed.embedUrl}
