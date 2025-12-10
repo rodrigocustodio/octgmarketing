@@ -67,6 +67,12 @@ export function getVideoEmbed(url: string): VideoEmbed | null {
     if (url.includes('mediadelivery.net/play')) {
       embedUrl = url.replace('mediadelivery.net/play', 'mediadelivery.net/embed');
     }
+    
+    // Force disable autoplay by adding/overriding the autoplay parameter
+    const urlObj = new URL(embedUrl);
+    urlObj.searchParams.set('autoplay', 'false');
+    embedUrl = urlObj.toString();
+    
     return {
       type: 'bunny-iframe',
       embedUrl: embedUrl
