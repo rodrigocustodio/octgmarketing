@@ -3,104 +3,123 @@ import { Link } from "react-router-dom";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/SEOHead";
-import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Calendar, MapPin, Users, Building2, ExternalLink, Search, Globe } from "lucide-react";
+import { Calendar, MapPin, Users, Search, Star } from "lucide-react";
 import { useEvents, Event } from "@/hooks/useEvents";
 import { format } from "date-fns";
 
-function formatEventDate(startDate: string, endDate: string | null): string {
+function formatDateRange(startDate: string, endDate: string | null): string {
   const start = new Date(startDate);
   if (!endDate) {
-    return format(start, "MMMM d, yyyy");
+    return format(start, "MMM d, yyyy");
   }
   const end = new Date(endDate);
   if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
-    return `${format(start, "MMMM d")}–${format(end, "d, yyyy")}`;
+    return `${format(start, "MMM d")}–${format(end, "d, yyyy")}`;
   }
-  return `${format(start, "MMMM d")} – ${format(end, "MMMM d, yyyy")}`;
+  return `${format(start, "MMM d")} – ${format(end, "MMM d, yyyy")}`;
 }
 
 function isUpcoming(startDate: string): boolean {
   return new Date(startDate) >= new Date(new Date().toDateString());
 }
 
-function EventCard({ event, isPast = false }: { event: Event; isPast?: boolean }) {
+function groupEventsByMonth(events: Event[]): Record<string, Event[]> {
+  return events.reduce((groups, event) => {
+    const monthKey = format(new Date(event.start_date), "MMMM yyyy").toUpperCase();
+    if (!groups[monthKey]) groups[monthKey] = [];
+    groups[monthKey].push(event);
+    return groups;
+  }, {} as Record<string, Event[]>);
+}
+
+function EventRow({ event, isPast = false }: { event: Event; isPast?: boolean }) {
+  const startDate = new Date(event.start_date);
+  
   return (
-    <Link to={`/events/${event.slug}`}>
-      <Card className={`h-full hover:shadow-lg transition-all duration-300 hover:-translate-y-1 border-border/50 ${isPast ? 'opacity-70' : ''}`}>
-        <CardContent className="p-6">
-          <div className="flex items-start justify-between gap-4 mb-4">
-            <div className="flex items-center gap-3">
-              <div className={`w-14 h-14 rounded-lg flex flex-col items-center justify-center ${isPast ? 'bg-muted' : 'bg-accent/20'}`}>
-                <span className={`text-xs font-semibold ${isPast ? 'text-muted-foreground' : 'text-accent'}`}>
-                  {format(new Date(event.start_date), "MMM")}
-                </span>
-                <span className="text-xl font-bold">
-                  {format(new Date(event.start_date), "d")}
-                </span>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {isPast && <Badge variant="outline" className="text-xs">Passed</Badge>}
-              {event.is_featured && !isPast && <Badge variant="featured" className="text-xs">Featured</Badge>}
+    <Link 
+      to={`/events/${event.slug}`}
+      className={`block group ${isPast ? 'opacity-60' : ''}`}
+    >
+      <div className="flex items-start gap-4 md:gap-6 py-5 px-4 rounded-lg hover:bg-card/80 transition-colors border-b border-border/50 last:border-b-0">
+        {/* Large Date Block */}
+        <div className={`flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg flex flex-col items-center justify-center ${isPast ? 'bg-muted' : 'bg-accent/15'}`}>
+          <span className={`text-2xl md:text-3xl font-bold ${isPast ? 'text-muted-foreground' : 'text-foreground'}`}>
+            {format(startDate, "d")}
+          </span>
+          <span className={`text-xs font-semibold uppercase tracking-wide ${isPast ? 'text-muted-foreground' : 'text-accent'}`}>
+            {format(startDate, "MMM")}
+          </span>
+        </div>
+
+        {/* Event Details */}
+        <div className="flex-1 min-w-0">
+          {/* Event Name */}
+          <div className="flex items-start justify-between gap-3 mb-2">
+            <h3 className="font-display text-lg md:text-xl font-bold group-hover:text-accent transition-colors line-clamp-2">
+              {event.name}
+            </h3>
+            <div className="flex-shrink-0 flex items-center gap-2">
+              {event.is_featured && !isPast && (
+                <Star className="h-4 w-4 text-accent fill-accent" />
+              )}
               {event.region?.name && (
-                <Badge variant="secondary" className="text-xs">{event.region.name}</Badge>
+                <Badge variant="secondary" className="text-xs hidden sm:inline-flex">
+                  {event.region.name}
+                </Badge>
               )}
             </div>
           </div>
 
-          <h3 className="font-display font-bold text-lg mb-2 line-clamp-2">
-            {event.name}
-          </h3>
-
-          {event.description && (
-            <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-              {event.description}
-            </p>
-          )}
-
-          <div className="space-y-2 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <Calendar className="h-4 w-4 flex-shrink-0" />
-              <span>{formatEventDate(event.start_date, event.end_date)}</span>
-            </div>
-            <div className="flex items-center gap-2">
-              <MapPin className="h-4 w-4 flex-shrink-0" />
+          {/* Inline Details */}
+          <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted-foreground">
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
               <span className="line-clamp-1">{event.location}</span>
             </div>
-            {event.venue && (
-              <div className="flex items-center gap-2">
-                <Building2 className="h-4 w-4 flex-shrink-0" />
-                <span className="line-clamp-1">{event.venue}</span>
-              </div>
-            )}
+            <div className="flex items-center gap-1.5">
+              <Calendar className="h-3.5 w-3.5 flex-shrink-0" />
+              <span>{formatDateRange(event.start_date, event.end_date)}</span>
+            </div>
             {event.attendees_count && (
-              <div className="flex items-center gap-2">
-                <Users className="h-4 w-4 flex-shrink-0" />
+              <div className="flex items-center gap-1.5">
+                <Users className="h-3.5 w-3.5 flex-shrink-0" />
                 <span>{event.attendees_count} attendees</span>
               </div>
             )}
+            {event.exhibitors_count && (
+              <div className="flex items-center gap-1.5 text-accent">
+                <span>{event.exhibitors_count} exhibitors</span>
+              </div>
+            )}
           </div>
-
-          {event.website && !isPast && (
-            <div className="mt-4 pt-4 border-t border-border">
-              <Button variant="outline" size="sm" className="w-full" asChild onClick={(e) => e.stopPropagation()}>
-                <a href={event.website} target="_blank" rel="noopener noreferrer">
-                  <Globe className="h-4 w-4 mr-2" />
-                  Official Website
-                  <ExternalLink className="h-3 w-3 ml-2" />
-                </a>
-              </Button>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     </Link>
+  );
+}
+
+function MonthSection({ month, events, isPast = false }: { month: string; events: Event[]; isPast?: boolean }) {
+  return (
+    <div className="mb-8">
+      {/* Month Header */}
+      <div className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm py-3 mb-2">
+        <h2 className="font-display text-lg font-bold tracking-wide text-muted-foreground">
+          {month}
+        </h2>
+      </div>
+      
+      {/* Events List */}
+      <div className="bg-card/30 rounded-xl border border-border/30">
+        {events.map((event) => (
+          <EventRow key={event.id} event={event} isPast={isPast} />
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -146,6 +165,9 @@ const Events = () => {
       return matchesSearch && matchesRegion;
     });
   }, [pastEvents, searchQuery, selectedRegion]);
+
+  const upcomingByMonth = useMemo(() => groupEventsByMonth(filteredUpcoming), [filteredUpcoming]);
+  const pastByMonth = useMemo(() => groupEventsByMonth(filteredPast), [filteredPast]);
 
   return (
     <>
@@ -208,19 +230,19 @@ const Events = () => {
           {/* Events Content */}
           <section className="container py-12">
             {isLoading ? (
-              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[...Array(9)].map((_, i) => (
-                  <Skeleton key={i} className="h-64 rounded-xl" />
+              <div className="space-y-4">
+                {[...Array(6)].map((_, i) => (
+                  <Skeleton key={i} className="h-24 rounded-xl" />
                 ))}
               </div>
             ) : (
               <Tabs defaultValue="upcoming" className="w-full">
                 <TabsList className="mb-8">
                   <TabsTrigger value="upcoming">
-                    Upcoming Events ({filteredUpcoming.length})
+                    Upcoming ({filteredUpcoming.length})
                   </TabsTrigger>
                   <TabsTrigger value="past">
-                    Past Events ({filteredPast.length})
+                    Past ({filteredPast.length})
                   </TabsTrigger>
                 </TabsList>
 
@@ -236,9 +258,9 @@ const Events = () => {
                       </p>
                     </div>
                   ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredUpcoming.map((event) => (
-                        <EventCard key={event.id} event={event} />
+                    <div>
+                      {Object.entries(upcomingByMonth).map(([month, monthEvents]) => (
+                        <MonthSection key={month} month={month} events={monthEvents} />
                       ))}
                     </div>
                   )}
@@ -256,9 +278,9 @@ const Events = () => {
                       </p>
                     </div>
                   ) : (
-                    <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-                      {filteredPast.map((event) => (
-                        <EventCard key={event.id} event={event} isPast />
+                    <div>
+                      {Object.entries(pastByMonth).map(([month, monthEvents]) => (
+                        <MonthSection key={month} month={month} events={monthEvents} isPast />
                       ))}
                     </div>
                   )}
