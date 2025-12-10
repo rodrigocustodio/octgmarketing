@@ -236,20 +236,6 @@ const EventDetail = () => {
                   </CardContent>
                 </Card>
 
-                {/* Event Gallery */}
-                {event.gallery_images && event.gallery_images.length > 0 && (
-                  <Card>
-                    <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Images className="h-5 w-5" />
-                        Event Photos
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <EventGalleryLightbox images={event.gallery_images} />
-                    </CardContent>
-                  </Card>
-                )}
 
                 {event.website && !isPast && (
                   <div className="flex gap-4">
@@ -329,6 +315,21 @@ const EventDetail = () => {
                           <ExternalLink className="ml-2 h-3 w-3" />
                         </a>
                       </Button>
+                    </CardContent>
+                  </Card>
+                )}
+
+                {/* Event Gallery - in sidebar */}
+                {event.gallery_images && event.gallery_images.length > 0 && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Images className="h-5 w-5" />
+                        Event Photos
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <EventGalleryLightbox images={event.gallery_images} />
                     </CardContent>
                   </Card>
                 )}
