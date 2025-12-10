@@ -14,7 +14,7 @@ const badgeVariants = cva(
         outline: "border-border text-foreground bg-transparent",
         region: "bg-primary/90 text-primary-foreground border-primary/50 hover:bg-primary",
         topic: "bg-accent/90 text-accent-foreground border-accent/50 hover:bg-accent",
-        featured: "bg-octg-gold text-white border-octg-gold/50 hover:bg-octg-gold/90",
+        featured: "bg-accent text-accent-foreground border-accent/50 hover:bg-accent/90",
         status: "bg-muted text-muted-foreground border-border",
         "status-active": "bg-green-500/15 text-green-600 dark:text-green-400 border-green-500/30",
         "status-draft": "bg-yellow-500/15 text-yellow-600 dark:text-yellow-400 border-yellow-500/30",
