@@ -143,7 +143,7 @@ export function useProductManufacturers(productId: string | undefined) {
       const { data, error } = await supabase
         .from("product_companies")
         .select(`
-          company:companies(id, name, slug, logo_url)
+          company:companies(id, name, slug, logo_url, headquarters)
         `)
         .eq("product_id", productId!);
 
@@ -153,6 +153,7 @@ export function useProductManufacturers(productId: string | undefined) {
         name: string;
         slug: string;
         logo_url: string | null;
+        headquarters: string | null;
       }>;
     },
     enabled: !!productId,
@@ -166,7 +167,7 @@ export function useProductArticles(productId: string | undefined) {
       const { data, error } = await supabase
         .from("product_articles")
         .select(`
-          article:articles(id, title, slug, hero_image_url, publish_date)
+          article:articles(id, title, subtitle, slug, hero_image_url, publish_date)
         `)
         .eq("product_id", productId!);
 
@@ -174,6 +175,7 @@ export function useProductArticles(productId: string | undefined) {
       return data?.map((item) => item.article).filter(Boolean) as Array<{
         id: string;
         title: string;
+        subtitle: string | null;
         slug: string;
         hero_image_url: string | null;
         publish_date: string | null;

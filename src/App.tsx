@@ -26,6 +26,7 @@ import TermsAndConditions from "./pages/TermsAndConditions";
 import NewsletterTerms from "./pages/NewsletterTerms";
 import OctgDirectory from "./pages/OctgDirectory";
 import OctgCategory from "./pages/OctgCategory";
+import ProductDetail from "./pages/ProductDetail";
 
 // Admin pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -69,6 +70,7 @@ const App = () => (
                 <Route path="/ceo/:slug" element={<CEODetail />} />
                 <Route path="/octg-directory" element={<OctgDirectory />} />
                 <Route path="/octg-directory/:categorySlug" element={<OctgCategory />} />
+                <Route path="/octg-directory/:categorySlug/:productSlug" element={<ProductDetail />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsAndConditions />} />
                 <Route path="/newsletter-terms" element={<NewsletterTerms />} />
