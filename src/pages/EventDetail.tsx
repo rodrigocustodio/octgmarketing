@@ -206,7 +206,7 @@ const EventDetail = () => {
                           <video
                             src={videoEmbed.embedUrl}
                             controls
-                            className="w-full h-full rounded-lg object-cover"
+                            className="absolute inset-0 w-full h-full rounded-lg object-cover"
                           />
                         ) : (
                           <iframe
@@ -214,7 +214,7 @@ const EventDetail = () => {
                             title={`${event.name} video`}
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                             allowFullScreen
-                            className="w-full h-full rounded-lg"
+                            className="absolute inset-0 w-full h-full rounded-lg border-0"
                           />
                         )}
                       </AspectRatio>
