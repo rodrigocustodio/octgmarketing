@@ -12,7 +12,8 @@ import {
   PenSquare,
   FilePlus,
   Users,
-  Building2
+  Building2,
+  Package
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -62,6 +63,11 @@ const navItems = [
     title: "Companies",
     href: "/admin/companies",
     icon: Building2,
+  },
+  {
+    title: "Products",
+    href: "/admin/products",
+    icon: Package,
   },
   {
     title: "Settings",
