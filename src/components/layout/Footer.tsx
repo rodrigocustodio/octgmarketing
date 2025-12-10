@@ -21,6 +21,7 @@ const footerLinks = {
     { name: "Company Directory", href: "/directory" },
     { name: "CEO Directory", href: "/ceo-directory" },
     { name: "Product Directory", href: "/octg-directory" },
+    { name: "Events Calendar", href: "/events" },
   ],
   legal: [
     { name: "Privacy Policy", href: "/privacy" },

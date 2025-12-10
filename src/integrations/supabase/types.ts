@@ -354,6 +354,71 @@ export type Database = {
           },
         ]
       }
+      events: {
+        Row: {
+          attendees_count: string | null
+          created_at: string
+          description: string | null
+          end_date: string | null
+          exhibitors_count: string | null
+          id: string
+          image_url: string | null
+          is_featured: boolean | null
+          location: string
+          name: string
+          region_id: string | null
+          slug: string
+          start_date: string
+          updated_at: string
+          venue: string | null
+          website: string | null
+        }
+        Insert: {
+          attendees_count?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          exhibitors_count?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          location: string
+          name: string
+          region_id?: string | null
+          slug: string
+          start_date: string
+          updated_at?: string
+          venue?: string | null
+          website?: string | null
+        }
+        Update: {
+          attendees_count?: string | null
+          created_at?: string
+          description?: string | null
+          end_date?: string | null
+          exhibitors_count?: string | null
+          id?: string
+          image_url?: string | null
+          is_featured?: boolean | null
+          location?: string
+          name?: string
+          region_id?: string | null
+          slug?: string
+          start_date?: string
+          updated_at?: string
+          venue?: string | null
+          website?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "events_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       executives: {
         Row: {
           bio: string | null
