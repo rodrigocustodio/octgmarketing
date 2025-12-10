@@ -15,7 +15,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save, Trash2, Calendar, Sparkles, Loader2 } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Calendar, Sparkles, Loader2, ImageIcon } from "lucide-react";
+import { ImageUpload } from "@/components/admin/ImageUpload";
 import { useEvent, useCreateEvent, useUpdateEvent, useDeleteEvent } from "@/hooks/useEvents";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -38,6 +39,7 @@ const EventEdit = () => {
 
   const [regions, setRegions] = useState<Region[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -124,7 +126,32 @@ const EventEdit = () => {
       console.error('Generation error:', error);
       toast.error(error.message || "Failed to generate description");
     } finally {
-      setIsGenerating(false);
+    setIsGenerating(false);
+    }
+  };
+
+  const handleImageUpload = async (base64: string, fileName: string): Promise<string> => {
+    setIsUploadingImage(true);
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error("Not authenticated");
+
+      const folder = `octgindex/events/${formData.slug || id || 'new'}`;
+      
+      const { data, error } = await supabase.functions.invoke('upload-image', {
+        body: { imageBase64: base64, fileName, folder },
+      });
+
+      if (error) throw error;
+      if (!data.cdnUrl) throw new Error("No URL returned from upload");
+
+      toast.success("Image uploaded successfully");
+      return data.cdnUrl;
+    } catch (error: any) {
+      console.error('Upload error:', error);
+      throw new Error(error.message || "Failed to upload image");
+    } finally {
+      setIsUploadingImage(false);
     }
   };
 
@@ -423,27 +450,21 @@ const EventEdit = () => {
 
             <Card>
               <CardHeader>
-                <CardTitle>Image</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <ImageIcon className="h-5 w-5" />
+                  Hero Image
+                </CardTitle>
               </CardHeader>
-              <CardContent>
-                <div className="space-y-2">
-                  <Label htmlFor="image_url">Image URL</Label>
-                  <Input
-                    id="image_url"
-                    value={formData.image_url}
-                    onChange={(e) => setFormData((prev) => ({ ...prev, image_url: e.target.value }))}
-                    placeholder="https://..."
-                  />
-                </div>
-                {formData.image_url && (
-                  <div className="mt-4">
-                    <img
-                      src={formData.image_url}
-                      alt="Event preview"
-                      className="w-full h-32 object-cover rounded-lg"
-                    />
-                  </div>
-                )}
+              <CardContent className="space-y-3">
+                <ImageUpload
+                  value={formData.image_url}
+                  onChange={(url) => setFormData((prev) => ({ ...prev, image_url: url || "" }))}
+                  onUpload={handleImageUpload}
+                  isUploading={isUploadingImage}
+                />
+                <p className="text-xs text-muted-foreground">
+                  Recommended: 1920×600px for optimal hero display
+                </p>
               </CardContent>
             </Card>
           </div>
