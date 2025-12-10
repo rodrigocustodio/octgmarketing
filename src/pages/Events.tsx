@@ -196,7 +196,7 @@ const Events = () => {
               <div className="max-w-3xl">
                 <Badge variant="outline" className="mb-4 border-white/30 text-white">2026 Event Calendar</Badge>
                 <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white">
-                  Industry Events
+                  OCTG & Energy Events
                 </h1>
                 <p className="text-xl text-white/80">
                   Discover major oil, gas, and energy conferences, exhibitions, and networking events worldwide.
