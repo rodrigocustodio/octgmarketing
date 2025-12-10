@@ -5,39 +5,39 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
 @layer base {
-  /* Light Mode - Clean Professional */
+  /* Light Mode - Warm Cream (Claude-inspired soft aesthetic) */
   :root {
-    --background: 210 20% 98%;
-    --foreground: 222 47% 11%;
+    --background: 40 25% 97%;
+    --foreground: 30 15% 15%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222 47% 11%;
+    --card: 40 20% 99%;
+    --card-foreground: 30 15% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover: 40 18% 99%;
+    --popover-foreground: 30 15% 15%;
 
-    /* Primary - Steel Blue */
-    --primary: 210 50% 40%;
-    --primary-foreground: 0 0% 100%;
+    /* Primary - Warm Steel */
+    --primary: 210 45% 42%;
+    --primary-foreground: 40 20% 99%;
 
-    /* Secondary - Light Slate */
-    --secondary: 214 20% 92%;
-    --secondary-foreground: 222 47% 20%;
+    /* Secondary - Warm Beige */
+    --secondary: 35 15% 92%;
+    --secondary-foreground: 30 20% 25%;
 
-    /* Muted - Light Gray */
-    --muted: 210 15% 93%;
-    --muted-foreground: 215 20% 35%;
+    /* Muted - Soft Cream */
+    --muted: 35 18% 93%;
+    --muted-foreground: 30 15% 40%;
 
     /* Accent - Bronze/Copper */
     --accent: 30 65% 42%;
-    --accent-foreground: 0 0% 100%;
+    --accent-foreground: 40 20% 99%;
 
     --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive-foreground: 40 20% 99%;
 
-    --border: 214 20% 88%;
-    --input: 214 20% 85%;
-    --ring: 210 50% 45%;
+    --border: 35 15% 88%;
+    --input: 35 12% 90%;
+    --ring: 210 45% 45%;
 
     --radius: 0.5rem;
 
@@ -45,32 +45,32 @@
     --octg-bronze: 30 65% 42%;
     --octg-copper: 25 70% 38%;
     --octg-steel: 210 40% 45%;
-    --octg-slate: 220 15% 92%;
+    --octg-slate: 35 12% 92%;
     --octg-navy: 220 50% 30%;
-    --octg-charcoal: 220 15% 25%;
+    --octg-charcoal: 30 15% 25%;
     --octg-gold: 38 80% 38%;
 
-    /* Gradients - Light Mode */
-    --gradient-hero: linear-gradient(135deg, hsl(210 20% 98%) 0%, hsl(214 25% 95%) 50%, hsl(30 20% 95%) 100%);
-    --gradient-card: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 15% 98%) 100%);
+    /* Gradients - Light Mode (Warm Cream) */
+    --gradient-hero: linear-gradient(135deg, hsl(40 25% 97%) 0%, hsl(35 20% 95%) 50%, hsl(30 18% 94%) 100%);
+    --gradient-card: linear-gradient(180deg, hsl(40 20% 99%) 0%, hsl(38 18% 97%) 100%);
     --gradient-bronze: linear-gradient(135deg, hsl(30 65% 42%) 0%, hsl(25 70% 35%) 100%);
     --gradient-steel: linear-gradient(135deg, hsl(210 40% 45%) 0%, hsl(210 50% 38%) 100%);
 
-    /* Shadows - Light Mode */
-    --shadow-card: 0 4px 20px -4px hsl(222 20% 80% / 0.4);
-    --shadow-elevated: 0 10px 40px -10px hsl(222 20% 70% / 0.3);
+    /* Shadows - Light Mode (Warm tones) */
+    --shadow-card: 0 4px 20px -4px hsl(35 20% 70% / 0.3);
+    --shadow-elevated: 0 10px 40px -10px hsl(35 20% 60% / 0.25);
     --shadow-glow-bronze: 0 0 30px hsl(30 65% 42% / 0.2);
-    --shadow-glow-steel: 0 0 30px hsl(210 50% 45% / 0.2);
+    --shadow-glow-steel: 0 0 30px hsl(210 50% 45% / 0.15);
 
-    /* Sidebar - Light Mode */
-    --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 222 47% 15%;
-    --sidebar-primary: 210 50% 40%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 214 20% 95%;
-    --sidebar-accent-foreground: 222 47% 15%;
-    --sidebar-border: 214 20% 88%;
-    --sidebar-ring: 210 50% 45%;
+    /* Sidebar - Light Mode (Warm) */
+    --sidebar-background: 38 20% 98%;
+    --sidebar-foreground: 30 15% 18%;
+    --sidebar-primary: 210 45% 42%;
+    --sidebar-primary-foreground: 40 20% 99%;
+    --sidebar-accent: 35 15% 95%;
+    --sidebar-accent-foreground: 30 15% 18%;
+    --sidebar-border: 35 15% 88%;
+    --sidebar-ring: 210 45% 45%;
   }
 
   /* Dark Mode - Corporate Industrial */
