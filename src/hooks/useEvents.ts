@@ -11,6 +11,7 @@ export interface Event {
   start_date: string;
   end_date: string | null;
   website: string | null;
+  video_url: string | null;
   image_url: string | null;
   gallery_images: string[] | null;
   region_id: string | null;

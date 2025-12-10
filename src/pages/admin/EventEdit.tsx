@@ -50,6 +50,7 @@ const EventEdit = () => {
     start_date: "",
     end_date: "",
     website: "",
+    video_url: "",
     image_url: "",
     gallery_images: [] as string[],
     region_id: "",
@@ -79,6 +80,7 @@ const EventEdit = () => {
         start_date: event.start_date || "",
         end_date: event.end_date || "",
         website: event.website || "",
+        video_url: event.video_url || "",
         image_url: event.image_url || "",
         gallery_images: event.gallery_images || [],
         region_id: event.region_id || "",
@@ -176,6 +178,7 @@ const EventEdit = () => {
         start_date: formData.start_date,
         end_date: formData.end_date || null,
         website: formData.website || null,
+        video_url: formData.video_url || null,
         image_url: formData.image_url || null,
         gallery_images: formData.gallery_images.length > 0 ? formData.gallery_images : null,
         region_id: formData.region_id || null,
@@ -374,6 +377,20 @@ const EventEdit = () => {
                     onChange={(e) => setFormData((prev) => ({ ...prev, website: e.target.value }))}
                     placeholder="https://..."
                   />
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="video_url">YouTube Video URL</Label>
+                  <Input
+                    id="video_url"
+                    type="url"
+                    value={formData.video_url}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, video_url: e.target.value }))}
+                    placeholder="https://youtube.com/watch?v=... or https://youtu.be/..."
+                  />
+                  <p className="text-xs text-muted-foreground">
+                    Supports youtube.com/watch, youtu.be, and embed URLs
+                  </p>
                 </div>
               </CardContent>
             </Card>
