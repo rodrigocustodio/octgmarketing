@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { 
   Calendar, 
   MapPin, 
@@ -15,10 +16,12 @@ import {
   Globe,
   ArrowLeft,
   Share2,
-  Images
+  Images,
+  Play
 } from "lucide-react";
 import { EventGalleryLightbox } from "@/components/events/EventGalleryLightbox";
 import { useEvent } from "@/hooks/useEvents";
+import { getYouTubeEmbedUrl } from "@/lib/youtube-utils";
 import { format } from "date-fns";
 
 function formatEventDate(startDate: string, endDate: string | null): string {
@@ -89,6 +92,8 @@ const EventDetail = () => {
 
   const isPast = !isUpcoming(event.start_date);
 
+  const youtubeEmbedUrl = event.video_url ? getYouTubeEmbedUrl(event.video_url) : null;
+
   // Schema.org Event structured data
   const eventSchema = {
     "@context": "https://schema.org",
@@ -115,6 +120,12 @@ const EventDetail = () => {
     ...(event.image_url && { image: event.image_url }),
     ...(event.gallery_images && event.gallery_images.length > 0 && {
       image: [event.image_url, ...event.gallery_images].filter(Boolean),
+    }),
+    ...(youtubeEmbedUrl && {
+      video: {
+        "@type": "VideoObject",
+        embedUrl: youtubeEmbedUrl,
+      },
     }),
   };
 
@@ -180,6 +191,29 @@ const EventDetail = () => {
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-8">
+                {/* YouTube Video Player - positioned at top if exists */}
+                {youtubeEmbedUrl && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Play className="h-5 w-5" />
+                        Event Video
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <AspectRatio ratio={16 / 9}>
+                        <iframe
+                          src={youtubeEmbedUrl}
+                          title={`${event.name} video`}
+                          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                          allowFullScreen
+                          className="w-full h-full rounded-lg"
+                        />
+                      </AspectRatio>
+                    </CardContent>
+                  </Card>
+                )}
+
                 <Card>
                   <CardHeader>
                     <CardTitle>About This Event</CardTitle>
