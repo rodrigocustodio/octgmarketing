@@ -195,10 +195,10 @@ const EventDetail = () => {
                 {videoEmbed && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
-                        <Play className="h-5 w-5" />
-                        Event Video
-                      </CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <Play className="h-5 w-5" />
+                  About the Event and History
+                </CardTitle>
                     </CardHeader>
                     <CardContent>
                       {/* Use Bunny's recommended responsive CSS pattern */}
