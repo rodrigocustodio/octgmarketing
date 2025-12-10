@@ -251,3 +251,34 @@ export function generateTopicDescription(topicName: string, topicDesc?: string):
     `Latest ${topicName} news, analysis, and market insights for the OCTG industry. Stay updated with OCTG Index.`
   );
 }
+
+/**
+ * Generates a default title for product pages
+ */
+export function generateProductTitle(productName: string, category?: string): string {
+  if (category) {
+    return formatSEOTitle(`${productName} - ${category}`);
+  }
+  return formatSEOTitle(`${productName} - OCTG Product`);
+}
+
+/**
+ * Generates a default description for product pages
+ */
+export function generateProductDescription(
+  productName: string,
+  shortDescription?: string | null,
+  apiStandard?: string | null
+): string {
+  // Use short description if available
+  if (shortDescription && shortDescription.length >= MIN_DESCRIPTION_LENGTH) {
+    return formatSEODescription(shortDescription);
+  }
+
+  // Generate default
+  const apiText = apiStandard ? ` manufactured to ${apiStandard} standards` : "";
+  
+  return formatSEODescription(
+    `Learn about ${productName}${apiText}. View technical specifications, manufacturers, and applications in the OCTG industry.`
+  );
+}
