@@ -13,6 +13,7 @@ import {
   FilePlus,
   Users,
   Building2,
+  CalendarDays,
   Package
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
@@ -68,6 +69,11 @@ const navItems = [
     title: "Products",
     href: "/admin/products",
     icon: Package,
+  },
+  {
+    title: "Events",
+    href: "/admin/events",
+    icon: CalendarDays,
   },
   {
     title: "Settings",

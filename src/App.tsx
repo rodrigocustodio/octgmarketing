@@ -27,6 +27,8 @@ import NewsletterTerms from "./pages/NewsletterTerms";
 import OctgDirectory from "./pages/OctgDirectory";
 import OctgCategory from "./pages/OctgCategory";
 import ProductDetail from "./pages/ProductDetail";
+import Events from "./pages/Events";
+import EventDetail from "./pages/EventDetail";
 
 // Admin pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -44,6 +46,8 @@ import Executives from "./pages/admin/Executives";
 import ExecutiveEdit from "./pages/admin/ExecutiveEdit";
 import AdminProducts from "./pages/admin/Products";
 import ProductEdit from "./pages/admin/ProductEdit";
+import AdminEvents from "./pages/admin/Events";
+import EventEdit from "./pages/admin/EventEdit";
 import Settings from "./pages/admin/Settings";
 
 const queryClient = new QueryClient();
@@ -73,6 +77,8 @@ const App = () => (
                 <Route path="/octg-directory" element={<OctgDirectory />} />
                 <Route path="/octg-directory/:categorySlug" element={<OctgCategory />} />
                 <Route path="/octg-directory/:categorySlug/:productSlug" element={<ProductDetail />} />
+                <Route path="/events" element={<Events />} />
+                <Route path="/events/:slug" element={<EventDetail />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsAndConditions />} />
                 <Route path="/newsletter-terms" element={<NewsletterTerms />} />
@@ -94,6 +100,8 @@ const App = () => (
                 <Route path="/admin/companies/:id" element={<ProtectedRoute><CompanyEdit /></ProtectedRoute>} />
                 <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
                 <Route path="/admin/products/:id" element={<ProtectedRoute><ProductEdit /></ProtectedRoute>} />
+                <Route path="/admin/events" element={<ProtectedRoute><AdminEvents /></ProtectedRoute>} />
+                <Route path="/admin/events/:id" element={<ProtectedRoute><EventEdit /></ProtectedRoute>} />
                 <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

@@ -17,6 +17,7 @@ import { IndustryFocusMasonry } from "@/components/home/IndustryFocusMasonry";
 import { TopicRows } from "@/components/home/TopicRows";
 import { QuickReadsGrid } from "@/components/home/QuickReadsGrid";
 import { AnalysisReportsSection } from "@/components/home/AnalysisReportsSection";
+import { UpcomingEventsSection } from "@/components/home/UpcomingEventsSection";
 
 function formatArticleDate(dateString: string | null): string {
   if (!dateString) return "";
@@ -241,7 +242,10 @@ const Index = () => {
         {/* SECTION 2: Industry Focus Masonry */}
         <IndustryFocusMasonry articles={industryFocusArticles} />
 
-        {/* SECTION 3: By Topic Rows */}
+        {/* SECTION 3: Upcoming Events */}
+        <UpcomingEventsSection />
+
+        {/* SECTION 4: By Topic Rows */}
         <TopicRows articles={topicRowsArticles} usedIds={usedIds} />
 
         {/* SECTION 4: Analysis & Reports */}
