@@ -11,9 +11,23 @@ import ScrollRestoration from "@/components/ScrollRestoration";
 import Index from "./pages/Index";
 import Article from "./pages/Article";
 import Region from "./pages/Region";
+import Auth from "./pages/Auth";
+import NotFound from "./pages/NotFound";
 import Topic from "./pages/Topic";
 import Topics from "./pages/Topics";
-import Auth from "./pages/Auth";
+import Directory from "./pages/Directory";
+import DirectoryCategory from "./pages/DirectoryCategory";
+import DirectoryRegion from "./pages/DirectoryRegion";
+import CompanyDetail from "./pages/CompanyDetail";
+import CEODirectory from "./pages/CEODirectory";
+import CEODetail from "./pages/CEODetail";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
+import NewsletterTerms from "./pages/NewsletterTerms";
+import OctgDirectory from "./pages/OctgDirectory";
+import OctgCategory from "./pages/OctgCategory";
+
+// Admin pages
 import Dashboard from "./pages/admin/Dashboard";
 import Pipeline from "./pages/admin/Pipeline";
 import Sources from "./pages/admin/Sources";
@@ -23,22 +37,11 @@ import DraftDetail from "./pages/admin/DraftDetail";
 import Articles from "./pages/admin/Articles";
 import ArticleEdit from "./pages/admin/ArticleEdit";
 import CreateArticle from "./pages/admin/CreateArticle";
-import Settings from "./pages/admin/Settings";
-import NotFound from "./pages/NotFound";
-import Directory from "./pages/Directory";
-import DirectoryRegion from "./pages/DirectoryRegion";
-import DirectoryCategory from "./pages/DirectoryCategory";
-import CompanyDetail from "./pages/CompanyDetail";
-import CEODirectory from "./pages/CEODirectory";
-import CEODetail from "./pages/CEODetail";
-import PrivacyPolicy from "./pages/PrivacyPolicy";
-import TermsAndConditions from "./pages/TermsAndConditions";
-import NewsletterTerms from "./pages/NewsletterTerms";
-import Executives from "./pages/admin/Executives";
-import ExecutiveEdit from "./pages/admin/ExecutiveEdit";
 import Companies from "./pages/admin/Companies";
 import CompanyEdit from "./pages/admin/CompanyEdit";
-import OctgDirectory from "./pages/OctgDirectory";
+import Executives from "./pages/admin/Executives";
+import ExecutiveEdit from "./pages/admin/ExecutiveEdit";
+import Settings from "./pages/admin/Settings";
 
 const queryClient = new QueryClient();
 
@@ -65,6 +68,7 @@ const App = () => (
                 <Route path="/ceo-directory" element={<CEODirectory />} />
                 <Route path="/ceo/:slug" element={<CEODetail />} />
                 <Route path="/octg-directory" element={<OctgDirectory />} />
+                <Route path="/octg-directory/:categorySlug" element={<OctgCategory />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsAndConditions />} />
                 <Route path="/newsletter-terms" element={<NewsletterTerms />} />
