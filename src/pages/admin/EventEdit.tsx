@@ -188,14 +188,14 @@ const EventEdit = () => {
       };
 
       if (isNew) {
-        await createEvent.mutateAsync(eventData);
+        const newEvent = await createEvent.mutateAsync(eventData);
         toast.success("Event created successfully");
+        navigate(`/admin/events/${newEvent.id}`, { replace: true });
       } else {
         await updateEvent.mutateAsync({ id: id!, ...eventData });
         toast.success("Event updated successfully");
+        // Stay on current page - no navigation
       }
-
-      navigate("/admin/events");
     } catch (error: any) {
       toast.error(error.message || "Failed to save event");
     }
