@@ -15,7 +15,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { ArrowLeft, Save, Trash2, Calendar } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Calendar, Sparkles, Loader2 } from "lucide-react";
 import { useEvent, useCreateEvent, useUpdateEvent, useDeleteEvent } from "@/hooks/useEvents";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
@@ -37,6 +37,7 @@ const EventEdit = () => {
   const deleteEvent = useDeleteEvent();
 
   const [regions, setRegions] = useState<Region[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     slug: "",
@@ -93,6 +94,38 @@ const EventEdit = () => {
         .replace(/[^a-z0-9]+/g, "-")
         .replace(/(^-|-$)/g, ""),
     }));
+  };
+
+  const handleGenerateDescription = async () => {
+    if (!formData.name) {
+      toast.error("Please enter event name first");
+      return;
+    }
+
+    setIsGenerating(true);
+    try {
+      const { data, error } = await supabase.functions.invoke('generate-event-description', {
+        body: {
+          eventName: formData.name,
+          location: formData.location,
+          website: formData.website,
+          venue: formData.venue,
+          startDate: formData.start_date,
+          endDate: formData.end_date,
+        },
+      });
+
+      if (error) throw error;
+      if (!data.success) throw new Error(data.error);
+
+      setFormData((prev) => ({ ...prev, description: data.description }));
+      toast.success("Description generated successfully");
+    } catch (error: any) {
+      console.error('Generation error:', error);
+      toast.error(error.message || "Failed to generate description");
+    } finally {
+      setIsGenerating(false);
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -220,14 +253,41 @@ const EventEdit = () => {
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="description">Description</Label>
+                  <div className="flex items-center justify-between">
+                    <Label htmlFor="description">Description</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={handleGenerateDescription}
+                      disabled={isGenerating || !formData.name}
+                      className="bg-accent/20 hover:bg-accent/30 border-accent/30"
+                    >
+                      {isGenerating ? (
+                        <>
+                          <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                          Researching...
+                        </>
+                      ) : (
+                        <>
+                          <Sparkles className="h-4 w-4 mr-2" />
+                          Generate Description
+                        </>
+                      )}
+                    </Button>
+                  </div>
                   <Textarea
                     id="description"
                     value={formData.description}
                     onChange={(e) => setFormData((prev) => ({ ...prev, description: e.target.value }))}
                     placeholder="Describe the event..."
-                    rows={4}
+                    rows={6}
                   />
+                  {formData.description && (
+                    <p className="text-xs text-muted-foreground text-right">
+                      {formData.description.length} characters
+                    </p>
+                  )}
                 </div>
 
                 <div className="grid sm:grid-cols-2 gap-4">

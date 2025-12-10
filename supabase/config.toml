@@ -38,3 +38,15 @@ verify_jwt = false
 
 [functions.optimize-article-seo]
 verify_jwt = false
+
+[functions.generate-event-description]
+verify_jwt = false
+
+[functions.fix-article-endings]
+verify_jwt = false
+
+[functions.generate-executive-bio]
+verify_jwt = false
+
+[functions.fetch-steel-prices]
+verify_jwt = false
