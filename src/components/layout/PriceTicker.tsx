@@ -24,15 +24,15 @@ function PriceItem({ symbol, price, change, changePercent, currency }: {
 
   return (
     <div className="flex items-center gap-1.5 px-3 py-1 whitespace-nowrap">
-      <span className="font-medium text-foreground/80">{symbol}</span>
-      <span className="text-muted-foreground/90">
+      <span className="font-medium text-foreground">{symbol}</span>
+      <span className="text-foreground/70">
         {formatPrice(price, currency)}
       </span>
       <span className={cn(
         "flex items-center gap-0.5 text-xs font-medium",
-        isPositive && "text-emerald-400/70",
-        isNegative && "text-rose-400/70",
-        isNeutral && "text-muted-foreground/70"
+        isPositive && "text-emerald-600",
+        isNegative && "text-rose-600",
+        isNeutral && "text-muted-foreground"
       )}>
         {isPositive && <TrendingUp className="h-3 w-3" />}
         {isNegative && <TrendingDown className="h-3 w-3" />}
