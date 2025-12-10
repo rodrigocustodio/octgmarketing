@@ -29,7 +29,7 @@ export function EventGalleryLightbox({ images }: EventGalleryLightboxProps) {
   return (
     <>
       {/* Gallery Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 gap-2">
         {images.map((url, idx) => (
           <button
             key={idx}
