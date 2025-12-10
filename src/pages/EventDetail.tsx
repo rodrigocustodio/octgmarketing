@@ -128,7 +128,7 @@ const EventDetail = () => {
         <main>
           {/* Hero with optional background image */}
           <section 
-            className="relative py-16 md:py-24"
+            className="relative py-10 md:py-14"
             style={event.image_url ? {
               backgroundImage: `url(${event.image_url})`,
               backgroundSize: 'cover',
@@ -186,7 +186,7 @@ const EventDetail = () => {
           </section>
 
           {/* Content */}
-          <section className="container py-12">
+          <section className="container py-8 md:py-10">
             <div className="grid lg:grid-cols-3 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2 space-y-8">
