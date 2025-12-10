@@ -12,6 +12,7 @@ export interface Event {
   end_date: string | null;
   website: string | null;
   image_url: string | null;
+  gallery_images: string[] | null;
   region_id: string | null;
   attendees_count: string | null;
   exhibitors_count: string | null;
