@@ -214,7 +214,7 @@ const EventDetail = () => {
                             src={videoEmbed.embedUrl}
                             title={`${event.name} video`}
                             loading="lazy"
-                            allow="accelerometer; gyroscope; autoplay; encrypted-media; picture-in-picture"
+                            allow="accelerometer; gyroscope; encrypted-media; picture-in-picture"
                             allowFullScreen
                             className="absolute top-0 left-0 w-full h-full rounded-lg"
                             style={{ border: 'none' }}
