@@ -108,25 +108,27 @@ serve(async (req) => {
     console.log('Research content length:', researchContent.length);
 
     // Generate description with OpenAI
-    const systemPrompt = `You are an expert energy industry event researcher. Generate a comprehensive, professional description for an energy industry event.
+    const systemPrompt = `You are an expert energy industry event researcher. Generate a professional description for an energy industry event.
 
 REQUIREMENTS:
-- Write exactly 800-1000 characters (approximately 3-4 short paragraphs)
-- Structure the description as follows:
-  1. Opening: Event significance, scale, and industry position (1-2 sentences)
-  2. What to Expect: Key activities - exhibitions, conferences, technology showcases, networking (2-3 sentences)
-  3. Who Attends: Target audience - NOCs, IOCs, OCTG manufacturers, service companies, policymakers (1-2 sentences)
-  4. Impact: Industry influence, deal-making opportunities, innovation focus (1-2 sentences)
+- Write exactly 750-850 characters (target 800 characters)
+- MUST be a single continuous paragraph with NO line breaks or paragraph breaks
+- NO markdown formatting, NO bullet points, NO headers
+- Professional corporate tone suitable for a news publication
+
+CONTENT TO INCLUDE (all in one flowing paragraph):
+- Event name and significance in the industry
+- Scale (attendee/exhibitor numbers if available)
+- Key activities and what attendees can expect
+- Target audience (NOCs, IOCs, OCTG manufacturers, service companies)
+- Brief mention of industry impact or opportunities
 
 STYLE:
-- Professional corporate tone suitable for a news publication
-- Include specific numbers when available (exhibitor counts, attendee numbers, floor space)
-- NO markdown formatting - plain text paragraphs only
-- NO bullet points or headers
+- Factual and concise
+- Include specific numbers when available
 - Focus on energy/oil & gas/OCTG industry relevance
-- Make it compelling for potential attendees and exhibitors
 
-OUTPUT: Return ONLY the description text, nothing else.`;
+OUTPUT: Return ONLY the description text as a single paragraph, nothing else.`;
 
     const userPrompt = `Generate a professional description for this energy industry event:
 
@@ -152,7 +154,7 @@ ${researchContent.slice(0, 8000) || 'No research data available. Generate based 
           { role: 'system', content: systemPrompt },
           { role: 'user', content: userPrompt },
         ],
-        max_tokens: 500,
+        max_tokens: 300,
         temperature: 0.7,
       }),
     });
