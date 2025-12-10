@@ -17,7 +17,7 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, Save, Trash2, Calendar, Sparkles, Loader2, ImageIcon } from "lucide-react";
 import { ImageUpload } from "@/components/admin/ImageUpload";
-import { useEvent, useCreateEvent, useUpdateEvent, useDeleteEvent } from "@/hooks/useEvents";
+import { useEventById, useCreateEvent, useUpdateEvent, useDeleteEvent } from "@/hooks/useEvents";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 
@@ -32,7 +32,7 @@ const EventEdit = () => {
   const navigate = useNavigate();
   const isNew = id === "new";
 
-  const { data: event, isLoading } = useEvent(isNew ? "" : id || "");
+  const { data: event, isLoading } = useEventById(isNew ? "" : id || "");
   const createEvent = useCreateEvent();
   const updateEvent = useUpdateEvent();
   const deleteEvent = useDeleteEvent();
