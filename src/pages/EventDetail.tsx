@@ -130,7 +130,7 @@ const EventDetail = () => {
           <section 
             className="relative py-10 md:py-14"
             style={{
-              backgroundImage: `url(${event.image_url || '/images/events-hero-default.jpg'})`,
+              backgroundImage: `url(${event.image_url ? encodeURI(event.image_url) : '/images/events-hero-default.jpg'})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
             }}
