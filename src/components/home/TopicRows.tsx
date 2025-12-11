@@ -7,6 +7,7 @@ import { format } from "date-fns";
 import heroImage from "@/assets/hero-octg.jpg";
 import { LucideIcon } from "lucide-react";
 import { ArticleWithTopics } from "@/hooks/useArticles";
+import { optimizeImageUrl } from "@/lib/utils";
 
 const topicConfig: { slug: string; name: string; icon: LucideIcon }[] = [
   { slug: "mills-manufacturing", name: "Mills & Manufacturing", icon: Factory },
@@ -55,8 +56,11 @@ function TopicRow({ slug, name, icon: Icon, articles }: TopicRowProps) {
             <Card variant="interactive" className="h-full overflow-hidden group">
               <div className="aspect-[16/9] relative overflow-hidden">
                 <img 
-                  src={article.hero_image_url || heroImage} 
+                  src={optimizeImageUrl(article.hero_image_url, { width: 600, quality: 80 }) || heroImage} 
                   alt={article.title}
+                  width={600}
+                  height={338}
+                  loading="lazy"
                   className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />

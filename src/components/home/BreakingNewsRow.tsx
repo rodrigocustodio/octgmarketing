@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Zap } from "lucide-react";
 import { format } from "date-fns";
+import { optimizeImageUrl } from "@/lib/utils";
 
 interface Article {
   id: string;
@@ -47,8 +48,11 @@ export function BreakingNewsRow({ articles }: BreakingNewsRowProps) {
                 {article.hero_image_url && (
                   <div className="w-24 h-20 flex-shrink-0 overflow-hidden rounded-l-lg">
                     <img 
-                      src={article.hero_image_url} 
+                      src={optimizeImageUrl(article.hero_image_url, { width: 200, quality: 75 })} 
                       alt={article.title}
+                      width={96}
+                      height={80}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   </div>

@@ -5,6 +5,7 @@ import { Factory, ArrowRight, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
 import heroImage from "@/assets/hero-octg.jpg";
+import { optimizeImageUrl } from "@/lib/utils";
 
 interface Article {
   id: string;
@@ -62,8 +63,11 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
             <Card variant="article" className="overflow-hidden">
               <div className="relative aspect-[16/10]">
                 <img 
-                  src={featured.hero_image_url || heroImage} 
+                  src={optimizeImageUrl(featured.hero_image_url, { width: 1000, quality: 85 }) || heroImage} 
                   alt={featured.title}
+                  width={1000}
+                  height={625}
+                  loading="lazy"
                   className="absolute inset-0 w-full h-full object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />

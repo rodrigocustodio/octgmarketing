@@ -26,6 +26,7 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { generateCEOTitle, generateCEODescription } from "@/lib/seo-utils";
+import { optimizeImageUrl } from "@/lib/utils";
 
 const regionColors: Record<string, string> = {
   Americas: "bg-blue-500/20 text-blue-400 border-blue-500/30",
@@ -252,8 +253,11 @@ export default function CEODetail() {
                 <div className="aspect-[3/4] bg-muted rounded-lg overflow-hidden">
                   {executive.photo_url ? (
                     <img
-                      src={executive.photo_url}
+                      src={optimizeImageUrl(executive.photo_url, { width: 400, quality: 85 })}
                       alt={`${executive.name}, ${executive.title} at ${executive.company_name}`}
+                      width={400}
+                      height={533}
+                      loading="lazy"
                       className="w-full h-full object-cover"
                     />
                   ) : (

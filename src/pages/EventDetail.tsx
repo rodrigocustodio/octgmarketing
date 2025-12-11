@@ -22,7 +22,7 @@ import {
 import { EventGalleryLightbox } from "@/components/events/EventGalleryLightbox";
 import { useEvent } from "@/hooks/useEvents";
 import { getVideoEmbed } from "@/lib/video-utils";
-import { parseLocalDate } from "@/lib/utils";
+import { parseLocalDate, optimizeImageUrl } from "@/lib/utils";
 import { format } from "date-fns";
 
 function formatEventDate(startDate: string, endDate: string | null): string {
@@ -144,14 +144,14 @@ const EventDetail = () => {
 
         <main>
           {/* Hero with background image - always use ADIPEC as default */}
-          <section 
-            className="relative py-10 md:py-14"
-            style={{
-              backgroundImage: `url(${event.image_url ? encodeURI(event.image_url) : '/images/events-hero-default.jpg'})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          >
+          <section className="relative py-10 md:py-14 overflow-hidden">
+            <img
+              src={optimizeImageUrl(event.image_url, { width: 1200, quality: 85 }) || '/images/events-hero-default.jpg'}
+              alt=""
+              width={1200}
+              height={600}
+              className="absolute inset-0 w-full h-full object-cover object-center"
+            />
             {/* Dark gradient overlay for text readability */}
             <div className="absolute inset-0 bg-gradient-to-r from-black/90 via-black/80 to-black/70" />
 
@@ -230,8 +230,11 @@ const EventDetail = () => {
                 {!videoEmbed && event.image_url && (
                   <div className="rounded-xl overflow-hidden">
                     <img 
-                      src={event.image_url} 
+                      src={optimizeImageUrl(event.image_url, { width: 800, quality: 85 })} 
                       alt={event.name}
+                      width={800}
+                      height={224}
+                      loading="lazy"
                       className="w-full h-56 object-cover"
                     />
                   </div>
