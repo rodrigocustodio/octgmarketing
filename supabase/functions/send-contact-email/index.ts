@@ -15,6 +15,45 @@ interface ContactRequest {
   jobTitle?: string;
   contactReason: string;
   message: string;
+  subscribeNewsletter?: boolean;
+}
+
+const BREVO_API_KEY = Deno.env.get("BREVO_API_KEY");
+
+async function syncToBrevo(email: string, name?: string) {
+  if (!BREVO_API_KEY) {
+    console.log("[send-contact-email] BREVO_API_KEY not set, skipping Brevo sync");
+    return;
+  }
+
+  try {
+    const response = await fetch("https://api.brevo.com/v3/contacts", {
+      method: "POST",
+      headers: {
+        "api-key": BREVO_API_KEY,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        email,
+        listIds: [2],
+        updateEnabled: true,
+        attributes: {
+          FIRSTNAME: name || "",
+          SOURCE: "OCTG Index Contact Form",
+          SUBSCRIBED_AT: new Date().toISOString(),
+        },
+      }),
+    });
+
+    if (!response.ok) {
+      const error = await response.text();
+      console.error("[send-contact-email] Brevo sync error:", error);
+    } else {
+      console.log("[send-contact-email] Synced to Brevo successfully");
+    }
+  } catch (error) {
+    console.error("[send-contact-email] Brevo sync failed:", error);
+  }
 }
 
 const reasonLabels: Record<string, string> = {
@@ -57,9 +96,9 @@ serve(async (req) => {
   }
 
   try {
-    const { name, email, company, jobTitle, contactReason, message }: ContactRequest = await req.json();
+    const { name, email, company, jobTitle, contactReason, message, subscribeNewsletter }: ContactRequest = await req.json();
 
-    console.log(`[send-contact-email] Processing contact from ${email}, reason: ${contactReason}`);
+    console.log(`[send-contact-email] Processing contact from ${email}, reason: ${contactReason}, newsletter: ${subscribeNewsletter}`);
 
     // Validate required fields
     if (!name || !email || !contactReason || !message) {
@@ -185,6 +224,26 @@ serve(async (req) => {
 
     await sendEmail(["info@octgindex.com"], `New Contact: ${reasonLabel} - ${name}`, teamEmailHtml, email);
     console.log("[send-contact-email] Team notification sent");
+
+    // Handle newsletter subscription if opted in
+    if (subscribeNewsletter) {
+      console.log("[send-contact-email] User opted in to newsletter, syncing to Brevo...");
+      
+      // Add to newsletter_subscribers table
+      const { error: newsletterError } = await supabase.from("newsletter_subscribers").insert({
+        email,
+      });
+
+      if (newsletterError) {
+        // If duplicate, that's fine - they're already subscribed
+        if (newsletterError.code !== "23505") {
+          console.error("[send-contact-email] Newsletter insert error:", newsletterError);
+        }
+      }
+
+      // Sync to Brevo
+      await syncToBrevo(email, name);
+    }
 
     return new Response(
       JSON.stringify({ success: true, message: "Contact form submitted successfully" }),

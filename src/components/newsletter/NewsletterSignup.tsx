@@ -32,23 +32,20 @@ export function NewsletterSignup() {
 
     setLoading(true);
     try {
-      const { error: dbError } = await supabase
-        .from("newsletter_subscribers")
-        .insert({ email: result.data.email });
+      const { data, error } = await supabase.functions.invoke("newsletter-subscribe", {
+        body: { email: result.data.email },
+      });
 
-      if (dbError) {
-        if (dbError.code === "23505") {
-          toast.info("You're already subscribed!");
-        } else if (dbError.code === "23514") {
-          // CHECK constraint violation
-          setError("Please enter a valid email address");
-        } else {
-          throw dbError;
-        }
+      if (error) {
+        throw error;
+      }
+
+      if (data?.alreadySubscribed) {
+        toast.info("You're already subscribed!");
       } else {
         toast.success("Successfully subscribed to the newsletter!");
-        setEmail("");
       }
+      setEmail("");
     } catch (err) {
       toast.error("Failed to subscribe. Please try again.");
     } finally {
