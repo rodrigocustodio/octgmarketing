@@ -28,6 +28,16 @@ import {
   Users,
   Building2,
   Loader2,
+  MessageSquare,
+  Palette,
+  Monitor,
+  Cpu,
+  Video,
+  Smartphone,
+  Presentation,
+  GraduationCap,
+  Sparkles,
+  ExternalLink,
 } from "lucide-react";
 import heroOctg from "@/assets/hero-octg.jpg";
 
@@ -74,6 +84,23 @@ const contactReasons = [
     description: "Access industry data and analytics",
     icon: Database,
   },
+  {
+    id: "consulting",
+    label: "Communication Consulting",
+    description: "Strategic communication consulting for energy companies",
+    icon: MessageSquare,
+  },
+];
+
+const marketingServices = [
+  { icon: Palette, label: "Graphic Design" },
+  { icon: Monitor, label: "Web Design" },
+  { icon: Cpu, label: "AI Services & Automation" },
+  { icon: Video, label: "Video Production" },
+  { icon: Smartphone, label: "App Development" },
+  { icon: Presentation, label: "C-Level Presentations" },
+  { icon: GraduationCap, label: "Training Videos & Systems" },
+  { icon: Sparkles, label: "Branding & Consulting" },
 ];
 
 const formSchema = z.object({
@@ -251,7 +278,59 @@ export default function Contact() {
               </p>
             </div>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 max-w-6xl mx-auto mb-12">
+            {/* OCTG Marketing Services Banner */}
+            <div className="relative max-w-6xl mx-auto mb-8">
+              {/* Animated gradient border */}
+              <div 
+                className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-octg-bronze via-octg-gold to-octg-copper animate-gradient-flow opacity-80"
+                style={{ backgroundSize: "200% 200%" }}
+              />
+              <div className="relative bg-card rounded-xl p-6 md:p-8">
+                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-3">
+                      <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-octg-bronze to-octg-gold flex items-center justify-center">
+                        <Building2 className="h-5 w-5 text-white" />
+                      </div>
+                      <div>
+                        <h3 className="font-display text-xl font-bold">OCTG Marketing</h3>
+                        <p className="text-sm text-muted-foreground">Full-Service Agency for Energy & Oil Gas</p>
+                      </div>
+                    </div>
+                    <p className="text-muted-foreground mb-4">
+                      OCTG Index is part of OCTG Marketing — a full-service agency supporting Energy, Oil & Gas companies with their Marketing and Creative needs.
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {marketingServices.map((service) => {
+                        const Icon = service.icon;
+                        return (
+                          <div 
+                            key={service.label}
+                            className="flex items-center gap-1.5 px-3 py-1.5 bg-muted/50 rounded-full text-sm"
+                          >
+                            <Icon className="h-3.5 w-3.5 text-octg-bronze" />
+                            <span>{service.label}</span>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="flex-shrink-0">
+                    <a
+                      href="https://octgmarketing.com"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-octg-bronze to-octg-gold text-white font-semibold rounded-lg hover:opacity-90 transition-opacity"
+                    >
+                      Explore Our Services
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4 max-w-6xl mx-auto mb-12">
               {contactReasons.map((reason) => {
                 const Icon = reason.icon;
                 const isSelected = selectedReason === reason.id;
