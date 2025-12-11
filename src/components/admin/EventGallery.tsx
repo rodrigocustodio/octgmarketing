@@ -12,66 +12,82 @@ interface EventGalleryProps {
 }
 
 export function EventGallery({ eventSlug, images, onChange }: EventGalleryProps) {
-  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
+  const [uploadingCount, setUploadingCount] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  const handleUpload = async (file: File) => {
-    if (!file.type.startsWith("image/")) {
-      toast.error("Please select an image file");
-      return;
+  const handleMultiUpload = async (files: File[]) => {
+    const availableSlots = maxImages - images.length;
+    const filesToUpload = files.slice(0, availableSlots);
+    
+    if (files.length > availableSlots) {
+      toast.warning(`Only uploading ${availableSlots} image(s) - gallery limit reached`);
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error("Image must be less than 5MB");
-      return;
-    }
+    // Validate files
+    const validFiles = filesToUpload.filter(file => {
+      if (!file.type.startsWith("image/")) {
+        toast.error(`${file.name} is not an image`);
+        return false;
+      }
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error(`${file.name} exceeds 5MB limit`);
+        return false;
+      }
+      return true;
+    });
 
-    const idx = images.length;
-    setUploadingIndex(idx);
+    if (validFiles.length === 0) return;
+
+    setUploadingCount(validFiles.length);
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error("Not authenticated");
 
-      // Convert to base64
-      const reader = new FileReader();
-      const base64 = await new Promise<string>((resolve, reject) => {
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-
       const folder = `octgindex/events/${eventSlug}/gallery`;
 
-      const { data, error } = await supabase.functions.invoke("upload-image", {
-        body: { imageBase64: base64, fileName: file.name, folder },
+      // Upload all files in parallel
+      const uploadPromises = validFiles.map(async (file) => {
+        const reader = new FileReader();
+        const base64 = await new Promise<string>((resolve, reject) => {
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(file);
+        });
+
+        const { data, error } = await supabase.functions.invoke("upload-image", {
+          body: { imageBase64: base64, fileName: file.name, folder },
+        });
+
+        if (error) throw error;
+        if (!data.cdnUrl) throw new Error("No URL returned");
+        return data.cdnUrl;
       });
 
-      if (error) throw error;
-      if (!data.cdnUrl) throw new Error("No URL returned");
-
-      onChange([...images, data.cdnUrl]);
-      toast.success("Image uploaded");
+      const newUrls = await Promise.all(uploadPromises);
+      onChange([...images, ...newUrls]);
+      toast.success(`${newUrls.length} image(s) uploaded`);
     } catch (error: any) {
       console.error("Upload error:", error);
-      toast.error(error.message || "Failed to upload image");
+      toast.error(error.message || "Failed to upload images");
     } finally {
-      setUploadingIndex(null);
+      setUploadingCount(0);
     }
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) handleUpload(file);
+    const files = Array.from(e.target.files || []);
+    if (files.length > 0) handleMultiUpload(files);
     e.target.value = "";
   };
+
+  const maxImages = 6;
 
   const removeImage = (index: number) => {
     onChange(images.filter((_, i) => i !== index));
   };
 
-  const maxImages = 6;
-  const emptySlots = Math.max(0, maxImages - images.length - (uploadingIndex !== null ? 1 : 0));
+  const hasAvailableSlots = images.length + uploadingCount < maxImages;
 
   return (
     <Card>
@@ -90,6 +106,7 @@ export function EventGallery({ eventSlug, images, onChange }: EventGalleryProps)
           ref={inputRef}
           type="file"
           accept="image/*"
+          multiple
           className="hidden"
           onChange={handleFileSelect}
         />
@@ -108,22 +125,22 @@ export function EventGallery({ eventSlug, images, onChange }: EventGalleryProps)
             </div>
           ))}
 
-          {uploadingIndex !== null && (
-            <div className="aspect-video rounded-md border-2 border-dashed border-primary/50 flex items-center justify-center bg-muted/50">
+          {Array.from({ length: uploadingCount }).map((_, idx) => (
+            <div key={`uploading-${idx}`} className="aspect-video rounded-md border-2 border-dashed border-primary/50 flex items-center justify-center bg-muted/50">
               <Loader2 className="h-6 w-6 animate-spin text-primary" />
             </div>
-          )}
+          ))}
 
-          {emptySlots > 0 && images.length < maxImages && (
+          {hasAvailableSlots && (
             <Button
               type="button"
               variant="outline"
               className="aspect-video h-auto flex flex-col gap-1 border-dashed"
               onClick={() => inputRef.current?.click()}
-              disabled={uploadingIndex !== null}
+              disabled={uploadingCount > 0}
             >
               <Upload className="h-5 w-5" />
-              <span className="text-xs">Add Photo</span>
+              <span className="text-xs">Add Photos</span>
             </Button>
           )}
         </div>
