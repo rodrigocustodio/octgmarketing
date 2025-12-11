@@ -39,7 +39,7 @@ export default function CEODirectory() {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     "@id": "https://octgindex.com/ceo-directory",
-    name: "OCTG Industry Leadership Directory",
+    name: "Energy Industry Leadership Directory",
     description: `Meet the CEOs leading ${stats?.total || 49} publicly traded companies in the OCTG industry. Executive profiles spanning steel manufacturing, oilfield services, and drilling.`,
     url: "https://octgindex.com/ceo-directory",
     isPartOf: {
@@ -57,7 +57,7 @@ export default function CEODirectory() {
   const itemListSchema = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    name: "OCTG Industry Executives",
+    name: "Energy Industry Executives",
     description: "Complete listing of CEOs and executives in the OCTG industry",
     numberOfItems: stats?.total || 49,
     itemListElement: executives?.slice(0, 20).map((exec, index) => ({
@@ -126,7 +126,7 @@ export default function CEODirectory() {
   return (
     <>
       <SEOHead
-        title="OCTG Industry Leadership | CEO Directory"
+        title="Energy Industry Leadership | CEO Directory"
         description="Meet the CEOs leading major publicly traded companies in the OCTG industry. Executive profiles spanning steel manufacturing, oilfield services, and drilling."
         canonical="https://octgindex.com/ceo-directory"
       />
@@ -170,7 +170,7 @@ export default function CEODirectory() {
                 Leadership Directory
               </Badge>
               <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4">
-                OCTG Industry Leadership
+                Energy Industry Leadership
               </h1>
               <p className="text-lg text-muted-foreground leading-relaxed">
                 Meet the Chief Executive Officers leading {stats?.total || 37} publicly traded companies 
