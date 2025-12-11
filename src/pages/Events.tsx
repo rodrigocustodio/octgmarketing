@@ -188,17 +188,17 @@ const Events = () => {
               style={{ backgroundImage: "url('/images/events-hero-default.jpg')" }}
             />
             
-            {/* Dark Gradient Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-r from-black/95 via-black/90 to-black/85" />
+            {/* Theme-Aware Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-background/95 via-background/90 to-background/80" />
             
             {/* Content */}
             <div className="container relative z-10">
               <div className="max-w-3xl">
-                <Badge variant="outline" className="mb-4 border-white/30 text-white">2026 Event Calendar</Badge>
-                <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4 text-white">
+                <Badge variant="outline" className="mb-4 border-border">2026 Event Calendar</Badge>
+                <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4 text-foreground">
                   OCTG & Energy Events
                 </h1>
-                <p className="text-xl text-white/80">
+                <p className="text-xl text-muted-foreground">
                   Discover major oil, gas, and energy conferences, exhibitions, and networking events worldwide.
                 </p>
               </div>
@@ -206,12 +206,12 @@ const Events = () => {
               {/* Filters */}
               <div className="mt-8 flex flex-col sm:flex-row gap-4">
                 <div className="relative flex-1 max-w-md">
-                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white/60" />
+                  <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                   <Input
                     placeholder="Search events..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-white/10 border-white/20 text-white placeholder:text-white/50"
+                    className="pl-10 bg-card/50 border-border text-foreground placeholder:text-muted-foreground"
                   />
                 </div>
                 <div className="flex gap-2 flex-wrap">
@@ -219,7 +219,7 @@ const Events = () => {
                     variant={selectedRegion === "all" ? "default" : "outline"}
                     size="sm"
                     onClick={() => setSelectedRegion("all")}
-                    className={selectedRegion === "all" ? "" : "border-white/30 text-white hover:bg-white/10"}
+                    className={selectedRegion === "all" ? "" : "border-border hover:bg-accent/10"}
                   >
                     All Regions
                   </Button>
@@ -229,7 +229,7 @@ const Events = () => {
                       variant={selectedRegion === region ? "default" : "outline"}
                       size="sm"
                       onClick={() => setSelectedRegion(region)}
-                      className={selectedRegion === region ? "" : "border-white/30 text-white hover:bg-white/10"}
+                      className={selectedRegion === region ? "" : "border-border hover:bg-accent/10"}
                     >
                       {region}
                     </Button>
