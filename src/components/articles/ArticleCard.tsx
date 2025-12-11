@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { optimizeImageUrl } from "@/lib/utils";
 
 interface ArticleCardProps {
   title: string;
@@ -20,7 +21,12 @@ export function ArticleCard({ title, subtitle, imageUrl, region, topic, date, sl
         {imageUrl && (
           <div className="aspect-video overflow-hidden">
             <img
-              src={imageUrl}
+              src={optimizeImageUrl(imageUrl, { width: 800, quality: 80 })}
+              srcSet={`
+                ${optimizeImageUrl(imageUrl, { width: 400, quality: 75 })} 400w,
+                ${optimizeImageUrl(imageUrl, { width: 800, quality: 80 })} 800w
+              `}
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               alt={title}
               width={800}
               height={450}

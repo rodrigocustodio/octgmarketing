@@ -6,6 +6,38 @@ export function cn(...inputs: ClassValue[]) {
 }
 
 /**
+ * Bunny CDN Image Optimizer utility
+ * Appends optimization parameters to Bunny CDN URLs for automatic resizing and format conversion
+ */
+interface ImageOptimizeOptions {
+  width?: number;
+  height?: number;
+  quality?: number;
+}
+
+export function optimizeImageUrl(
+  url: string | null | undefined,
+  options: ImageOptimizeOptions = {}
+): string | undefined {
+  if (!url) return undefined;
+  
+  // Only optimize Bunny CDN URLs
+  if (!url.includes('tukia-cdn.b-cdn.net')) return url;
+  
+  const params = new URLSearchParams();
+  
+  if (options.width) params.append('width', options.width.toString());
+  if (options.height) params.append('height', options.height.toString());
+  if (options.quality) params.append('quality', options.quality.toString());
+  
+  const paramString = params.toString();
+  if (!paramString) return url;
+  
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}${paramString}`;
+}
+
+/**
  * Parse date string as local time to avoid timezone shifts.
  * Date-only strings like "2026-01-13" are parsed as UTC by default,
  * which can shift to the previous day in local timezones behind UTC.

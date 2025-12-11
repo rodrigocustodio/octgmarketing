@@ -11,6 +11,7 @@ import { Link } from "react-router-dom";
 import { ArrowRight } from "lucide-react";
 import heroImage from "@/assets/hero-octg.jpg";
 import { useHomepageArticles, ArticleWithTopics } from "@/hooks/useArticles";
+import { optimizeImageUrl } from "@/lib/utils";
 import { format } from "date-fns";
 import { BreakingNewsRow } from "@/components/home/BreakingNewsRow";
 import { IndustryFocusMasonry } from "@/components/home/IndustryFocusMasonry";
@@ -152,7 +153,7 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
           {/* Use img tag for LCP optimization instead of background-image */}
           <img
-            src={featuredArticle?.hero_image_url || heroImage}
+            src={optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
             alt=""
             width={1920}
             height={1080}

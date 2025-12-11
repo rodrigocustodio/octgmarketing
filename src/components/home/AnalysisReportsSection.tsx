@@ -3,6 +3,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { FileText, ArrowRight } from "lucide-react";
 import { format } from "date-fns";
+import { optimizeImageUrl } from "@/lib/utils";
 
 interface Article {
   id: string;
@@ -71,11 +72,13 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
             <Link to={`/article/${featuredArticle.slug}`} className="block group h-full">
               <Card className="h-full overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="relative h-full min-h-[400px] lg:min-h-[480px]">
-                  <div 
-                    className="absolute inset-0 bg-cover bg-center"
-                    style={{
-                      backgroundImage: `url(${featuredArticle.hero_image_url || placeholderImages[0]})`,
-                    }}
+                  <img 
+                    src={optimizeImageUrl(featuredArticle.hero_image_url, { width: 800, quality: 85 }) || placeholderImages[0]}
+                    alt={featuredArticle.title}
+                    width={800}
+                    height={480}
+                    loading="lazy"
+                    className="absolute inset-0 w-full h-full object-cover"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/50 to-transparent" />
                   <div className="absolute bottom-0 left-0 right-0 p-6 sm:p-8">
@@ -114,8 +117,11 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
                     {/* Thumbnail */}
                     <div className="relative w-32 sm:w-40 flex-shrink-0 overflow-hidden">
                       <img 
-                        src={article.hero_image_url || placeholderImages[(index + 1) % placeholderImages.length]}
+                        src={optimizeImageUrl(article.hero_image_url, { width: 320, quality: 75 }) || placeholderImages[(index + 1) % placeholderImages.length]}
                         alt={article.title}
+                        width={160}
+                        height={120}
+                        loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
@@ -154,8 +160,11 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
                     {/* Small Thumbnail */}
                     <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden">
                       <img 
-                        src={article.hero_image_url || placeholderImages[(index + 3) % placeholderImages.length]}
+                        src={optimizeImageUrl(article.hero_image_url, { width: 160, quality: 75 }) || placeholderImages[(index + 3) % placeholderImages.length]}
                         alt={article.title}
+                        width={80}
+                        height={80}
+                        loading="lazy"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>

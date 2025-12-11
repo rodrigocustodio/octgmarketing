@@ -40,6 +40,7 @@ import {
 } from "@/hooks/useProducts";
 import { generateProductTitle, generateProductDescription } from "@/lib/seo-utils";
 import { format } from "date-fns";
+import { optimizeImageUrl } from "@/lib/utils";
 
 const formatSpecKey = (key: string): string => {
   return key
@@ -296,8 +297,10 @@ export default function ProductDetail() {
         {/* Background Image with Gradient Overlay */}
         <div className="absolute inset-0">
           <img 
-            src={product.hero_image_url || bannerCasing} 
+            src={optimizeImageUrl(product.hero_image_url, { width: 1200, quality: 85 }) || bannerCasing} 
             alt="" 
+            width={1200}
+            height={600}
             className="w-full h-full object-cover object-center"
           />
           <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/40" />

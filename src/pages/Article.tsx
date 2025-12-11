@@ -21,6 +21,7 @@ import { markdownToHtml } from "@/lib/markdown";
 import { format } from "date-fns";
 import heroImage from "@/assets/hero-octg.jpg";
 import { generateArticleTitle, generateArticleDescription } from "@/lib/seo-utils";
+import { optimizeImageUrl } from "@/lib/utils";
 
 function formatArticleDate(dateString: string | null): string {
   if (!dateString) return "";
@@ -119,13 +120,12 @@ const Article = () => {
           {/* Hero Section */}
           <section className="relative overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-transparent z-10" />
-            <div 
-              className="absolute inset-0 opacity-40 dark:opacity-50"
-              style={{
-                backgroundImage: `url(${article.hero_image_url || heroImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center right',
-              }}
+            <img
+              src={optimizeImageUrl(article.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
+              alt=""
+              width={1200}
+              height={600}
+              className="absolute inset-0 w-full h-full object-cover object-right opacity-40 dark:opacity-50"
             />
             
             <div className="container relative z-20 py-12 sm:py-20">
