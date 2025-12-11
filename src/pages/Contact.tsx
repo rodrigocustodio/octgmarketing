@@ -376,14 +376,7 @@ export default function Contact() {
         </section>
 
         {/* Contact Form Section */}
-        <section className="relative py-20 overflow-hidden">
-          {/* Background Image */}
-          <div
-            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
-            style={{ backgroundImage: `url('/images/contact-form-bg.jpg')` }}
-          />
-          {/* Dark Overlay */}
-          <div className="absolute inset-0 bg-background/95 dark:bg-background/98" />
+        <section className="relative py-20 bg-muted/50">
 
           <div className="relative z-10 container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
