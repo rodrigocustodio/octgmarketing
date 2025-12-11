@@ -147,16 +147,18 @@ const Index = () => {
         <Header />
       
       <main>
-        {/* Hero Section */}
-        <section className="relative overflow-hidden">
+        {/* Hero Section - Optimized for LCP */}
+        <section className="relative overflow-hidden min-h-[400px] sm:min-h-[500px]">
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
-          <div 
-            className="absolute inset-0 opacity-60"
-            style={{
-              backgroundImage: `url(${featuredArticle?.hero_image_url || heroImage})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center right',
-            }}
+          {/* Use img tag for LCP optimization instead of background-image */}
+          <img
+            src={featuredArticle?.hero_image_url || heroImage}
+            alt=""
+            width={1920}
+            height={1080}
+            fetchPriority="high"
+            decoding="async"
+            className="absolute inset-0 w-full h-full object-cover object-right opacity-60"
           />
           <div className="container relative z-20 py-16 sm:py-24">
             {isLoading ? (

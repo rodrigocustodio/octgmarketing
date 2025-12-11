@@ -74,7 +74,7 @@ export function Header() {
               size="icon"
               className="hidden sm:flex"
               onClick={() => setSearchOpen(true)}
-              title="Search (⌘K)"
+              aria-label="Search (⌘K)"
             >
               <Search className="h-5 w-5" />
             </Button>
@@ -84,6 +84,7 @@ export function Header() {
               size="icon"
               className="lg:hidden"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? "Close menu" : "Open menu"}
             >
               {mobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
             </Button>
