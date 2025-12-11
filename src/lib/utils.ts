@@ -22,7 +22,7 @@ export function optimizeImageUrl(
 ): string | undefined {
   if (!url) return undefined;
   
-  // Bunny CDN URLs - apply optimizer params directly
+  // Only optimize Bunny CDN URLs - Supabase free tier doesn't support image transformation
   if (url.includes('tukia-cdn.b-cdn.net')) {
     const params = new URLSearchParams();
     
@@ -37,25 +37,7 @@ export function optimizeImageUrl(
     return `${url}${separator}${paramString}`;
   }
   
-  // Supabase Storage URLs - apply same optimization params
-  // Supabase supports image transformation via URL params
-  if (url.includes('supabase.co/storage')) {
-    const params = new URLSearchParams();
-    
-    if (options.width) params.append('width', options.width.toString());
-    if (options.height) params.append('height', options.height.toString());
-    if (options.quality) params.append('quality', options.quality.toString());
-    
-    const paramString = params.toString();
-    if (!paramString) return url;
-    
-    // Supabase uses /render/image/public/ for transformations
-    // Convert storage URL to render URL format
-    const renderUrl = url.replace('/storage/v1/object/public/', '/storage/v1/render/image/public/');
-    const separator = renderUrl.includes('?') ? '&' : '?';
-    return `${renderUrl}${separator}${paramString}`;
-  }
-  
+  // Return all other URLs unchanged (including Supabase)
   return url;
 }
 
