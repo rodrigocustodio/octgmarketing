@@ -39,7 +39,7 @@ const mobileMenuLinks = {
   ],
   directories: [
     { name: "Companies", href: "/directory" },
-    { name: "Leadership", href: "/ceo-directory" },
+    { name: "Global Leaders", href: "/ceo-directory" },
     { name: "Events", href: "/events" },
     { name: "Pricing", href: "/pricing-index" },
   ],
@@ -99,7 +99,7 @@ export function Header() {
               <Button variant="nav" size="sm">Products</Button>
             </Link>
             <Link to="/ceo-directory">
-              <Button variant="nav" size="sm">Leadership</Button>
+              <Button variant="nav" size="sm">Global Leaders</Button>
             </Link>
             <Link to="/events">
               <Button variant="nav" size="sm">Events</Button>
