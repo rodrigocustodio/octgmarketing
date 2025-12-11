@@ -1075,6 +1075,7 @@ export type Database = {
         | "event_coverage"
         | "expert_contribution"
         | "data_access"
+        | "consulting"
       draft_article_status: "pending_review" | "approved" | "rejected"
       source_article_status: "new" | "processed" | "failed"
     }
@@ -1225,6 +1226,7 @@ export const Constants = {
         "event_coverage",
         "expert_contribution",
         "data_access",
+        "consulting",
       ],
       draft_article_status: ["pending_review", "approved", "rejected"],
       source_article_status: ["new", "processed", "failed"],
