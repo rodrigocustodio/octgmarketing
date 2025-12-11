@@ -92,13 +92,19 @@ EXCERPT/META DESCRIPTION REQUIREMENTS:
 - Summarize key news value
 - End with benefit statement or hook
 
+HEADING HIERARCHY RULES (CRITICAL - MUST FOLLOW):
+- NEVER use # (H1) in body_markdown - the article title is rendered separately as H1 in the UI
+- ALL body content headings MUST start with ## (H2) as the highest level
+- The FIRST heading in body_markdown MUST be ## (two hashtags)
+- Use ### (H3) for subsections under H2
+- Proper hierarchy: ## Section → ### Subsection → #### Sub-subsection
+- VIOLATION: Starting body with # is FORBIDDEN
+
 MANDATORY CONTENT STRUCTURE (follow this hierarchy exactly):
 
-# [Title - H1, not included in body_markdown]
+[Opening paragraph: 2-3 sentences with primary keyword in first sentence. NO markdown formatting. NO heading before this paragraph. Direct value proposition. This should directly answer the main question for featured snippets.]
 
-[Opening paragraph: 2-3 sentences with primary keyword in first sentence. NO markdown formatting. Direct value proposition. This should directly answer the main question for featured snippets.]
-
-## [H2: Primary Topic - Answer Main Query]
+## [H2: Primary Topic - MUST use ## not # - Answer Main Query]
 
 [Direct answer in first 2-3 sentences, then expand with 3-4 supporting paragraphs. Include statistics and data points.]
 
