@@ -147,40 +147,39 @@ export function NewsletterSignup() {
           >
             {/* Front - Subscribe Form */}
             <div
-              className={`bg-card/50 border border-border/50 rounded-lg p-6 backface-hidden ${
-                isSubscribed ? "invisible" : ""
-              }`}
+              className={`backface-hidden ${isSubscribed ? "invisible" : ""}`}
             >
-              <h3 className="font-display text-xl font-semibold mb-2 text-center">
-                Subscribe Now
-              </h3>
-              <p className="text-sm text-muted-foreground mb-4 text-center">
-                Get insights delivered to your inbox.
-              </p>
-              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-                <div className="space-y-1">
-                  <Input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={(e) => {
-                      setEmail(e.target.value);
-                      if (error) setError(null);
-                    }}
-                    variant="bronze"
-                    inputSize="lg"
-                    aria-invalid={!!error}
-                    aria-describedby={error ? "email-error" : undefined}
-                  />
-                  {error && (
-                    <p id="email-error" className="text-sm text-destructive">
-                      {error}
-                    </p>
-                  )}
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="flex gap-2">
+                  <div className="flex-1">
+                    <Input
+                      type="email"
+                      placeholder="Enter your email"
+                      value={email}
+                      onChange={(e) => {
+                        setEmail(e.target.value);
+                        if (error) setError(null);
+                      }}
+                      variant="bronze"
+                      inputSize="lg"
+                      aria-invalid={!!error}
+                      aria-describedby={error ? "email-error" : undefined}
+                    />
+                  </div>
+                  <Button type="submit" variant="bronze" size="lg" disabled={loading}>
+                    {loading ? "..." : "Subscribe"}
+                  </Button>
                 </div>
-                <Button type="submit" variant="bronze" size="lg" className="w-full" disabled={loading}>
-                  {loading ? "Subscribing..." : "Subscribe"}
-                </Button>
+                {error && (
+                  <p id="email-error" className="text-sm text-destructive">
+                    {error}
+                  </p>
+                )}
+                <ul className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
+                  <li>• No spam, ever</li>
+                  <li>• Unsubscribe anytime</li>
+                  <li>• Weekly insights delivered</li>
+                </ul>
               </form>
             </div>
 

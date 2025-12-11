@@ -259,21 +259,9 @@ const Index = () => {
         <QuickReadsGrid articles={finalQuickReadsArticles} />
 
         {/* Newsletter CTA */}
-        <section className="bg-card">
-          <div className="container py-12 sm:py-16">
-            <div className="max-w-2xl mx-auto text-center">
-              <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight mb-4">
-                Stay Ahead of the Market
-              </h2>
-              <p className="text-muted-foreground mb-8">
-                Subscribe to receive weekly insights on OCTG market trends, pricing analysis, and industry developments.
-              </p>
-              <div className="max-w-md mx-auto">
-                <NewsletterSignup />
-              </div>
-            </div>
-          </div>
-        </section>
+        <div className="container py-12 sm:py-16">
+          <NewsletterSignup />
+        </div>
       </main>
 
         <Footer />
