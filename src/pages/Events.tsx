@@ -10,14 +10,15 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Calendar, MapPin, Users, Search, Star } from "lucide-react";
 import { useEvents, Event } from "@/hooks/useEvents";
+import { parseLocalDate } from "@/lib/utils";
 import { format } from "date-fns";
 
 function formatDateRange(startDate: string, endDate: string | null): string {
-  const start = new Date(startDate);
+  const start = parseLocalDate(startDate);
   if (!endDate) {
     return format(start, "MMM d, yyyy");
   }
-  const end = new Date(endDate);
+  const end = parseLocalDate(endDate);
   if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
     return `${format(start, "MMM d")}–${format(end, "d, yyyy")}`;
   }
@@ -25,12 +26,12 @@ function formatDateRange(startDate: string, endDate: string | null): string {
 }
 
 function isUpcoming(startDate: string): boolean {
-  return new Date(startDate) >= new Date(new Date().toDateString());
+  return parseLocalDate(startDate) >= new Date(new Date().toDateString());
 }
 
 function groupEventsByMonth(events: Event[]): Record<string, Event[]> {
   return events.reduce((groups, event) => {
-    const monthKey = format(new Date(event.start_date), "MMMM yyyy").toUpperCase();
+    const monthKey = format(parseLocalDate(event.start_date), "MMMM yyyy").toUpperCase();
     if (!groups[monthKey]) groups[monthKey] = [];
     groups[monthKey].push(event);
     return groups;
@@ -38,7 +39,7 @@ function groupEventsByMonth(events: Event[]): Record<string, Event[]> {
 }
 
 function EventRow({ event, isPast = false }: { event: Event; isPast?: boolean }) {
-  const startDate = new Date(event.start_date);
+  const startDate = parseLocalDate(event.start_date);
   
   return (
     <Link 
