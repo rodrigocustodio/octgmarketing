@@ -7,7 +7,14 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -19,13 +26,7 @@ import {
   Calendar,
   UserCheck,
   Database,
-  Globe,
-  Mail,
-  MapPin,
   CheckCircle2,
-  ArrowRight,
-  BarChart3,
-  Users,
   Building2,
   Loader2,
   MessageSquare,
@@ -43,7 +44,6 @@ import {
   PenTool,
   LayoutGrid,
 } from "lucide-react";
-import heroOctg from "@/assets/hero-octg.jpg";
 
 const contactReasons = [
   {
@@ -111,23 +111,69 @@ const marketingServices = [
   { icon: LayoutGrid, label: "Billboards" },
 ];
 
+const countries = [
+  "United States",
+  "Canada",
+  "United Kingdom",
+  "United Arab Emirates",
+  "Saudi Arabia",
+  "Qatar",
+  "Kuwait",
+  "Oman",
+  "Bahrain",
+  "Norway",
+  "Netherlands",
+  "Germany",
+  "France",
+  "Italy",
+  "Spain",
+  "Brazil",
+  "Argentina",
+  "Mexico",
+  "Colombia",
+  "Venezuela",
+  "China",
+  "Japan",
+  "South Korea",
+  "India",
+  "Indonesia",
+  "Malaysia",
+  "Singapore",
+  "Australia",
+  "Nigeria",
+  "Angola",
+  "Egypt",
+  "Algeria",
+  "Libya",
+  "Russia",
+  "Kazakhstan",
+  "Azerbaijan",
+  "Other",
+];
+
 const formSchema = z.object({
-  name: z.string().trim().min(1, "Name is required").max(100),
+  firstName: z.string().trim().min(1, "First name is required").max(50),
+  lastName: z.string().trim().min(1, "Last name is required").max(50),
   email: z.string().trim().email("Please enter a valid email").max(255),
-  company: z.string().trim().max(100).optional(),
-  jobTitle: z.string().trim().max(100).optional(),
+  company: z.string().trim().min(1, "Company is required").max(100),
+  phoneNumber: z.string().trim().max(30).optional(),
+  country: z.string().min(1, "Please select a country"),
   contactReason: z.string().min(1, "Please select a reason for contact"),
   message: z.string().trim().min(10, "Message must be at least 10 characters").max(5000),
+  subscribeNewsletter: z.boolean().optional(),
 });
 
 export default function Contact() {
   const [selectedReason, setSelectedReason] = useState<string>("");
   const [formData, setFormData] = useState({
-    name: "",
+    firstName: "",
+    lastName: "",
     email: "",
     company: "",
-    jobTitle: "",
+    phoneNumber: "",
+    country: "",
     message: "",
+    subscribeNewsletter: false,
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -158,12 +204,14 @@ export default function Contact() {
     try {
       const { data, error } = await supabase.functions.invoke("send-contact-email", {
         body: {
-          name: formData.name,
+          name: `${formData.firstName} ${formData.lastName}`,
           email: formData.email,
-          company: formData.company || undefined,
-          jobTitle: formData.jobTitle || undefined,
+          company: formData.company,
+          phoneNumber: formData.phoneNumber || undefined,
+          country: formData.country,
           contactReason: selectedReason,
           message: formData.message,
+          subscribeNewsletter: formData.subscribeNewsletter,
         },
       });
 
@@ -324,6 +372,207 @@ export default function Contact() {
             {errors.contactReason && (
               <p className="text-center text-destructive text-sm mb-8">{errors.contactReason}</p>
             )}
+          </div>
+        </section>
+
+        {/* Contact Form Section */}
+        <section className="relative py-20 overflow-hidden">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url('/images/contact-form-bg.jpg')` }}
+          />
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-background/95 dark:bg-background/98" />
+
+          <div className="relative z-10 container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <Card className="bg-card/95 backdrop-blur-sm border-border/50">
+                <CardHeader className="text-center pb-6">
+                  <CardTitle className="text-2xl md:text-3xl font-display">
+                    Send Us a Message
+                  </CardTitle>
+                  <CardDescription className="text-base">
+                    Fill out the form below and our team will get back to you within 24-48 hours.
+                  </CardDescription>
+                </CardHeader>
+                <CardContent>
+                  {isSubmitted ? (
+                    <div className="text-center py-12">
+                      <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-4" />
+                      <h3 className="text-xl font-semibold mb-2">Thank You!</h3>
+                      <p className="text-muted-foreground">
+                        Your message has been received. We'll be in touch soon.
+                      </p>
+                    </div>
+                  ) : (
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      {/* Contact Reason Dropdown */}
+                      <div className="space-y-2">
+                        <Label htmlFor="contactReason">Reason for Contact *</Label>
+                        <Select value={selectedReason} onValueChange={setSelectedReason}>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue placeholder="Select a reason..." />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover">
+                            {contactReasons.map((reason) => (
+                              <SelectItem key={reason.id} value={reason.id}>
+                                {reason.label}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errors.contactReason && (
+                          <p className="text-destructive text-sm">{errors.contactReason}</p>
+                        )}
+                      </div>
+
+                      {/* First Name + Last Name */}
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="firstName">First Name *</Label>
+                          <Input
+                            id="firstName"
+                            value={formData.firstName}
+                            onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
+                            placeholder="John"
+                            className="bg-background"
+                          />
+                          {errors.firstName && (
+                            <p className="text-destructive text-sm">{errors.firstName}</p>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="lastName">Last Name *</Label>
+                          <Input
+                            id="lastName"
+                            value={formData.lastName}
+                            onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
+                            placeholder="Doe"
+                            className="bg-background"
+                          />
+                          {errors.lastName && (
+                            <p className="text-destructive text-sm">{errors.lastName}</p>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Email */}
+                      <div className="space-y-2">
+                        <Label htmlFor="email">Email Address *</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={formData.email}
+                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                          placeholder="john.doe@company.com"
+                          className="bg-background"
+                        />
+                        {errors.email && (
+                          <p className="text-destructive text-sm">{errors.email}</p>
+                        )}
+                      </div>
+
+                      {/* Company + Phone Number */}
+                      <div className="grid sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label htmlFor="company">Company *</Label>
+                          <Input
+                            id="company"
+                            value={formData.company}
+                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                            placeholder="Acme Energy Corp"
+                            className="bg-background"
+                          />
+                          {errors.company && (
+                            <p className="text-destructive text-sm">{errors.company}</p>
+                          )}
+                        </div>
+                        <div className="space-y-2">
+                          <Label htmlFor="phoneNumber">Phone Number</Label>
+                          <Input
+                            id="phoneNumber"
+                            type="tel"
+                            value={formData.phoneNumber}
+                            onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
+                            placeholder="+1 (555) 123-4567"
+                            className="bg-background"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Country Dropdown */}
+                      <div className="space-y-2">
+                        <Label htmlFor="country">Country *</Label>
+                        <Select value={formData.country} onValueChange={(value) => setFormData({ ...formData, country: value })}>
+                          <SelectTrigger className="bg-background">
+                            <SelectValue placeholder="Select your country..." />
+                          </SelectTrigger>
+                          <SelectContent className="bg-popover max-h-60">
+                            {countries.map((country) => (
+                              <SelectItem key={country} value={country}>
+                                {country}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errors.country && (
+                          <p className="text-destructive text-sm">{errors.country}</p>
+                        )}
+                      </div>
+
+                      {/* Message */}
+                      <div className="space-y-2">
+                        <Label htmlFor="message">Message *</Label>
+                        <Textarea
+                          id="message"
+                          value={formData.message}
+                          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                          placeholder="Tell us how we can help you..."
+                          rows={5}
+                          className="bg-background resize-none"
+                        />
+                        {errors.message && (
+                          <p className="text-destructive text-sm">{errors.message}</p>
+                        )}
+                      </div>
+
+                      {/* Newsletter Checkbox */}
+                      <div className="flex items-start gap-3">
+                        <Checkbox
+                          id="subscribeNewsletter"
+                          checked={formData.subscribeNewsletter}
+                          onCheckedChange={(checked) =>
+                            setFormData({ ...formData, subscribeNewsletter: checked === true })
+                          }
+                          className="mt-0.5"
+                        />
+                        <Label htmlFor="subscribeNewsletter" className="text-sm text-muted-foreground cursor-pointer leading-relaxed">
+                          Subscribe to our newsletter for industry updates, market insights, and exclusive content
+                        </Label>
+                      </div>
+
+                      {/* Submit Button */}
+                      <Button
+                        type="submit"
+                        size="lg"
+                        className="w-full"
+                        disabled={isSubmitting}
+                      >
+                        {isSubmitting ? (
+                          <>
+                            <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                            Sending...
+                          </>
+                        ) : (
+                          "Submit Message"
+                        )}
+                      </Button>
+                    </form>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
           </div>
         </section>
 
