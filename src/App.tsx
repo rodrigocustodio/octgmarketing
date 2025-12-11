@@ -30,6 +30,7 @@ import ProductDetail from "./pages/ProductDetail";
 import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
 import PricingIndex from "./pages/PricingIndex";
+import Contact from "./pages/Contact";
 
 // Admin pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -82,6 +83,7 @@ const App = () => (
                 <Route path="/events" element={<Events />} />
                 <Route path="/events/:slug" element={<EventDetail />} />
                 <Route path="/pricing-index" element={<PricingIndex />} />
+                <Route path="/contact" element={<Contact />} />
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsAndConditions />} />
                 <Route path="/newsletter-terms" element={<NewsletterTerms />} />

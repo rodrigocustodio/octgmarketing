@@ -86,6 +86,9 @@ export function Header() {
             <Link to="/events">
               <Button variant="nav" size="sm">Events</Button>
             </Link>
+            <Link to="/contact">
+              <Button variant="nav" size="sm">Contact</Button>
+            </Link>
             <Link to="/pricing-index">
               <Button variant="nav" size="sm">Pricing</Button>
             </Link>

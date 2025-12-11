@@ -24,6 +24,9 @@ const footerLinks = {
     { name: "Events Calendar", href: "/events" },
     { name: "Pricing Index", href: "/pricing-index" },
   ],
+  connect: [
+    { name: "Contact Us", href: "/contact" },
+  ],
   legal: [
     { name: "Privacy Policy", href: "/privacy" },
     { name: "Terms & Conditions", href: "/terms" },
@@ -36,7 +39,7 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-card mt-20">
       <div className="container py-12">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-8">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div>
             <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Regions</h4>
             <ul className="space-y-2">
@@ -65,6 +68,18 @@ export function Footer() {
             <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Directories</h4>
             <ul className="space-y-2">
               {footerLinks.directories.map((link) => (
+                <li key={link.href}>
+                  <Link to={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
+                    {link.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Connect</h4>
+            <ul className="space-y-2">
+              {footerLinks.connect.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.name}
