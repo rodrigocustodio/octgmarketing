@@ -16,6 +16,29 @@ const regions = [
   { name: "Australia", slug: "australia" },
 ];
 
+const mobileMenuLinks = {
+  regions: [
+    { name: "Americas", href: "/region/americas" },
+    { name: "Europe", href: "/region/europe" },
+    { name: "Africa", href: "/region/africa" },
+    { name: "Middle East", href: "/region/middle-east" },
+    { name: "Asia-Pacific", href: "/region/asia-pacific" },
+    { name: "Australia", href: "/region/australia" },
+  ],
+  products: [
+    { name: "All Products", href: "/octg-directory" },
+    { name: "Pipe Types", href: "/octg-directory/pipe-types" },
+    { name: "Material Grades", href: "/octg-directory/grades" },
+    { name: "Connections", href: "/octg-directory/connections" },
+  ],
+  directories: [
+    { name: "Companies", href: "/directory" },
+    { name: "Leadership", href: "/ceo-directory" },
+    { name: "Events", href: "/events" },
+    { name: "Pricing", href: "/pricing-index" },
+  ],
+};
+
 export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
@@ -96,39 +119,75 @@ export function Header() {
 
         {mobileMenuOpen && (
           <div className="lg:hidden border-t border-border bg-background p-4 animate-fade-in">
-            <nav className="flex flex-col gap-2">
-              <Button
-                variant="nav"
-                className="w-full justify-start"
-                onClick={() => {
-                  setMobileMenuOpen(false);
-                  setSearchOpen(true);
-                }}
-              >
-                <Search className="mr-2 h-4 w-4" />
-                Search
-              </Button>
-              {regions.map((region) => (
-                <Link key={region.slug} to={`/region/${region.slug}`} onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="nav" className="w-full justify-start">{region.name}</Button>
-                </Link>
-              ))}
-              <Link to="/directory" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="nav" className="w-full justify-start">Companies</Button>
-              </Link>
-              <Link to="/octg-directory" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="nav" className="w-full justify-start">Products</Button>
-              </Link>
-              <Link to="/ceo-directory" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="nav" className="w-full justify-start">Leadership</Button>
-              </Link>
-              <Link to="/events" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="nav" className="w-full justify-start">Events</Button>
-              </Link>
-              <Link to="/pricing-index" onClick={() => setMobileMenuOpen(false)}>
-                <Button variant="nav" className="w-full justify-start">Pricing</Button>
-              </Link>
-            </nav>
+            {/* Search button - full width */}
+            <Button
+              variant="outline"
+              className="w-full justify-start mb-4"
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setSearchOpen(true);
+              }}
+            >
+              <Search className="mr-2 h-4 w-4" />
+              Search
+            </Button>
+
+            {/* Grid layout matching footer */}
+            <div className="grid grid-cols-2 gap-6">
+              {/* Regions */}
+              <div>
+                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">Regions</h3>
+                <ul className="space-y-2">
+                  {mobileMenuLinks.regions.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        to={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Products */}
+              <div>
+                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">Products</h3>
+                <ul className="space-y-2">
+                  {mobileMenuLinks.products.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        to={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+
+              {/* Directories */}
+              <div className="col-span-2">
+                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">Directories</h3>
+                <ul className="grid grid-cols-2 gap-2">
+                  {mobileMenuLinks.directories.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        to={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+                      >
+                        {link.name}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
           </div>
         )}
 
