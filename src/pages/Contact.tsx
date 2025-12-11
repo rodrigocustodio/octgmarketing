@@ -378,6 +378,78 @@ export default function Contact() {
           </div>
         </section>
 
+        {/* About Us / Team Section */}
+        <section className="py-16 bg-muted/30">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-4">
+                Meet Our Team
+              </h2>
+              <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                The professionals behind OCTG Index, dedicated to delivering industry intelligence.
+              </p>
+            </div>
+
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
+              {/* Rodrigo Santos */}
+              <div className="text-center">
+                <img
+                  src="/images/team/rodrigo-santos.jpg"
+                  alt="Rodrigo Santos"
+                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-border"
+                />
+                <h3 className="font-semibold text-foreground">Rodrigo Santos</h3>
+                <p className="text-sm text-octg-gold mb-2">CEO, OCTG Marketing</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Rodrigo leads OCTG Marketing as CEO, driving the strategic vision behind the OCTG Index platform. With deep expertise in energy sector communications, he connects industry professionals worldwide.
+                </p>
+              </div>
+
+              {/* Franklin Clarke */}
+              <div className="text-center">
+                <img
+                  src="/images/team/franklin-clarke.jpg"
+                  alt="Franklin Clarke"
+                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-border"
+                />
+                <h3 className="font-semibold text-foreground">Franklin Clarke</h3>
+                <p className="text-sm text-octg-gold mb-2">Regional Coverage Director</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Franklin oversees OCTG Index's global regional coverage, ensuring comprehensive news and analysis from every major oil and gas market. His industry network delivers timely insights worldwide.
+                </p>
+              </div>
+
+              {/* Oliver Duncan */}
+              <div className="text-center">
+                <img
+                  src="/images/team/oliver-duncan.jpg"
+                  alt="Oliver Duncan"
+                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-border"
+                />
+                <h3 className="font-semibold text-foreground">Oliver Duncan</h3>
+                <p className="text-sm text-octg-gold mb-2">Events & Calendar Director</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Oliver manages the OCTG Index events calendar, tracking 60+ industry conferences globally. He connects professionals with the most relevant networking opportunities in the energy sector.
+                </p>
+              </div>
+
+              {/* Maria Oliveira */}
+              <div className="text-center">
+                <img
+                  src="/images/team/maria-oliveira.jpg"
+                  alt="Maria Oliveira"
+                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-border"
+                />
+                <h3 className="font-semibold text-foreground">Maria Oliveira</h3>
+                <p className="text-sm text-octg-gold mb-2">Latin America Correspondent</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  Maria covers the South American OCTG market, providing in-depth analysis of Brazil, Argentina, and regional developments. Her expertise ensures comprehensive Latin America coverage.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Contact Form Section */}
         <section className="relative py-20 overflow-hidden">
           {/* Background Image */}
