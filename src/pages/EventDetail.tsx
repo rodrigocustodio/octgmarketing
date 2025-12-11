@@ -225,6 +225,17 @@ const EventDetail = () => {
                   </Card>
                 )}
 
+                {/* Featured Image Banner - show when NO video but image exists */}
+                {!videoEmbed && event.image_url && (
+                  <div className="rounded-xl overflow-hidden">
+                    <img 
+                      src={event.image_url} 
+                      alt={event.name}
+                      className="w-full h-56 object-cover"
+                    />
+                  </div>
+                )}
+
                 <Card>
                   <CardHeader>
                     <CardTitle>About This Event</CardTitle>
