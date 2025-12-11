@@ -354,6 +354,62 @@ export type Database = {
           },
         ]
       }
+      editorial_suggestions: {
+        Row: {
+          business_score: number | null
+          created_at: string
+          description: string | null
+          id: string
+          seo_score: number | null
+          source: string | null
+          status: string
+          suggestion_type: string
+          target_company_ids: string[] | null
+          target_region_id: string | null
+          target_topic_ids: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          business_score?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          seo_score?: number | null
+          source?: string | null
+          status?: string
+          suggestion_type?: string
+          target_company_ids?: string[] | null
+          target_region_id?: string | null
+          target_topic_ids?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          business_score?: number | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          seo_score?: number | null
+          source?: string | null
+          status?: string
+          suggestion_type?: string
+          target_company_ids?: string[] | null
+          target_region_id?: string | null
+          target_topic_ids?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_suggestions_target_region_id_fkey"
+            columns: ["target_region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       events: {
         Row: {
           attendees_count: string | null
@@ -859,6 +915,41 @@ export type Database = {
           updated_at?: string
         }
         Relationships: []
+      }
+      top_companies_watchlist: {
+        Row: {
+          category: string
+          company_id: string | null
+          created_at: string
+          id: string
+          notes: string | null
+          priority: number | null
+        }
+        Insert: {
+          category?: string
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          priority?: number | null
+        }
+        Update: {
+          category?: string
+          company_id?: string | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          priority?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "top_companies_watchlist_company_id_fkey"
+            columns: ["company_id"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       topics: {
         Row: {

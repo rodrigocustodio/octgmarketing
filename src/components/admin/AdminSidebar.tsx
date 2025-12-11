@@ -14,7 +14,8 @@ import {
   Users,
   Building2,
   CalendarDays,
-  Package
+  Package,
+  BarChart3
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -24,6 +25,11 @@ const navItems = [
     title: "Dashboard",
     href: "/admin",
     icon: LayoutDashboard,
+  },
+  {
+    title: "Editorial Room",
+    href: "/admin/editorial-room",
+    icon: BarChart3,
   },
   {
     title: "Create Article",
