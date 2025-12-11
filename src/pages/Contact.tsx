@@ -392,58 +392,58 @@ export default function Contact() {
 
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
               {/* Rodrigo Santos */}
-              <div className="text-center">
+              <div className="bg-card/50 rounded-xl p-6 border border-border/50 text-center">
                 <img
                   src="/images/team/rodrigo-santos.jpg"
                   alt="Rodrigo Santos"
-                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-border"
+                  className="w-32 h-32 rounded-xl object-cover mx-auto mb-4"
                 />
-                <h3 className="font-semibold text-foreground">Rodrigo Santos</h3>
-                <p className="text-sm text-octg-gold mb-2">CEO, OCTG Marketing</p>
+                <h3 className="text-lg font-semibold text-foreground">Rodrigo Santos</h3>
+                <p className="text-sm text-octg-gold mb-3">CEO, OCTG Marketing</p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Rodrigo leads OCTG Marketing as CEO, driving the strategic vision behind the OCTG Index platform. With deep expertise in energy sector communications, he connects industry professionals worldwide.
+                  Rodrigo leads OCTG Marketing as CEO, driving the strategic vision behind the OCTG Index platform with deep expertise in energy sector communications.
                 </p>
               </div>
 
               {/* Franklin Clarke */}
-              <div className="text-center">
+              <div className="bg-card/50 rounded-xl p-6 border border-border/50 text-center">
                 <img
                   src="/images/team/franklin-clarke.jpg"
                   alt="Franklin Clarke"
-                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-border"
+                  className="w-32 h-32 rounded-xl object-cover mx-auto mb-4"
                 />
-                <h3 className="font-semibold text-foreground">Franklin Clarke</h3>
-                <p className="text-sm text-octg-gold mb-2">Regional Coverage Director</p>
+                <h3 className="text-lg font-semibold text-foreground">Franklin Clarke</h3>
+                <p className="text-sm text-octg-gold mb-3">Regional Coverage Director</p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Franklin oversees OCTG Index's global regional coverage, ensuring comprehensive news and analysis from every major oil and gas market. His industry network delivers timely insights worldwide.
+                  Franklin oversees OCTG Index's global regional coverage, ensuring comprehensive news and analysis from every major oil and gas market.
                 </p>
               </div>
 
               {/* Oliver Duncan */}
-              <div className="text-center">
+              <div className="bg-card/50 rounded-xl p-6 border border-border/50 text-center">
                 <img
                   src="/images/team/oliver-duncan.jpg"
                   alt="Oliver Duncan"
-                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-border"
+                  className="w-32 h-32 rounded-xl object-cover mx-auto mb-4"
                 />
-                <h3 className="font-semibold text-foreground">Oliver Duncan</h3>
-                <p className="text-sm text-octg-gold mb-2">Events & Calendar Director</p>
+                <h3 className="text-lg font-semibold text-foreground">Oliver Duncan</h3>
+                <p className="text-sm text-octg-gold mb-3">Events & Calendar Director</p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Oliver manages the OCTG Index events calendar, tracking 60+ industry conferences globally. He connects professionals with the most relevant networking opportunities in the energy sector.
+                  Oliver manages the OCTG Index events calendar, tracking 60+ industry conferences and connecting professionals with networking opportunities.
                 </p>
               </div>
 
               {/* Maria Oliveira */}
-              <div className="text-center">
+              <div className="bg-card/50 rounded-xl p-6 border border-border/50 text-center">
                 <img
                   src="/images/team/maria-oliveira.jpg"
                   alt="Maria Oliveira"
-                  className="w-20 h-20 rounded-full object-cover mx-auto mb-4 border-2 border-border"
+                  className="w-32 h-32 rounded-xl object-cover mx-auto mb-4"
                 />
-                <h3 className="font-semibold text-foreground">Maria Oliveira</h3>
-                <p className="text-sm text-octg-gold mb-2">Latin America Correspondent</p>
+                <h3 className="text-lg font-semibold text-foreground">Maria Oliveira</h3>
+                <p className="text-sm text-octg-gold mb-3">Latin America Correspondent</p>
                 <p className="text-sm text-muted-foreground leading-relaxed">
-                  Maria covers the South American OCTG market, providing in-depth analysis of Brazil, Argentina, and regional developments. Her expertise ensures comprehensive Latin America coverage.
+                  Maria covers the South American OCTG market, providing in-depth analysis of Brazil, Argentina, and regional developments.
                 </p>
               </div>
             </div>
