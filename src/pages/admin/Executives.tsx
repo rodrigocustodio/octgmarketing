@@ -185,22 +185,23 @@ export default function Executives() {
                         {exec.region}
                       </Badge>
                     </TableCell>
-                    <TableCell>
-                      <div className="flex gap-2">
-                        <Link to={`/admin/executives/${exec.id}`}>
-                          <Button variant="ghost" size="icon">
-                            <Pencil className="h-4 w-4" />
+                      <TableCell>
+                        <div className="flex gap-2">
+                          <Link to={`/admin/executives/${exec.id}`}>
+                            <Button variant="ghost" size="icon" aria-label="Edit executive">
+                              <Pencil className="h-4 w-4" />
+                            </Button>
+                          </Link>
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setDeleteId(exec.id)}
+                            aria-label="Delete executive"
+                          >
+                            <Trash2 className="h-4 w-4 text-destructive" />
                           </Button>
-                        </Link>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => setDeleteId(exec.id)}
-                        >
-                          <Trash2 className="h-4 w-4 text-destructive" />
-                        </Button>
-                      </div>
-                    </TableCell>
+                        </div>
+                      </TableCell>
                   </TableRow>
                 ))
               )}
