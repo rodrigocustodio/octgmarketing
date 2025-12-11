@@ -33,6 +33,7 @@ import PricingIndex from "./pages/PricingIndex";
 
 // Admin pages
 import Dashboard from "./pages/admin/Dashboard";
+import EditorialRoom from "./pages/admin/EditorialRoom";
 import Pipeline from "./pages/admin/Pipeline";
 import Sources from "./pages/admin/Sources";
 import SourcesConfig from "./pages/admin/SourcesConfig";
@@ -88,6 +89,7 @@ const App = () => (
                 
                 {/* Admin Routes */}
                 <Route path="/admin" element={<ProtectedRoute><Dashboard /></ProtectedRoute>} />
+                <Route path="/admin/editorial-room" element={<ProtectedRoute><EditorialRoom /></ProtectedRoute>} />
                 <Route path="/admin/pipeline" element={<ProtectedRoute><Pipeline /></ProtectedRoute>} />
                 <Route path="/admin/sources" element={<ProtectedRoute><Sources /></ProtectedRoute>} />
                 <Route path="/admin/sources-config" element={<ProtectedRoute><SourcesConfig /></ProtectedRoute>} />
