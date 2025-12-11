@@ -24,9 +24,9 @@
     --secondary: 35 15% 92%;
     --secondary-foreground: 30 20% 25%;
 
-    /* Muted - Soft Cream */
+    /* Muted - Soft Cream (improved contrast for accessibility) */
     --muted: 35 18% 93%;
-    --muted-foreground: 30 15% 40%;
+    --muted-foreground: 30 15% 32%;
 
     /* Accent - Bronze/Copper */
     --accent: 30 65% 42%;
@@ -92,9 +92,9 @@
     --secondary: 217 33% 15%;
     --secondary-foreground: 210 20% 90%;
 
-    /* Muted - Charcoal */
+    /* Muted - Charcoal (improved contrast for accessibility) */
     --muted: 220 20% 18%;
-    --muted-foreground: 215 15% 55%;
+    --muted-foreground: 215 15% 65%;
 
     /* Accent - Bronze/Copper */
     --accent: 30 60% 45%;

@@ -58,13 +58,17 @@ function TickerSkeleton() {
   );
 }
 
+// Fixed height to prevent CLS
+const TICKER_HEIGHT = "h-7"; // 28px
+
 export function PriceTicker() {
   const { data: prices, isLoading } = useSteelPrices();
 
+  // Always render with fixed height to prevent CLS
   if (isLoading) {
     return (
-      <div className="sticky top-16 z-40 w-full border-b border-border bg-muted/30 backdrop-blur supports-[backdrop-filter]:bg-muted/20">
-        <div className="h-8 flex items-center overflow-hidden">
+      <div className={`sticky top-16 z-40 w-full border-b border-border bg-muted/30 backdrop-blur supports-[backdrop-filter]:bg-muted/20 ${TICKER_HEIGHT}`}>
+        <div className={`${TICKER_HEIGHT} flex items-center overflow-hidden`}>
           <TickerSkeleton />
         </div>
       </div>
@@ -73,8 +77,8 @@ export function PriceTicker() {
 
   if (!prices || prices.length === 0) {
     return (
-      <div className="sticky top-16 z-40 w-full border-b border-border bg-muted/30 backdrop-blur supports-[backdrop-filter]:bg-muted/20">
-        <div className="h-8 flex items-center justify-center text-xs text-muted-foreground">
+      <div className={`sticky top-16 z-40 w-full border-b border-border bg-muted/30 backdrop-blur supports-[backdrop-filter]:bg-muted/20 ${TICKER_HEIGHT}`}>
+        <div className={`${TICKER_HEIGHT} flex items-center justify-center text-xs text-muted-foreground`}>
           No price data available
         </div>
       </div>
@@ -82,8 +86,8 @@ export function PriceTicker() {
   }
 
   return (
-    <div className="sticky top-16 z-40 w-full border-b border-border/50 bg-muted/20 backdrop-blur-sm">
-      <div className="h-7 flex items-center overflow-hidden">
+    <div className={`sticky top-16 z-40 w-full border-b border-border/50 bg-muted/20 backdrop-blur-sm ${TICKER_HEIGHT}`}>
+      <div className={`${TICKER_HEIGHT} flex items-center overflow-hidden`}>
         <div className="ticker-wrapper">
           <div className="ticker-content text-[11px] font-mono text-muted-foreground">
             {/* Double the content for seamless loop */}
