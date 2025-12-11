@@ -43,6 +43,9 @@ import {
   ShoppingBag,
   PenTool,
   LayoutGrid,
+  Mail,
+  Instagram,
+  Facebook,
 } from "lucide-react";
 
 const contactReasons = [
@@ -376,7 +379,14 @@ export default function Contact() {
         </section>
 
         {/* Contact Form Section */}
-        <section className="relative py-20 bg-muted/50">
+        <section className="relative py-20 overflow-hidden">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url('/images/bg-offshore.jpg')` }}
+          />
+          {/* Dark Overlay */}
+          <div className="absolute inset-0 bg-black/70 dark:bg-black/80" />
 
           <div className="relative z-10 container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
@@ -388,6 +398,36 @@ export default function Contact() {
                   <CardDescription className="text-base">
                     Fill out the form below and our team will get back to you within 24-48 hours.
                   </CardDescription>
+                  
+                  {/* Connect With Us - Social Links */}
+                  <div className="pt-4 flex flex-wrap items-center justify-center gap-6">
+                    <span className="text-sm text-muted-foreground font-medium">Connect With Us:</span>
+                    <a
+                      href="mailto:info@octgindex.com"
+                      className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"
+                    >
+                      <Mail className="h-4 w-4" />
+                      Contact Us
+                    </a>
+                    <a
+                      href="https://instagram.com/octgindex"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"
+                    >
+                      <Instagram className="h-4 w-4" />
+                      Instagram
+                    </a>
+                    <a
+                      href="https://facebook.com/octgindex"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"
+                    >
+                      <Facebook className="h-4 w-4" />
+                      Facebook
+                    </a>
+                  </div>
                 </CardHeader>
                 <CardContent>
                   {isSubmitted ? (
