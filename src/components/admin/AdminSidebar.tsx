@@ -132,9 +132,9 @@ const AdminSidebar = () => {
 
       {/* User section */}
       <div className="p-4 border-t border-border space-y-4">
-        <div className="px-4 py-2">
-          <p className="text-sm font-medium truncate">{user?.email}</p>
-          <p className="text-xs text-muted-foreground">
+        <div className="px-4 py-2 bg-muted/50 rounded-lg">
+          <p className="text-sm font-medium truncate text-foreground">{user?.email}</p>
+          <p className="text-xs text-foreground/70">
             {isAdmin ? "Administrator" : "Editor"}
           </p>
         </div>
@@ -142,7 +142,7 @@ const AdminSidebar = () => {
         <div className="space-y-1">
           <Link
             to="/"
-            className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+            className="flex items-center gap-3 px-4 py-2 rounded-lg text-sm text-foreground hover:bg-muted transition-colors"
           >
             <ChevronLeft className="h-4 w-4" />
             Back to Site
@@ -150,7 +150,7 @@ const AdminSidebar = () => {
           
           <Button
             variant="ghost"
-            className="w-full justify-start gap-3 px-4 text-muted-foreground hover:text-foreground"
+            className="w-full justify-start gap-3 px-4 text-foreground hover:bg-muted"
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4" />
