@@ -499,7 +499,7 @@ const Companies = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" asChild>
+                        <Button variant="ghost" size="sm" asChild aria-label="Edit company">
                           <Link to={`/admin/companies/${company.id}`}>
                             <Edit className="h-4 w-4" />
                           </Link>

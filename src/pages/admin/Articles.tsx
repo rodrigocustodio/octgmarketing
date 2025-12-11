@@ -470,14 +470,14 @@ const Articles = () => {
                               </Tooltip>
                             </TooltipProvider>
                           )}
-                          <Button variant="ghost" size="icon" asChild>
+                          <Button variant="ghost" size="icon" asChild aria-label="Edit article">
                             <Link to={`/admin/articles/${article.id}`}>
                               <Edit className="h-4 w-4" />
                             </Link>
                           </Button>
                           <AlertDialog>
                             <AlertDialogTrigger asChild>
-                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive">
+                              <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive" aria-label="Delete article">
                                 <Trash2 className="h-4 w-4" />
                               </Button>
                             </AlertDialogTrigger>

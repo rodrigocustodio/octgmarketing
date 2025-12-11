@@ -151,6 +151,7 @@ const Sources = () => {
                             size="sm"
                             variant="ghost"
                             onClick={() => setSelectedSource(source)}
+                            aria-label="View source details"
                           >
                             <Eye className="h-4 w-4" />
                           </Button>
@@ -159,7 +160,7 @@ const Sources = () => {
                             target="_blank"
                             rel="noopener noreferrer"
                           >
-                            <Button size="sm" variant="ghost">
+                            <Button size="sm" variant="ghost" aria-label="Open original source">
                               <ExternalLink className="h-4 w-4" />
                             </Button>
                           </a>

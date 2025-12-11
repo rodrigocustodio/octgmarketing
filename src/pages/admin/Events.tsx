@@ -394,7 +394,7 @@ const AdminEvents = () => {
                               size="icon"
                               onClick={() => handleGenerateDescription(event)}
                               disabled={isGeneratingThis || isBulkGenerating}
-                              title="Generate description"
+                              aria-label="Generate description"
                               className={hasDescription ? "text-green-600" : "bg-accent/20 hover:bg-accent/30"}
                             >
                               {isGeneratingThis ? (
@@ -409,7 +409,7 @@ const AdminEvents = () => {
                               variant="ghost"
                               size="icon"
                               onClick={() => handleToggleFeatured(event.id, event.is_featured || false)}
-                              title={event.is_featured ? "Remove from featured" : "Mark as featured"}
+                              aria-label={event.is_featured ? "Remove from featured" : "Mark as featured"}
                             >
                               {event.is_featured ? (
                                 <StarOff className="h-4 w-4" />
@@ -418,7 +418,7 @@ const AdminEvents = () => {
                               )}
                             </Button>
                             <Link to={`/admin/events/${event.id}`}>
-                              <Button variant="ghost" size="icon">
+                              <Button variant="ghost" size="icon" aria-label="Edit event">
                                 <Edit className="h-4 w-4" />
                               </Button>
                             </Link>
@@ -427,6 +427,7 @@ const AdminEvents = () => {
                               size="icon"
                               onClick={() => handleDelete(event.id, event.name)}
                               className="text-destructive hover:text-destructive"
+                              aria-label="Delete event"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>

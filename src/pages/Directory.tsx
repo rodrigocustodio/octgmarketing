@@ -349,6 +349,7 @@ export default function Directory() {
                     variant={viewMode === "table" ? "secondary" : "ghost"}
                     size="icon"
                     onClick={() => setViewMode("table")}
+                    aria-label="View as list"
                   >
                     <List className="h-4 w-4" />
                   </Button>
@@ -356,6 +357,7 @@ export default function Directory() {
                     variant={viewMode === "grid" ? "secondary" : "ghost"}
                     size="icon"
                     onClick={() => setViewMode("grid")}
+                    aria-label="View as grid"
                   >
                     <LayoutGrid className="h-4 w-4" />
                   </Button>

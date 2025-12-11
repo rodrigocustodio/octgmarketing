@@ -56,6 +56,7 @@ export function EventGalleryLightbox({ images }: EventGalleryLightboxProps) {
               size="icon"
               className="absolute top-2 right-2 z-10 text-white hover:bg-white/20"
               onClick={() => setLightboxOpen(false)}
+              aria-label="Close lightbox"
             >
               <X className="h-5 w-5" />
             </Button>
@@ -68,6 +69,7 @@ export function EventGalleryLightbox({ images }: EventGalleryLightboxProps) {
                   size="icon"
                   className="absolute left-2 top-1/2 -translate-y-1/2 z-10 text-white hover:bg-white/20"
                   onClick={goPrev}
+                  aria-label="Previous image"
                 >
                   <ChevronLeft className="h-8 w-8" />
                 </Button>
@@ -76,6 +78,7 @@ export function EventGalleryLightbox({ images }: EventGalleryLightboxProps) {
                   size="icon"
                   className="absolute right-2 top-1/2 -translate-y-1/2 z-10 text-white hover:bg-white/20"
                   onClick={goNext}
+                  aria-label="Next image"
                 >
                   <ChevronRight className="h-8 w-8" />
                 </Button>
