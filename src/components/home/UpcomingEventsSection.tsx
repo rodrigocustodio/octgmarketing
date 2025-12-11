@@ -6,13 +6,14 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Calendar, MapPin, ArrowRight, Users } from "lucide-react";
 import { useUpcomingEvents } from "@/hooks/useEvents";
 import { format } from "date-fns";
+import { parseLocalDate } from "@/lib/utils";
 
 function formatEventDate(startDate: string, endDate: string | null): string {
-  const start = new Date(startDate);
+  const start = parseLocalDate(startDate);
   if (!endDate) {
     return format(start, "MMM d, yyyy");
   }
-  const end = new Date(endDate);
+  const end = parseLocalDate(endDate);
   if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
     return `${format(start, "MMM d")}–${format(end, "d, yyyy")}`;
   }
@@ -73,10 +74,10 @@ export function UpcomingEventsSection() {
                     </div>
                     <div>
                       <p className="text-sm font-semibold text-accent">
-                        {format(new Date(event.start_date), "MMM")}
+                        {format(parseLocalDate(event.start_date), "MMM")}
                       </p>
                       <p className="text-xl font-bold">
-                        {format(new Date(event.start_date), "d")}
+                        {format(parseLocalDate(event.start_date), "d")}
                       </p>
                     </div>
                   </div>

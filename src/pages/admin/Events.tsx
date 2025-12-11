@@ -19,9 +19,10 @@ import { useEvents, useDeleteEvent, useUpdateEvent, Event } from "@/hooks/useEve
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { parseLocalDate } from "@/lib/utils";
 
 function isUpcoming(startDate: string): boolean {
-  return new Date(startDate) >= new Date(new Date().toDateString());
+  return parseLocalDate(startDate) >= new Date(new Date().toDateString());
 }
 
 const AdminEvents = () => {
@@ -354,11 +355,11 @@ const AdminEvents = () => {
                         </TableCell>
                         <TableCell>
                           <p className="text-sm">
-                            {format(new Date(event.start_date), "MMM d, yyyy")}
+                            {format(parseLocalDate(event.start_date), "MMM d, yyyy")}
                           </p>
                           {event.end_date && (
                             <p className="text-xs text-muted-foreground">
-                              to {format(new Date(event.end_date), "MMM d")}
+                              to {format(parseLocalDate(event.end_date), "MMM d")}
                             </p>
                           )}
                         </TableCell>
