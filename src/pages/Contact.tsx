@@ -199,23 +199,25 @@ export default function Contact() {
         </section>
 
         {/* Why OCTG Index Section */}
-        <section className="mb-16">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            <div>
-              <h2 className="text-3xl font-bold text-foreground mb-6">
-                Why OCTG Index Exists
-              </h2>
-              <p className="text-muted-foreground text-lg leading-relaxed">
-                OCTG Index is the leading news and intelligence platform serving the global Energy sector, providing comprehensive coverage of Oil & Gas, Solar, and OCTG Supply Chain Management industries. Our platform features an extensive OCTG Product directory with detailed technical specifications, a company database profiling over 200 industry players with their operations and contact information, and a Global CEO Leadership directory connecting executives and decision-makers across the worldwide OCTG ecosystem. We deliver real-time market intelligence, industry analysis, and event coverage to professionals driving the future of energy.
-              </p>
-            </div>
-            <div className="relative">
-              <div className="aspect-[4/3] rounded-xl overflow-hidden shadow-xl bg-muted">
-                <img
-                  src="/images/events-hero-default.jpg"
-                  alt="OCTG Index Industry Coverage"
-                  className="w-full h-full object-cover"
-                />
+        <section className="py-16 bg-muted/30 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
+          <div className="container mx-auto">
+            <div className="grid lg:grid-cols-2 gap-12 items-center">
+              <div className="max-w-xl">
+                <h2 className="text-3xl font-bold text-foreground mb-6">
+                  Why OCTG Index Exists
+                </h2>
+                <p className="text-muted-foreground text-lg leading-relaxed">
+                  OCTG Index is the leading news and intelligence platform serving the global Energy sector, providing comprehensive coverage of Oil & Gas, Solar, and OCTG Supply Chain Management industries. Our platform features an extensive OCTG Product directory with detailed technical specifications, a company database profiling over 200 industry players with their operations and contact information, and a Global CEO Leadership directory connecting executives and decision-makers across the worldwide OCTG ecosystem. We deliver real-time market intelligence, industry analysis, and event coverage to professionals driving the future of energy.
+                </p>
+              </div>
+              <div className="relative flex justify-center lg:justify-end">
+                <div className="aspect-[16/10] rounded-xl overflow-hidden shadow-xl bg-muted max-w-md w-full">
+                  <img
+                    src="/images/events-hero-default.jpg"
+                    alt="OCTG Index Industry Coverage"
+                    className="w-full h-full object-cover"
+                  />
+                </div>
               </div>
             </div>
           </div>
