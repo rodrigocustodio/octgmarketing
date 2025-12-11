@@ -280,32 +280,40 @@ const ArticleEdit = () => {
     },
   });
 
-  // Image upload
+  // Image upload - uses Bunny CDN via edge function
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
     setIsUploading(true);
     try {
-      const fileExt = file.name.split(".").pop();
-      const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
-      const filePath = `uploads/${fileName}`;
+      const reader = new FileReader();
+      reader.onload = async (event) => {
+        const base64 = event.target?.result as string;
+        const fileExt = file.name.split(".").pop();
+        const fileName = `${Date.now()}-${Math.random().toString(36).substring(7)}.${fileExt}`;
+        
+        const { data, error } = await supabase.functions.invoke('upload-image', {
+          body: { 
+            imageBase64: base64, 
+            fileName, 
+            folder: `octgindex/articles/${id || 'manual'}` 
+          },
+        });
 
-      const { error: uploadError } = await supabase.storage
-        .from("article-images")
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      const { data: urlData } = supabase.storage
-        .from("article-images")
-        .getPublicUrl(filePath);
-
-      setFormData((prev) => ({ ...prev, hero_image_url: urlData.publicUrl }));
-      toast.success("Image uploaded");
+        if (error) throw error;
+        
+        setFormData((prev) => ({ ...prev, hero_image_url: data.cdnUrl }));
+        toast.success("Image uploaded to CDN");
+        setIsUploading(false);
+      };
+      reader.onerror = () => {
+        toast.error("Failed to read image file");
+        setIsUploading(false);
+      };
+      reader.readAsDataURL(file);
     } catch (error) {
       toast.error("Failed to upload image");
-    } finally {
       setIsUploading(false);
     }
   };
