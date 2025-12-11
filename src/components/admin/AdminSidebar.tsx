@@ -106,8 +106,8 @@ const AdminSidebar = () => {
         </Link>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      {/* Navigation - scrollable */}
+      <nav className="flex-1 min-h-0 p-4 space-y-1 overflow-y-auto">
         {navItems.map((item) => {
           const isActive = location.pathname === item.href || 
             (item.href !== "/admin" && location.pathname.startsWith(item.href));
@@ -130,8 +130,8 @@ const AdminSidebar = () => {
         })}
       </nav>
 
-      {/* User section */}
-      <div className="p-4 border-t border-border space-y-4">
+      {/* User section - fixed at bottom */}
+      <div className="shrink-0 p-4 border-t border-border space-y-4">
         <div className="px-4 py-2 bg-muted/50 rounded-lg">
           <p className="text-sm font-medium truncate text-foreground">{user?.email}</p>
           <p className="text-xs text-foreground/70">
