@@ -312,7 +312,24 @@ export function useCompanies() {
   });
 }
 
-export interface ArticleWithTopics extends ArticleWithRegion {
+// Lightweight article type for homepage cards (no body content)
+export interface ArticlePreview {
+  id: string;
+  title: string;
+  subtitle: string | null;
+  slug: string;
+  hero_image_url: string | null;
+  publish_date: string | null;
+  status: string;
+  created_at: string;
+  region: {
+    id: string;
+    name: string;
+    slug: string;
+  } | null;
+}
+
+export interface ArticleWithTopics extends ArticlePreview {
   topics?: { id: string; name: string; slug: string }[];
 }
 
@@ -320,51 +337,53 @@ export function useHomepageArticles() {
   return useQuery({
     queryKey: ["homepage-articles"],
     queryFn: async () => {
-      // Fetch all published articles
-      const { data: articles, error: articlesError } = await supabase
-        .from("articles")
-        .select(`
-          id,
-          title,
-          subtitle,
-          slug,
-          body,
-          hero_image_url,
-          publish_date,
-          status,
-          created_at,
-          region:regions(id, name, slug)
-        `)
-        .in("status", ["published", "featured"])
-        .order("publish_date", { ascending: false, nullsFirst: false });
+      // Run all 3 queries in parallel for maximum speed
+      const [articlesResult, articleTopicsResult, topicsResult] = await Promise.all([
+        // Fetch published articles WITHOUT body (not needed for cards)
+        supabase
+          .from("articles")
+          .select(`
+            id,
+            title,
+            subtitle,
+            slug,
+            hero_image_url,
+            publish_date,
+            status,
+            created_at,
+            region:regions(id, name, slug)
+          `)
+          .in("status", ["published", "featured"])
+          .order("publish_date", { ascending: false, nullsFirst: false })
+          .limit(40), // Homepage only needs ~30 articles max
+        
+        // Fetch article-topic relationships
+        supabase
+          .from("article_topics")
+          .select("article_id, topic_id"),
+        
+        // Fetch all topics
+        supabase
+          .from("topics")
+          .select("id, name, slug")
+      ]);
 
-      if (articlesError) throw articlesError;
-      if (!articles) return [];
+      if (articlesResult.error) throw articlesResult.error;
+      if (articleTopicsResult.error) throw articleTopicsResult.error;
+      if (topicsResult.error) throw topicsResult.error;
 
-      // Fetch article-topic relationships for all articles
-      const articleIds = articles.map(a => a.id);
-      const { data: articleTopics, error: topicsError } = await supabase
-        .from("article_topics")
-        .select("article_id, topic_id")
-        .in("article_id", articleIds);
-
-      if (topicsError) throw topicsError;
-
-      // Fetch all topics
-      const { data: topics, error: allTopicsError } = await supabase
-        .from("topics")
-        .select("id, name, slug");
-
-      if (allTopicsError) throw allTopicsError;
+      const articles = articlesResult.data || [];
+      const articleTopics = articleTopicsResult.data || [];
+      const topics = topicsResult.data || [];
 
       // Create topic lookup map
-      const topicMap = new Map(topics?.map(t => [t.id, t]) || []);
+      const topicMap = new Map(topics.map(t => [t.id, t]));
 
       // Attach topics to articles
       const articlesWithTopics: ArticleWithTopics[] = articles.map(article => {
         const articleTopicIds = articleTopics
-          ?.filter(at => at.article_id === article.id)
-          .map(at => at.topic_id) || [];
+          .filter(at => at.article_id === article.id)
+          .map(at => at.topic_id);
         
         const articleTopicsList = articleTopicIds
           .map(id => topicMap.get(id))
@@ -378,5 +397,7 @@ export function useHomepageArticles() {
 
       return articlesWithTopics;
     },
+    staleTime: 60 * 1000, // Consider data fresh for 1 minute
+    gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 }
