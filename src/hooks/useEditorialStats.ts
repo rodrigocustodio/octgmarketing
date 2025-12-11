@@ -266,7 +266,7 @@ export function useGenerateArticleFromSuggestion() {
       });
       
       if (error) throw error;
-      if (!data?.success) throw new Error(data?.error || "Failed to generate article");
+      if (!data?.title) throw new Error(data?.error || "Failed to generate article");
 
       // Insert the generated article as a draft
       const { data: draft, error: draftError } = await supabase
@@ -275,9 +275,9 @@ export function useGenerateArticleFromSuggestion() {
           title: data.title,
           slug: data.slug,
           excerpt: data.excerpt,
-          body_markdown: data.body,
-          suggested_topic_ids: data.topics,
-          suggested_company_ids: data.companies,
+          body_markdown: data.body_markdown,
+          suggested_topic_ids: data.suggested_topic_ids,
+          suggested_company_ids: data.suggested_company_ids,
           region_id: data.region_id,
           tags: data.tags,
           status: "pending_review",
