@@ -56,3 +56,9 @@ verify_jwt = false
 
 [functions.generate-topic-suggestions]
 verify_jwt = false
+
+[functions.send-contact-email]
+verify_jwt = false
+
+[functions.newsletter-subscribe]
+verify_jwt = false

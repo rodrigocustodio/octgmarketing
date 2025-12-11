@@ -285,6 +285,45 @@ export type Database = {
           },
         ]
       }
+      contact_submissions: {
+        Row: {
+          company: string | null
+          contact_reason: Database["public"]["Enums"]["contact_reason"]
+          email: string
+          id: string
+          job_title: string | null
+          message: string
+          name: string
+          notes: string | null
+          status: string
+          submitted_at: string
+        }
+        Insert: {
+          company?: string | null
+          contact_reason: Database["public"]["Enums"]["contact_reason"]
+          email: string
+          id?: string
+          job_title?: string | null
+          message: string
+          name: string
+          notes?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Update: {
+          company?: string | null
+          contact_reason?: Database["public"]["Enums"]["contact_reason"]
+          email?: string
+          id?: string
+          job_title?: string | null
+          message?: string
+          name?: string
+          notes?: string | null
+          status?: string
+          submitted_at?: string
+        }
+        Relationships: []
+      }
       draft_articles: {
         Row: {
           body_markdown: string | null
@@ -1028,6 +1067,14 @@ export type Database = {
         | "logistics"
         | "software"
         | "trading"
+      contact_reason:
+        | "advertisement"
+        | "media_partnership"
+        | "article_promotion"
+        | "questions"
+        | "event_coverage"
+        | "expert_contribution"
+        | "data_access"
       draft_article_status: "pending_review" | "approved" | "rejected"
       source_article_status: "new" | "processed" | "failed"
     }
@@ -1169,6 +1216,15 @@ export const Constants = {
         "logistics",
         "software",
         "trading",
+      ],
+      contact_reason: [
+        "advertisement",
+        "media_partnership",
+        "article_promotion",
+        "questions",
+        "event_coverage",
+        "expert_contribution",
+        "data_access",
       ],
       draft_article_status: ["pending_review", "approved", "rejected"],
       source_article_status: ["new", "processed", "failed"],
