@@ -163,11 +163,11 @@ const Index = () => {
           />
           <div className="container relative z-20 py-16 sm:py-24">
             {isLoading ? (
-              <div className="max-w-4xl space-y-4">
-                <Skeleton className="h-8 w-32" />
-                <Skeleton className="h-12 w-3/4" />
-                <Skeleton className="h-6 w-1/2" />
-                <Skeleton className="h-10 w-40" />
+              <div className="max-w-4xl space-y-4 min-h-[200px]">
+                <Skeleton className="h-8 w-32 bg-white/10" />
+                <Skeleton className="h-12 w-3/4 bg-white/10" />
+                <Skeleton className="h-6 w-1/2 bg-white/10" />
+                <Skeleton className="h-10 w-40 bg-white/10" />
               </div>
             ) : featuredArticle ? (
               <div className="max-w-4xl animate-fade-in-up">
