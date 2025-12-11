@@ -1,10 +1,16 @@
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Menu, X, Search } from "lucide-react";
+import { Menu, X, Search, ChevronDown } from "lucide-react";
 import { useState, useEffect } from "react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { PriceTicker } from "./PriceTicker";
 import { SearchDialog } from "@/components/search/SearchDialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import pipeIcon from "@/assets/logo-side-icon.png";
 
 const regions = [
@@ -69,11 +75,23 @@ export function Header() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
-            {regions.map((region) => (
-              <Link key={region.slug} to={`/region/${region.slug}`}>
-                <Button variant="nav" size="sm">{region.name}</Button>
-              </Link>
-            ))}
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="nav" size="sm" className="gap-1">
+                  Regions
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-40">
+                {regions.map((region) => (
+                  <DropdownMenuItem key={region.slug} asChild>
+                    <Link to={`/region/${region.slug}`} className="w-full cursor-pointer">
+                      {region.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Link to="/directory">
               <Button variant="nav" size="sm">Companies</Button>
             </Link>
