@@ -337,7 +337,7 @@ const EventDetail = () => {
                     <CardHeader>
                       <CardTitle className="flex items-center gap-2">
                         <Images className="h-5 w-5" />
-                        Event Photos
+                        Highlights & Moments
                       </CardTitle>
                     </CardHeader>
                     <CardContent>
