@@ -199,68 +199,23 @@ export default function Contact() {
         </section>
 
         {/* Why OCTG Index Section */}
-        <section className="py-16 bg-card/50">
-          <div className="container mx-auto px-4">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div>
-                <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight mb-6">
-                  Why OCTG Index Exists
-                </h2>
-                <p className="text-lg text-muted-foreground mb-6">
-                  OCTG Index was created to bring transparency, intelligence, and connectivity to the global OCTG industry. We serve as the central hub for market insights, company intelligence, and industry events.
-                </p>
-                <div className="space-y-4">
-                  <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <BarChart3 className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-1">Market Intelligence</h3>
-                      <p className="text-muted-foreground text-sm">
-                        Real-time pricing data, market trends, and comprehensive industry analysis.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Building2 className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-1">Company Directory</h3>
-                      <p className="text-muted-foreground text-sm">
-                        200+ companies profiled with operations, leadership, and contact information.
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                      <Users className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-semibold mb-1">Industry Network</h3>
-                      <p className="text-muted-foreground text-sm">
-                        Connect with executives, experts, and decision-makers across the global OCTG ecosystem.
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="relative">
+        <section className="mb-16">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <div>
+              <h2 className="text-3xl font-bold text-foreground mb-6">
+                Why OCTG Index Exists
+              </h2>
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                OCTG Index is the leading news and intelligence platform serving the global Energy sector, providing comprehensive coverage of Oil & Gas, Solar, and OCTG Supply Chain Management industries. Our platform features an extensive OCTG Product directory with detailed technical specifications, a company database profiling over 200 industry players with their operations and contact information, and a Global CEO Leadership directory connecting executives and decision-makers across the worldwide OCTG ecosystem. We deliver real-time market intelligence, industry analysis, and event coverage to professionals driving the future of energy.
+              </p>
+            </div>
+            <div className="relative">
+              <div className="aspect-[4/3] rounded-xl overflow-hidden shadow-xl bg-muted">
                 <img
-                  src="https://tukia-cdn.b-cdn.net/octgindex/branding/contact-industry.jpg"
-                  alt="OCTG Industry Operations"
-                  className="rounded-xl shadow-2xl w-full"
-                  loading="lazy"
+                  src="/images/events-hero-default.jpg"
+                  alt="OCTG Index Industry Coverage"
+                  className="w-full h-full object-cover"
                 />
-                <div className="absolute -bottom-6 -left-6 bg-card border border-border rounded-lg p-4 shadow-lg">
-                  <div className="flex items-center gap-3">
-                    <Globe className="h-8 w-8 text-primary" />
-                    <div>
-                      <p className="text-2xl font-bold">6</p>
-                      <p className="text-sm text-muted-foreground">Global Regions</p>
-                    </div>
-                  </div>
-                </div>
               </div>
             </div>
           </div>
