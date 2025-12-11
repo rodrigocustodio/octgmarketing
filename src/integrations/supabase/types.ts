@@ -149,6 +149,13 @@ export type Database = {
         }
         Relationships: [
           {
+            foreignKeyName: "articles_author_id_fkey"
+            columns: ["author_id"]
+            isOneToOne: false
+            referencedRelation: "authors"
+            referencedColumns: ["id"]
+          },
+          {
             foreignKeyName: "articles_region_id_fkey"
             columns: ["region_id"]
             isOneToOne: false
@@ -219,6 +226,42 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      authors: {
+        Row: {
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          id: string
+          name: string
+          slug: string
+          specializations: string[] | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          name: string
+          slug: string
+          specializations?: string[] | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          id?: string
+          name?: string
+          slug?: string
+          specializations?: string[] | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
       }
       companies: {
         Row: {

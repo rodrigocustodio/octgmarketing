@@ -7,6 +7,7 @@ import RelatedArticles from "@/components/articles/RelatedArticles";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 import { OctgMarketingPromo } from "@/components/articles/OctgMarketingPromo";
+import { ArticleAuthorBox } from "@/components/articles/ArticleAuthorBox";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
@@ -202,6 +203,11 @@ const Article = () => {
                   className="article-content max-w-none"
                   dangerouslySetInnerHTML={{ __html: bodyHtml }}
                 />
+
+                {/* Author Box with CTA */}
+                {article.author && (
+                  <ArticleAuthorBox author={article.author} />
+                )}
               </div>
 
               {/* Sidebar */}

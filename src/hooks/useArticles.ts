@@ -1,6 +1,15 @@
 import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 
+export interface ArticleAuthor {
+  id: string;
+  name: string;
+  title: string;
+  bio: string | null;
+  avatar_url: string | null;
+  slug: string;
+}
+
 export interface ArticleWithRegion {
   id: string;
   title: string;
@@ -16,6 +25,7 @@ export interface ArticleWithRegion {
     name: string;
     slug: string;
   } | null;
+  author?: ArticleAuthor | null;
 }
 
 export function usePublishedArticles(limit?: number) {
@@ -121,7 +131,8 @@ export function useArticleBySlug(slug: string) {
           publish_date,
           status,
           created_at,
-          region:regions(id, name, slug)
+          region:regions(id, name, slug),
+          author:authors(id, name, title, bio, avatar_url, slug)
         `)
         .eq("slug", slug)
         .in("status", ["published", "featured"])
