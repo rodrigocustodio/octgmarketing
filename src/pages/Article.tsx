@@ -6,6 +6,7 @@ import ShareButtons from "@/components/articles/ShareButtons";
 import RelatedArticles from "@/components/articles/RelatedArticles";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
+import { OctgMarketingPromo } from "@/components/articles/OctgMarketingPromo";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
@@ -217,6 +218,11 @@ const Article = () => {
                     currentRegion={article.region?.name}
                   />
                 )}
+
+                {/* OCTG Marketing Promo */}
+                <div className="hidden lg:block">
+                  <OctgMarketingPromo />
+                </div>
 
                 {/* Newsletter - Stay Informed */}
                 <div className="hidden lg:block">
