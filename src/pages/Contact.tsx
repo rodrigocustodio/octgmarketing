@@ -389,63 +389,56 @@ export default function Contact() {
           <div className="absolute inset-0 bg-black/70 dark:bg-black/80" />
 
           <div className="relative z-10 container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
+            <div className="max-w-2xl mx-auto">
               <Card className="bg-card/95 backdrop-blur-sm border-border/50">
-                <CardHeader className="text-center pb-6">
-                  <CardTitle className="text-2xl md:text-3xl font-display">
-                    Send Us a Message
-                  </CardTitle>
-                  <CardDescription className="text-base">
-                    Fill out the form below and our team will get back to you within 24-48 hours.
-                  </CardDescription>
-                  
-                  {/* Connect With Us - Social Links */}
-                  <div className="pt-4 flex flex-wrap items-center justify-center gap-6">
-                    <span className="text-sm text-muted-foreground font-medium">Connect With Us:</span>
-                    <a
-                      href="mailto:info@octgindex.com"
-                      className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"
-                    >
-                      <Mail className="h-4 w-4" />
-                      Contact Us
-                    </a>
-                    <a
-                      href="https://instagram.com/octgindex"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"
-                    >
-                      <Instagram className="h-4 w-4" />
-                      Instagram
-                    </a>
-                    <a
-                      href="https://facebook.com/octgindex"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-2 text-sm text-foreground hover:text-primary transition-colors"
-                    >
-                      <Facebook className="h-4 w-4" />
-                      Facebook
-                    </a>
+                <CardHeader className="pb-4">
+                  <div className="flex items-center justify-between">
+                    <CardTitle className="text-xl font-display">Get In Touch</CardTitle>
+                    <div className="flex items-center gap-2">
+                      <a
+                        href="mailto:info@octgindex.com"
+                        className="p-2 rounded-full hover:bg-muted transition-colors"
+                        aria-label="Email us"
+                      >
+                        <Mail className="h-4 w-4" />
+                      </a>
+                      <a
+                        href="https://instagram.com/octgindex"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-full hover:bg-muted transition-colors"
+                        aria-label="Instagram"
+                      >
+                        <Instagram className="h-4 w-4" />
+                      </a>
+                      <a
+                        href="https://facebook.com/octgindex"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="p-2 rounded-full hover:bg-muted transition-colors"
+                        aria-label="Facebook"
+                      >
+                        <Facebook className="h-4 w-4" />
+                      </a>
+                    </div>
                   </div>
                 </CardHeader>
                 <CardContent>
                   {isSubmitted ? (
-                    <div className="text-center py-12">
-                      <CheckCircle2 className="h-16 w-16 text-primary mx-auto mb-4" />
-                      <h3 className="text-xl font-semibold mb-2">Thank You!</h3>
-                      <p className="text-muted-foreground">
+                    <div className="text-center py-8">
+                      <CheckCircle2 className="h-12 w-12 text-primary mx-auto mb-3" />
+                      <h3 className="text-lg font-semibold mb-1">Thank You!</h3>
+                      <p className="text-sm text-muted-foreground">
                         Your message has been received. We'll be in touch soon.
                       </p>
                     </div>
                   ) : (
-                    <form onSubmit={handleSubmit} className="space-y-6">
-                      {/* Contact Reason Dropdown */}
-                      <div className="space-y-2">
-                        <Label htmlFor="contactReason">Reason for Contact *</Label>
+                    <form onSubmit={handleSubmit} className="space-y-4">
+                      {/* Contact Reason */}
+                      <div>
                         <Select value={selectedReason} onValueChange={setSelectedReason}>
                           <SelectTrigger className="bg-background">
-                            <SelectValue placeholder="Select a reason..." />
+                            <SelectValue placeholder="Reason for contact *" />
                           </SelectTrigger>
                           <SelectContent className="bg-popover">
                             {contactReasons.map((reason) => (
@@ -456,132 +449,124 @@ export default function Contact() {
                           </SelectContent>
                         </Select>
                         {errors.contactReason && (
-                          <p className="text-destructive text-sm">{errors.contactReason}</p>
+                          <p className="text-destructive text-sm mt-1">{errors.contactReason}</p>
                         )}
                       </div>
 
-                      {/* First Name + Last Name */}
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="firstName">First Name *</Label>
+                      {/* Name Row */}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
                           <Input
                             id="firstName"
                             value={formData.firstName}
                             onChange={(e) => setFormData({ ...formData, firstName: e.target.value })}
-                            placeholder="John"
+                            placeholder="First name *"
                             className="bg-background"
                           />
                           {errors.firstName && (
-                            <p className="text-destructive text-sm">{errors.firstName}</p>
+                            <p className="text-destructive text-sm mt-1">{errors.firstName}</p>
                           )}
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="lastName">Last Name *</Label>
+                        <div>
                           <Input
                             id="lastName"
                             value={formData.lastName}
                             onChange={(e) => setFormData({ ...formData, lastName: e.target.value })}
-                            placeholder="Doe"
+                            placeholder="Last name *"
                             className="bg-background"
                           />
                           {errors.lastName && (
-                            <p className="text-destructive text-sm">{errors.lastName}</p>
+                            <p className="text-destructive text-sm mt-1">{errors.lastName}</p>
                           )}
                         </div>
                       </div>
 
-                      {/* Email */}
-                      <div className="space-y-2">
-                        <Label htmlFor="email">Email Address *</Label>
-                        <Input
-                          id="email"
-                          type="email"
-                          value={formData.email}
-                          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          placeholder="john.doe@company.com"
-                          className="bg-background"
-                        />
-                        {errors.email && (
-                          <p className="text-destructive text-sm">{errors.email}</p>
-                        )}
-                      </div>
-
-                      {/* Company + Phone Number */}
-                      <div className="grid sm:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="company">Company *</Label>
+                      {/* Email + Phone Row */}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
                           <Input
-                            id="company"
-                            value={formData.company}
-                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
-                            placeholder="Acme Energy Corp"
+                            id="email"
+                            type="email"
+                            value={formData.email}
+                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                            placeholder="Email address *"
                             className="bg-background"
                           />
-                          {errors.company && (
-                            <p className="text-destructive text-sm">{errors.company}</p>
+                          {errors.email && (
+                            <p className="text-destructive text-sm mt-1">{errors.email}</p>
                           )}
                         </div>
-                        <div className="space-y-2">
-                          <Label htmlFor="phoneNumber">Phone Number</Label>
+                        <div>
                           <Input
                             id="phoneNumber"
                             type="tel"
                             value={formData.phoneNumber}
                             onChange={(e) => setFormData({ ...formData, phoneNumber: e.target.value })}
-                            placeholder="+1 (555) 123-4567"
+                            placeholder="Phone number"
                             className="bg-background"
                           />
                         </div>
                       </div>
 
-                      {/* Country Dropdown */}
-                      <div className="space-y-2">
-                        <Label htmlFor="country">Country *</Label>
-                        <Select value={formData.country} onValueChange={(value) => setFormData({ ...formData, country: value })}>
-                          <SelectTrigger className="bg-background">
-                            <SelectValue placeholder="Select your country..." />
-                          </SelectTrigger>
-                          <SelectContent className="bg-popover max-h-60">
-                            {countries.map((country) => (
-                              <SelectItem key={country} value={country}>
-                                {country}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        {errors.country && (
-                          <p className="text-destructive text-sm">{errors.country}</p>
-                        )}
+                      {/* Company + Country Row */}
+                      <div className="grid sm:grid-cols-2 gap-3">
+                        <div>
+                          <Input
+                            id="company"
+                            value={formData.company}
+                            onChange={(e) => setFormData({ ...formData, company: e.target.value })}
+                            placeholder="Company *"
+                            className="bg-background"
+                          />
+                          {errors.company && (
+                            <p className="text-destructive text-sm mt-1">{errors.company}</p>
+                          )}
+                        </div>
+                        <div>
+                          <Select value={formData.country} onValueChange={(value) => setFormData({ ...formData, country: value })}>
+                            <SelectTrigger className="bg-background">
+                              <SelectValue placeholder="Country *" />
+                            </SelectTrigger>
+                            <SelectContent className="bg-popover max-h-60">
+                              {countries.map((country) => (
+                                <SelectItem key={country} value={country}>
+                                  {country}
+                                </SelectItem>
+                              ))}
+                            </SelectContent>
+                          </Select>
+                          {errors.country && (
+                            <p className="text-destructive text-sm mt-1">{errors.country}</p>
+                          )}
+                        </div>
                       </div>
 
                       {/* Message */}
-                      <div className="space-y-2">
-                        <Label htmlFor="message">Message *</Label>
+                      <div>
                         <Textarea
                           id="message"
                           value={formData.message}
                           onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                          placeholder="Tell us how we can help you..."
-                          rows={5}
+                          placeholder="Your message *"
+                          rows={4}
                           className="bg-background resize-none"
                         />
                         {errors.message && (
-                          <p className="text-destructive text-sm">{errors.message}</p>
+                          <p className="text-destructive text-sm mt-1">{errors.message}</p>
                         )}
                       </div>
 
                       {/* Newsletter Checkbox */}
-                      <div className="flex items-start gap-3">
+                      <div className="flex items-center gap-2">
                         <Checkbox
                           id="subscribeNewsletter"
                           checked={formData.subscribeNewsletter}
                           onCheckedChange={(checked) =>
                             setFormData({ ...formData, subscribeNewsletter: checked === true })
                           }
-                          className="mt-0.5"
                         />
-                        <Label htmlFor="subscribeNewsletter" className="text-sm text-muted-foreground cursor-pointer leading-relaxed">
-                          Subscribe to our newsletter for industry updates, market insights, and exclusive content
+                        <Label htmlFor="subscribeNewsletter" className="text-sm text-muted-foreground cursor-pointer">
+                          Subscribe to our newsletter
                         </Label>
                       </div>
 
