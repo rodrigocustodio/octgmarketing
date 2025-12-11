@@ -243,15 +243,16 @@ export default function Contact() {
                 className="absolute -inset-[2px] rounded-xl bg-gradient-to-r from-octg-bronze via-octg-gold to-octg-copper animate-gradient-flow opacity-80"
                 style={{ backgroundSize: "200% 200%" }}
               />
-              <div className="relative bg-card rounded-xl p-6 md:p-8">
-                <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
-                  <div className="flex-1">
+              <div className="relative bg-card rounded-xl overflow-hidden">
+                <div className="flex flex-col lg:flex-row lg:items-stretch">
+                  {/* Left side - Content */}
+                  <div className="flex-1 p-6 md:p-8">
                     <div className="flex items-center gap-3 mb-3">
                       <div className="h-10 w-10 rounded-lg bg-gradient-to-br from-octg-bronze to-octg-gold flex items-center justify-center">
                         <Building2 className="h-5 w-5 text-white" />
                       </div>
                       <div>
-                        <h3 className="font-display text-xl font-bold">OCTG Marketing</h3>
+                        <h3 className="font-display text-xl font-bold">OCTG Marketing Services</h3>
                         <p className="text-sm text-muted-foreground">Full-Service Agency for Energy & Oil Gas</p>
                       </div>
                     </div>
@@ -281,6 +282,15 @@ export default function Contact() {
                       Explore Our Services
                       <ExternalLink className="h-4 w-4" />
                     </a>
+                  </div>
+                  
+                  {/* Right side - Image */}
+                  <div className="hidden lg:block lg:w-72 xl:w-80 flex-shrink-0">
+                    <img
+                      src="/images/octg-marketing-team.jpg"
+                      alt="OCTG Marketing Team"
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 </div>
               </div>
