@@ -38,6 +38,10 @@ import {
   GraduationCap,
   Sparkles,
   ExternalLink,
+  Store,
+  ShoppingBag,
+  PenTool,
+  LayoutGrid,
 } from "lucide-react";
 import heroOctg from "@/assets/hero-octg.jpg";
 
@@ -101,6 +105,10 @@ const marketingServices = [
   { icon: Presentation, label: "C-Level Presentations" },
   { icon: GraduationCap, label: "Training Videos & Systems" },
   { icon: Sparkles, label: "Branding & Consulting" },
+  { icon: Store, label: "Trade Show Design" },
+  { icon: ShoppingBag, label: "Merch" },
+  { icon: PenTool, label: "Signage" },
+  { icon: LayoutGrid, label: "Billboards" },
 ];
 
 const formSchema = z.object({
