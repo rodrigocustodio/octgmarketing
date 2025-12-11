@@ -181,23 +181,6 @@ export default function Contact() {
       <Header />
 
       <main className="min-h-screen bg-background">
-        {/* Hero Section */}
-        <section className="relative h-[400px] flex items-center justify-center overflow-hidden">
-          <div
-            className="absolute inset-0 bg-cover bg-center"
-            style={{ backgroundImage: `url(${heroOctg})` }}
-          />
-          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/95 to-background/70" />
-          <div className="relative z-10 container mx-auto px-4 text-center">
-            <h1 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight mb-4">
-              Get in Touch
-            </h1>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Connect with the leading source of OCTG industry intelligence. We're here to help you succeed.
-            </p>
-          </div>
-        </section>
-
         {/* Why OCTG Index Section */}
         <section className="relative py-20 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden">
           {/* Background Image */}
