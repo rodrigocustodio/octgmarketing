@@ -105,80 +105,114 @@ export function NewsletterSignup() {
   };
 
   return (
-    <section className="relative perspective-1000">
-      <div
-        className={`relative transition-transform duration-700 transform-style-3d ${
-          isSubscribed ? "rotate-y-180" : ""
-        }`}
-      >
-        {/* Front - Subscribe Form */}
-        <div
-          className={`bg-gradient-card border border-border rounded-lg p-8 sm:p-12 backface-hidden ${
-            isSubscribed ? "invisible" : ""
-          }`}
-        >
-          <div className="max-w-2xl mx-auto text-center">
-            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight mb-4">
-              Stay Informed
-            </h2>
-            <p className="text-muted-foreground mb-6">
-              Get the latest OCTG industry news, market analysis, and insights delivered to your inbox.
-            </p>
-            <form onSubmit={handleSubmit} className="flex flex-col gap-3 max-w-md mx-auto">
-              <div className="space-y-1">
-                <Input
-                  type="email"
-                  placeholder="Enter your email"
-                  value={email}
-                  onChange={(e) => {
-                    setEmail(e.target.value);
-                    if (error) setError(null);
-                  }}
-                  variant="bronze"
-                  inputSize="lg"
-                  aria-invalid={!!error}
-                  aria-describedby={error ? "email-error" : undefined}
-                />
-                {error && (
-                  <p id="email-error" className="text-sm text-destructive">
-                    {error}
-                  </p>
-                )}
-              </div>
-              <Button type="submit" variant="bronze" size="lg" className="w-full" disabled={loading}>
-                {loading ? "Subscribing..." : "Subscribe"}
-              </Button>
-            </form>
-          </div>
+    <section className="bg-gradient-card border border-border rounded-lg p-8 sm:p-12">
+      <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+        {/* Left Column - Benefits */}
+        <div className="space-y-4">
+          <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight">
+            Stay Informed
+          </h2>
+          <p className="text-lg font-medium text-octg-gold">
+            Weekly Industry Intelligence
+          </p>
+          <p className="text-muted-foreground">
+            Join thousands of OCTG professionals who rely on our newsletter for the insights that drive better business decisions.
+          </p>
+          <ul className="space-y-2 text-muted-foreground">
+            <li className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-octg-gold flex-shrink-0" />
+              <span>Market trends & pricing analysis</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-octg-gold flex-shrink-0" />
+              <span>Breaking industry news</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-octg-gold flex-shrink-0" />
+              <span>Exclusive insights from experts</span>
+            </li>
+            <li className="flex items-center gap-2">
+              <Check className="w-4 h-4 text-octg-gold flex-shrink-0" />
+              <span>Event coverage & announcements</span>
+            </li>
+          </ul>
         </div>
 
-        {/* Back - Success State */}
-        <div
-          className={`absolute inset-0 bg-gradient-card border border-border rounded-lg p-8 sm:p-12 rotate-y-180 backface-hidden overflow-hidden ${
-            !isSubscribed ? "invisible" : ""
-          }`}
-        >
-          {/* Confetti container */}
-          {showConfetti && <Confetti />}
-          
-          <div className="max-w-2xl mx-auto text-center relative z-10 flex flex-col items-center justify-center h-full">
-            <div className="w-16 h-16 rounded-full bg-gradient-to-r from-octg-bronze via-octg-gold to-octg-copper flex items-center justify-center mb-4 animate-scale-in">
-              <Check className="w-8 h-8 text-white" />
+        {/* Right Column - Form with Flip Animation */}
+        <div className="relative perspective-1000">
+          <div
+            className={`relative transition-transform duration-700 transform-style-3d ${
+              isSubscribed ? "rotate-y-180" : ""
+            }`}
+          >
+            {/* Front - Subscribe Form */}
+            <div
+              className={`bg-card/50 border border-border/50 rounded-lg p-6 backface-hidden ${
+                isSubscribed ? "invisible" : ""
+              }`}
+            >
+              <h3 className="font-display text-xl font-semibold mb-2 text-center">
+                Subscribe Now
+              </h3>
+              <p className="text-sm text-muted-foreground mb-4 text-center">
+                Get insights delivered to your inbox.
+              </p>
+              <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+                <div className="space-y-1">
+                  <Input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (error) setError(null);
+                    }}
+                    variant="bronze"
+                    inputSize="lg"
+                    aria-invalid={!!error}
+                    aria-describedby={error ? "email-error" : undefined}
+                  />
+                  {error && (
+                    <p id="email-error" className="text-sm text-destructive">
+                      {error}
+                    </p>
+                  )}
+                </div>
+                <Button type="submit" variant="bronze" size="lg" className="w-full" disabled={loading}>
+                  {loading ? "Subscribing..." : "Subscribe"}
+                </Button>
+              </form>
             </div>
-            
-            <div className="flex items-center gap-2 mb-2">
-              <Sparkles className="w-5 h-5 text-octg-gold" />
-              <span className="text-sm font-medium text-octg-gold uppercase tracking-wider">You're In!</span>
-              <Sparkles className="w-5 h-5 text-octg-gold" />
+
+            {/* Back - Success State */}
+            <div
+              className={`absolute inset-0 bg-card/50 border border-border/50 rounded-lg p-6 rotate-y-180 backface-hidden overflow-hidden ${
+                !isSubscribed ? "invisible" : ""
+              }`}
+            >
+              {/* Confetti container */}
+              {showConfetti && <Confetti />}
+              
+              <div className="relative z-10 flex flex-col items-center justify-center h-full text-center">
+                <div className="w-14 h-14 rounded-full bg-gradient-to-r from-octg-bronze via-octg-gold to-octg-copper flex items-center justify-center mb-4 animate-scale-in">
+                  <Check className="w-7 h-7 text-white" />
+                </div>
+                
+                <div className="flex items-center gap-2 mb-2">
+                  <Sparkles className="w-4 h-4 text-octg-gold" />
+                  <span className="text-sm font-medium text-octg-gold uppercase tracking-wider">You're In!</span>
+                  <Sparkles className="w-4 h-4 text-octg-gold" />
+                </div>
+                
+                <h3 className="font-display text-xl font-semibold mb-2">
+                  Welcome to OCTG Index Newsletter
+                </h3>
+                
+                <p className="text-sm text-muted-foreground">
+                  Expect industry insights and market analysis delivered to your inbox.
+                </p>
+              </div>
             </div>
-            
-            <h2 className="font-display text-2xl sm:text-3xl font-bold tracking-tight mb-3">
-              Welcome to OCTG Index Newsletter
-            </h2>
-            
-            <p className="text-muted-foreground">
-              Expect industry insights and market analysis delivered to your inbox.
-            </p>
           </div>
         </div>
       </div>
