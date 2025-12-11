@@ -14,7 +14,7 @@ const SUPABASE_SERVICE_ROLE_KEY = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
 const TITLE_PROMPT = `You are an SEO expert. Rewrite this article title for optimal SEO:
 
 REQUIREMENTS:
-- MAXIMUM 50 characters (strict limit - count carefully!)
+- 50-60 characters (strict limit - count carefully!)
 - Front-load the most important keyword
 - Use action verbs where possible  
 - Remove filler words (the, and, for, in, with, etc.)
@@ -32,10 +32,10 @@ Return ONLY the optimized title, nothing else.`;
 const SUBTITLE_PROMPT = `You are an SEO expert. Rewrite this meta description for optimal SEO:
 
 REQUIREMENTS:
-- EXACTLY 120-150 characters (strict range - count carefully!)
+- 150-160 characters exactly (strict range - count carefully!)
 - Include primary keyword within first 70 characters
 - Summarize the key news value concisely
-- Add a hook or benefit statement
+- Add a hook or benefit statement at the end
 - Make it compelling for search results
 - No quotes or special formatting
 
@@ -101,7 +101,7 @@ serve(async (req) => {
     let articlesToProcess: ArticleToProcess[] = [];
 
     if (mode === 'bulk') {
-      // Fetch all items with title > 60 chars or subtitle/excerpt not in range
+      // Fetch all items with title > 60 chars or subtitle/excerpt not in range (updated to 150-160)
       const { data, error } = await supabase
         .from(targetTable)
         .select(`id, title, ${subtitleField}`)
@@ -116,8 +116,8 @@ serve(async (req) => {
       })).filter((a: ArticleToProcess) => 
         a.title.length > 60 || 
         !a.subtitle || 
-        a.subtitle.length < 120 || 
-        a.subtitle.length > 155
+        a.subtitle.length < 150 || 
+        a.subtitle.length > 160
       );
     } else if (targetId) {
       const { data, error } = await supabase
@@ -145,7 +145,7 @@ serve(async (req) => {
         let newTitle = article.title;
         let newSubtitle = article.subtitle;
 
-        // Optimize title if needed
+        // Optimize title if needed (> 60 chars)
         if (article.title.length > 60) {
           console.log(`Optimizing title for article ${article.id}: "${article.title}" (${article.title.length} chars)`);
           
@@ -179,8 +179,8 @@ serve(async (req) => {
           }
         }
 
-        // Optimize subtitle if needed
-        if (!article.subtitle || article.subtitle.length < 120 || article.subtitle.length > 155) {
+        // Optimize subtitle if needed (not in 150-160 range)
+        if (!article.subtitle || article.subtitle.length < 150 || article.subtitle.length > 160) {
           const subtitleContent = article.subtitle || article.title;
           console.log(`Optimizing subtitle for article ${article.id}`);
           
@@ -209,8 +209,8 @@ serve(async (req) => {
           newSubtitle = subtitleData.choices[0]?.message?.content?.trim() || article.subtitle;
           
           // Ensure subtitle is in range
-          if (newSubtitle && newSubtitle.length > 155) {
-            newSubtitle = newSubtitle.substring(0, 152) + '...';
+          if (newSubtitle && newSubtitle.length > 160) {
+            newSubtitle = newSubtitle.substring(0, 157) + '...';
           }
         }
 
