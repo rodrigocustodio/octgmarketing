@@ -199,29 +199,27 @@ export default function Contact() {
         </section>
 
         {/* Why OCTG Index Section */}
-        <section className="py-16 bg-muted/30 -mx-4 px-4 sm:-mx-6 sm:px-6 lg:-mx-8 lg:px-8">
-          <div className="container mx-auto">
-            <div className="grid lg:grid-cols-2 gap-12 items-center">
-              <div className="max-w-xl">
-                <h2 className="text-3xl font-bold text-foreground mb-6">
-                  Why OCTG Index Exists
-                </h2>
-                <p className="text-muted-foreground text-lg leading-relaxed mb-4">
-                  OCTG Index is the leading news and intelligence platform serving the global Energy sector, providing comprehensive coverage of Oil & Gas, Solar, and OCTG Supply Chain Management industries.
-                </p>
-                <p className="text-muted-foreground text-lg leading-relaxed">
-                  Our platform features an extensive OCTG Product directory with detailed technical specifications, a company database profiling over 200 industry players with their operations and contact information, and a Global CEO Leadership directory connecting executives and decision-makers across the worldwide OCTG ecosystem. We deliver real-time market intelligence, industry analysis, and event coverage to professionals driving the future of energy.
-                </p>
-              </div>
-              <div className="relative flex justify-center lg:justify-end">
-                <div className="aspect-[16/10] rounded-xl overflow-hidden shadow-xl bg-muted max-w-md w-full">
-                  <img
-                    src="/images/bg-octg-index.jpg"
-                    alt="OCTG Index Platform Overview"
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-              </div>
+        <section className="relative py-20 -mx-4 sm:-mx-6 lg:-mx-8 overflow-hidden">
+          {/* Background Image */}
+          <div
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url('/images/bg-octg-index.jpg')` }}
+          />
+          {/* Gradient Overlay - dark on left, revealing image on right */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/40" />
+          
+          {/* Content */}
+          <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-xl">
+              <h2 className="text-3xl font-bold text-foreground mb-6">
+                Why OCTG Index Exists
+              </h2>
+              <p className="text-muted-foreground text-lg leading-relaxed mb-4">
+                OCTG Index is the leading news and intelligence platform serving the global Energy sector, providing comprehensive coverage of Oil & Gas, Solar, and OCTG Supply Chain Management industries.
+              </p>
+              <p className="text-muted-foreground text-lg leading-relaxed">
+                Our platform features an extensive OCTG Product directory with detailed technical specifications, a company database profiling over 200 industry players with their operations and contact information, and a Global CEO Leadership directory connecting executives and decision-makers across the worldwide OCTG ecosystem. We deliver real-time market intelligence, industry analysis, and event coverage to professionals driving the future of energy.
+              </p>
             </div>
           </div>
         </section>
@@ -260,7 +258,7 @@ export default function Contact() {
                     <p className="text-muted-foreground mb-4">
                       OCTG Index is part of OCTG Marketing — a full-service agency supporting Energy, Oil & Gas companies with their Marketing and Creative needs.
                     </p>
-                    <div className="flex flex-wrap gap-2">
+                    <div className="flex flex-wrap gap-2 mb-6">
                       {marketingServices.map((service) => {
                         const Icon = service.icon;
                         return (
@@ -274,8 +272,6 @@ export default function Contact() {
                         );
                       })}
                     </div>
-                  </div>
-                  <div className="flex-shrink-0">
                     <a
                       href="https://octgmarketing.com"
                       target="_blank"
