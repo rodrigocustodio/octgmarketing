@@ -101,17 +101,21 @@ export function Footer() {
             </ul>
           </div>
         </div>
-        <div className="mt-12 pt-8 border-t border-border flex flex-col sm:flex-row justify-between items-center gap-4">
-          <div className="flex items-center gap-2">
-            <img src={pipeIcon} alt="" className="h-8 w-8" />
-            <span className="font-display font-bold tracking-tight">OCTG Index</span>
+        <div className="mt-12 pt-8 border-t border-border">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+            <div className="flex items-center gap-2">
+              <img src={pipeIcon} alt="" className="h-8 w-8" />
+              <span className="font-display font-bold tracking-tight">OCTG Index</span>
+            </div>
+            <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 text-sm text-muted-foreground">
+              <span>info@octgindex.com</span>
+              <span>Houston, Texas, USA</span>
+              <span>Global Coverage</span>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              © {new Date().getFullYear()} OCTG Index. All rights reserved.
+            </p>
           </div>
-          <p className="text-xs text-muted-foreground">
-            OCTG Marketing Group
-          </p>
-          <p className="text-sm text-muted-foreground">
-            © {new Date().getFullYear()} OCTG Index. All rights reserved.
-          </p>
         </div>
       </div>
     </footer>
