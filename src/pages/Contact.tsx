@@ -339,7 +339,7 @@ export default function Contact() {
             }}
           />
           {/* Dark overlay for text readability */}
-          <div className="absolute inset-0 z-0 bg-background/60 dark:bg-background/70" />
+          <div className="absolute inset-0 z-0 bg-background/95 dark:bg-background/98" />
           <div className="container mx-auto px-4 relative z-10">
             <div className="max-w-4xl mx-auto">
               {isSubmitted ? (
@@ -455,50 +455,6 @@ export default function Contact() {
                   </CardContent>
                 </Card>
               )}
-            </div>
-          </div>
-        </section>
-
-        {/* Quick Contact Info */}
-        <section className="py-16">
-          <div className="container mx-auto px-4">
-            <div className="grid md:grid-cols-3 gap-8 max-w-4xl mx-auto">
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <Mail className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Email Us</h3>
-                  <a
-                    href="mailto:info@octgindex.com"
-                    className="text-primary hover:underline"
-                  >
-                    info@octgindex.com
-                  </a>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <Globe className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Global Coverage</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Americas, Europe, Asia-Pacific, Middle East, Africa, Australia
-                  </p>
-                </CardContent>
-              </Card>
-              <Card className="text-center">
-                <CardContent className="pt-6">
-                  <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-4">
-                    <MapPin className="h-6 w-6 text-primary" />
-                  </div>
-                  <h3 className="font-semibold mb-2">Headquarters</h3>
-                  <p className="text-muted-foreground text-sm">
-                    Houston, Texas, USA
-                  </p>
-                </CardContent>
-              </Card>
             </div>
           </div>
         </section>
