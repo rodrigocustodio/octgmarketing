@@ -1,16 +1,21 @@
-import { useEditorialSuggestions, useUpdateSuggestionStatus, useGenerateTopicSuggestions } from "@/hooks/useEditorialStats";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useEditorialSuggestions, useUpdateSuggestionStatus, useGenerateTopicSuggestions, useGenerateArticleFromSuggestion } from "@/hooks/useEditorialStats";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Lightbulb, Sparkles, Check, X, Loader2, TrendingUp, Target } from "lucide-react";
+import { Lightbulb, Sparkles, Check, X, Loader2, TrendingUp, Target, FileText } from "lucide-react";
 import { toast } from "sonner";
 import { cn } from "@/lib/utils";
 
 export default function TopicSuggestions() {
+  const navigate = useNavigate();
+  const [generatingId, setGeneratingId] = useState<string | null>(null);
   const { data: suggestions, isLoading } = useEditorialSuggestions();
   const updateStatus = useUpdateSuggestionStatus();
   const generateSuggestions = useGenerateTopicSuggestions();
+  const generateArticle = useGenerateArticleFromSuggestion();
 
   const handleGenerate = async () => {
     try {
@@ -28,6 +33,24 @@ export default function TopicSuggestions() {
       toast.success(`Suggestion marked as ${status}`);
     } catch (error) {
       toast.error("Failed to update suggestion");
+    }
+  };
+
+  const handleGenerateArticle = async (suggestion: { id: string; title: string; description?: string | null }) => {
+    setGeneratingId(suggestion.id);
+    try {
+      const result = await generateArticle.mutateAsync({
+        id: suggestion.id,
+        title: suggestion.title,
+        description: suggestion.description || undefined,
+      });
+      toast.success("Article draft generated!");
+      navigate(`/admin/drafts/${result.draftId}`);
+    } catch (error) {
+      toast.error("Failed to generate article");
+      console.error(error);
+    } finally {
+      setGeneratingId(null);
     }
   };
 
@@ -131,10 +154,25 @@ export default function TopicSuggestions() {
                   </div>
                   <div className="flex gap-2">
                     <Button
+                      size="sm"
+                      variant="default"
+                      className="h-8"
+                      onClick={() => handleGenerateArticle(suggestion)}
+                      disabled={generatingId !== null}
+                    >
+                      {generatingId === suggestion.id ? (
+                        <Loader2 className="h-4 w-4 animate-spin mr-1" />
+                      ) : (
+                        <FileText className="h-4 w-4 mr-1" />
+                      )}
+                      {generatingId === suggestion.id ? "Generating..." : "Generate"}
+                    </Button>
+                    <Button
                       size="icon"
                       variant="ghost"
                       className="h-8 w-8 text-green-600 hover:text-green-700 hover:bg-green-500/10"
                       onClick={() => handleStatusUpdate(suggestion.id, "used")}
+                      disabled={generatingId !== null}
                       aria-label="Mark as used"
                     >
                       <Check className="h-4 w-4" />
@@ -144,6 +182,7 @@ export default function TopicSuggestions() {
                       variant="ghost"
                       className="h-8 w-8 text-destructive hover:text-destructive hover:bg-destructive/10"
                       onClick={() => handleStatusUpdate(suggestion.id, "dismissed")}
+                      disabled={generatingId !== null}
                       aria-label="Dismiss suggestion"
                     >
                       <X className="h-4 w-4" />

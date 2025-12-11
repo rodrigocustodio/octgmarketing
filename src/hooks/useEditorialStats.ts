@@ -241,12 +241,59 @@ export function useUpdateSuggestionStatus() {
 
 export function useGenerateTopicSuggestions() {
   const queryClient = useQueryClient();
-  
+
   return useMutation({
     mutationFn: async () => {
       const { data, error } = await supabase.functions.invoke("generate-topic-suggestions");
       if (error) throw error;
       return data;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["editorial-suggestions"] });
+    },
+  });
+}
+
+export function useGenerateArticleFromSuggestion() {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({ id, title, description }: { id: string; title: string; description?: string }) => {
+      const content = `Topic: ${title}\n\n${description || "Write a comprehensive article about this topic."}`;
+      
+      const { data, error } = await supabase.functions.invoke("generate-article-from-content", {
+        body: { content, source_name: "Editorial Suggestion" },
+      });
+      
+      if (error) throw error;
+      if (!data?.success) throw new Error(data?.error || "Failed to generate article");
+
+      // Insert the generated article as a draft
+      const { data: draft, error: draftError } = await supabase
+        .from("draft_articles")
+        .insert({
+          title: data.title,
+          slug: data.slug,
+          excerpt: data.excerpt,
+          body_markdown: data.body,
+          suggested_topic_ids: data.topics,
+          suggested_company_ids: data.companies,
+          region_id: data.region_id,
+          tags: data.tags,
+          status: "pending_review",
+        })
+        .select("id")
+        .single();
+
+      if (draftError) throw draftError;
+
+      // Mark the suggestion as used
+      await supabase
+        .from("editorial_suggestions")
+        .update({ status: "used" })
+        .eq("id", id);
+
+      return { draftId: draft.id };
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["editorial-suggestions"] });
