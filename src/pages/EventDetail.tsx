@@ -22,14 +22,15 @@ import {
 import { EventGalleryLightbox } from "@/components/events/EventGalleryLightbox";
 import { useEvent } from "@/hooks/useEvents";
 import { getVideoEmbed } from "@/lib/video-utils";
+import { parseLocalDate } from "@/lib/utils";
 import { format } from "date-fns";
 
 function formatEventDate(startDate: string, endDate: string | null): string {
-  const start = new Date(startDate);
+  const start = parseLocalDate(startDate);
   if (!endDate) {
     return format(start, "MMMM d, yyyy");
   }
-  const end = new Date(endDate);
+  const end = parseLocalDate(endDate);
   if (start.getMonth() === end.getMonth() && start.getFullYear() === end.getFullYear()) {
     return `${format(start, "MMMM d")}–${format(end, "d, yyyy")}`;
   }
@@ -37,7 +38,7 @@ function formatEventDate(startDate: string, endDate: string | null): string {
 }
 
 function isUpcoming(startDate: string): boolean {
-  return new Date(startDate) >= new Date(new Date().toDateString());
+  return parseLocalDate(startDate) >= new Date(new Date().toDateString());
 }
 
 const EventDetail = () => {
