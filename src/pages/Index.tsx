@@ -322,10 +322,20 @@ const Index = () => {
         {/* SECTION 5: Quick Reads Grid */}
         <QuickReadsGrid articles={finalQuickReadsArticles} />
 
-        {/* Newsletter CTA */}
-        <div className="container py-12 sm:py-16">
-          <NewsletterSignup />
-        </div>
+        {/* Newsletter CTA with Background Image */}
+        <section className="relative overflow-hidden">
+          {/* Background Image */}
+          <div 
+            className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+            style={{ backgroundImage: `url('/images/newsletter-bg.jpg')` }}
+          />
+          {/* Dark Gradient Overlay */}
+          <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/60" />
+          {/* Content Container */}
+          <div className="relative z-10 container py-12 sm:py-16">
+            <NewsletterSignup />
+          </div>
+        </section>
       </main>
 
         <Footer />
