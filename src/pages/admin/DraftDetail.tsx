@@ -58,6 +58,23 @@ const statusColors = {
   rejected: "bg-red-500/20 text-red-500 border-red-500/30",
 };
 
+// Author assignment based on region (per memory: features/article-author-regional-assignment-strategy)
+const REGION_AUTHOR_MAP: Record<string, string> = {
+  'americas': 'bfc3c93c-25b5-4d3c-b29e-697022214856', // Maria Oliveira
+  'europe': '828baef1-ceb9-4513-98e8-50b4fe9ac732',   // Franklin Clarke
+  'australia': '828baef1-ceb9-4513-98e8-50b4fe9ac732', // Franklin Clarke
+  'africa': '828baef1-ceb9-4513-98e8-50b4fe9ac732',   // Franklin Clarke
+  'middle-east': '83af1633-e44b-4d8a-9282-5a6f40840a67', // Oliver Duncan
+  'asia-pacific': '83af1633-e44b-4d8a-9282-5a6f40840a67', // Oliver Duncan
+};
+
+const getAuthorIdByRegion = (regionId: string, regions: { id: string; slug: string }[] | undefined): string | null => {
+  if (!regions) return null;
+  const region = regions.find(r => r.id === regionId);
+  if (!region) return null;
+  return REGION_AUTHOR_MAP[region.slug] || null;
+};
+
 const DraftDetail = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -310,6 +327,9 @@ const DraftDetail = () => {
       if (draftError) throw draftError;
 
       // Create new article in main articles table with the CDN image
+      // Auto-assign author based on region
+      const authorId = getAuthorIdByRegion(selectedRegionId, regions);
+      
       const { data: newArticle, error: articleError } = await supabase
         .from("articles")
         .insert({
@@ -319,6 +339,7 @@ const DraftDetail = () => {
           body: draft.body_markdown,
           hero_image_url: finalImageUrl,
           region_id: selectedRegionId,
+          author_id: authorId,
           status: "published",
           publish_date: new Date().toISOString(),
         })

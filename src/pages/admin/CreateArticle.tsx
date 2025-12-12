@@ -33,6 +33,23 @@ interface GeneratedArticle {
   suggested_company_ids: string[];
 }
 
+// Author assignment based on region (per memory: features/article-author-regional-assignment-strategy)
+const REGION_AUTHOR_MAP: Record<string, string> = {
+  'americas': 'bfc3c93c-25b5-4d3c-b29e-697022214856', // Maria Oliveira
+  'europe': '828baef1-ceb9-4513-98e8-50b4fe9ac732',   // Franklin Clarke
+  'australia': '828baef1-ceb9-4513-98e8-50b4fe9ac732', // Franklin Clarke
+  'africa': '828baef1-ceb9-4513-98e8-50b4fe9ac732',   // Franklin Clarke
+  'middle-east': '83af1633-e44b-4d8a-9282-5a6f40840a67', // Oliver Duncan
+  'asia-pacific': '83af1633-e44b-4d8a-9282-5a6f40840a67', // Oliver Duncan
+};
+
+const getAuthorIdByRegion = (regionId: string | null, regions: { id: string; slug: string }[]): string | null => {
+  if (!regionId || !regions) return null;
+  const region = regions.find(r => r.id === regionId);
+  if (!region) return null;
+  return REGION_AUTHOR_MAP[region.slug] || null;
+};
+
 export default function CreateArticle() {
   const navigate = useNavigate();
   const { toast } = useToast();
@@ -135,6 +152,9 @@ export default function CreateArticle() {
   // Publish article mutation
   const publishMutation = useMutation({
     mutationFn: async (status: "draft" | "published") => {
+      // Auto-assign author based on region
+      const authorId = getAuthorIdByRegion(regionId, regions);
+      
       // Insert article
       const { data: article, error: articleError } = await supabase
         .from("articles")
@@ -144,6 +164,7 @@ export default function CreateArticle() {
           body: bodyMarkdown,
           slug,
           region_id: regionId,
+          author_id: authorId,
           hero_image_url: heroImageUrl,
           status,
           publish_date: status === "published" ? new Date().toISOString() : null,

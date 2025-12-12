@@ -43,6 +43,23 @@ import {
 } from "@/components/ui/alert-dialog";
 import { ContentGallery } from "@/components/admin/ContentGallery";
 
+// Author assignment based on region (per memory: features/article-author-regional-assignment-strategy)
+const REGION_AUTHOR_MAP: Record<string, string> = {
+  'americas': 'bfc3c93c-25b5-4d3c-b29e-697022214856', // Maria Oliveira
+  'europe': '828baef1-ceb9-4513-98e8-50b4fe9ac732',   // Franklin Clarke
+  'australia': '828baef1-ceb9-4513-98e8-50b4fe9ac732', // Franklin Clarke
+  'africa': '828baef1-ceb9-4513-98e8-50b4fe9ac732',   // Franklin Clarke
+  'middle-east': '83af1633-e44b-4d8a-9282-5a6f40840a67', // Oliver Duncan
+  'asia-pacific': '83af1633-e44b-4d8a-9282-5a6f40840a67', // Oliver Duncan
+};
+
+const getAuthorIdByRegion = (regionId: string | null, regions: { id: string; slug: string }[] | undefined): string | null => {
+  if (!regionId || !regions) return null;
+  const region = regions.find(r => r.id === regionId);
+  if (!region) return null;
+  return REGION_AUTHOR_MAP[region.slug] || null;
+};
+
 const ArticleEdit = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -206,6 +223,9 @@ const ArticleEdit = () => {
   // Save mutation
   const saveMutation = useMutation({
     mutationFn: async () => {
+      // Auto-assign author based on region if article doesn't have one
+      const authorId = article?.author_id || getAuthorIdByRegion(formData.region_id, regions);
+      
       const articleData = {
         title: formData.title,
         slug: formData.slug || generateSlug(formData.title),
@@ -214,6 +234,7 @@ const ArticleEdit = () => {
         status: formData.status,
         region_id: formData.region_id || null,
         hero_image_url: formData.hero_image_url || null,
+        author_id: authorId,
         publish_date: formData.status !== "draft" ? new Date().toISOString() : null,
       };
 
