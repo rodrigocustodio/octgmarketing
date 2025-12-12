@@ -6,7 +6,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { 
   Calendar, 
   MapPin, 
@@ -20,6 +19,7 @@ import {
   Play
 } from "lucide-react";
 import { EventGalleryLightbox } from "@/components/events/EventGalleryLightbox";
+import { EventArticlesCard } from "@/components/events/EventArticlesCard";
 import { useEvent } from "@/hooks/useEvents";
 import { getVideoEmbed } from "@/lib/video-utils";
 import { parseLocalDate, optimizeImageUrl } from "@/lib/utils";
@@ -333,6 +333,11 @@ const EventDetail = () => {
                     </CardContent>
                   </Card>
                 )}
+
+                {/* Event Coverage Articles */}
+                <EventArticlesCard eventId={event.id} eventName={event.name} />
+
+                {/* Event Gallery - in sidebar */}
 
                 {/* Event Gallery - in sidebar */}
                 {event.gallery_images && event.gallery_images.length > 0 && (

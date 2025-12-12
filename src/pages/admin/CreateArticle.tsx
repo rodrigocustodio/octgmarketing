@@ -66,6 +66,7 @@ export default function CreateArticle() {
   const [bodyMarkdown, setBodyMarkdown] = useState("");
   const [slug, setSlug] = useState("");
   const [regionId, setRegionId] = useState<string | null>(null);
+  const [eventId, setEventId] = useState<string | null>(null);
   const [selectedTopicIds, setSelectedTopicIds] = useState<string[]>([]);
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([]);
   const [heroImageUrl, setHeroImageUrl] = useState<string | undefined>();
@@ -96,6 +97,19 @@ export default function CreateArticle() {
     queryKey: ["companies"],
     queryFn: async () => {
       const { data, error } = await supabase.from("companies").select("*").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  // Fetch events
+  const { data: events = [] } = useQuery({
+    queryKey: ["events-for-select"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("id, name, start_date")
+        .order("start_date", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -168,6 +182,7 @@ export default function CreateArticle() {
           hero_image_url: heroImageUrl,
           status,
           publish_date: status === "published" ? new Date().toISOString() : null,
+          event_id: eventId,
         })
         .select("id")
         .single();
@@ -395,6 +410,31 @@ export default function CreateArticle() {
                       {regions.map((region) => (
                         <SelectItem key={region.id} value={region.id}>
                           {region.name}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </CardContent>
+              </Card>
+
+              {/* Related Event */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Related Event</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Select
+                    value={eventId || "none"}
+                    onValueChange={(value) => setEventId(value === "none" ? null : value)}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select event (optional)" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="none">No event</SelectItem>
+                      {events.map((event) => (
+                        <SelectItem key={event.id} value={event.id}>
+                          {event.name}
                         </SelectItem>
                       ))}
                     </SelectContent>

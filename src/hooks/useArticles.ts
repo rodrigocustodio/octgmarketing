@@ -440,3 +440,29 @@ export function useHomepageArticles() {
     gcTime: 5 * 60 * 1000, // Keep in cache for 5 minutes
   });
 }
+
+// Fetch articles linked to a specific event
+export function useArticlesByEventId(eventId: string, limit: number = 10) {
+  return useQuery({
+    queryKey: ["articles-by-event", eventId, limit],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("articles")
+        .select(`
+          id,
+          title,
+          slug,
+          publish_date,
+          region:regions(id, name, slug)
+        `)
+        .eq("event_id", eventId)
+        .in("status", ["published", "featured"])
+        .order("publish_date", { ascending: false })
+        .limit(limit);
+
+      if (error) throw error;
+      return data;
+    },
+    enabled: !!eventId,
+  });
+}

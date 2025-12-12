@@ -109,6 +109,7 @@ export type Database = {
           author_id: string | null
           body: string | null
           created_at: string
+          event_id: string | null
           hero_image_url: string | null
           id: string
           publish_date: string | null
@@ -123,6 +124,7 @@ export type Database = {
           author_id?: string | null
           body?: string | null
           created_at?: string
+          event_id?: string | null
           hero_image_url?: string | null
           id?: string
           publish_date?: string | null
@@ -137,6 +139,7 @@ export type Database = {
           author_id?: string | null
           body?: string | null
           created_at?: string
+          event_id?: string | null
           hero_image_url?: string | null
           id?: string
           publish_date?: string | null
@@ -153,6 +156,13 @@ export type Database = {
             columns: ["author_id"]
             isOneToOne: false
             referencedRelation: "authors"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "articles_event_id_fkey"
+            columns: ["event_id"]
+            isOneToOne: false
+            referencedRelation: "events"
             referencedColumns: ["id"]
           },
           {
