@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { MapPin, Globe } from "lucide-react";
+import { MapPin, Globe, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface CompanySpotlightCardProps {
@@ -16,42 +16,51 @@ export function CompanySpotlightCard({
   website 
 }: CompanySpotlightCardProps) {
   return (
-    <div className="my-8 rounded-xl bg-muted/50 p-6 not-prose text-center">
-      {/* Company name as main title */}
-      <h4 className="font-display text-xl font-bold text-foreground mb-3">
-        {name}
-      </h4>
+    <div className="my-8 flex w-full rounded-xl shadow-lg overflow-hidden border border-border bg-muted hover:shadow-xl transition-shadow duration-300 not-prose">
       
-      {/* Details - centered with inline icons */}
-      <div className="space-y-1.5 text-sm text-muted-foreground mb-4">
-        {headquarters && (
-          <div className="flex items-center justify-center gap-1.5">
-            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
-            <span>{headquarters}</span>
-          </div>
-        )}
-        
-        {website && (
-          <div className="flex items-center justify-center gap-1.5">
-            <Globe className="h-3.5 w-3.5 flex-shrink-0" />
-            <a 
-              href={website.startsWith('http') ? website : `https://${website}`}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hover:text-accent hover:underline"
-            >
-              {website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
-            </a>
-          </div>
-        )}
+      {/* Left accent bar */}
+      <div className="w-1.5 bg-accent flex-shrink-0" />
+
+      {/* Main content */}
+      <div className="flex-1 p-6 flex flex-col justify-between">
+        <div>
+          {/* Company name */}
+          <h3 className="text-2xl font-bold text-foreground mb-2 tracking-tight">
+            {name}
+          </h3>
+
+          {/* Location */}
+          {headquarters && (
+            <div className="flex items-center text-muted-foreground mb-2">
+              <MapPin className="w-4 h-4 mr-2 text-accent" />
+              <span className="text-sm font-medium">{headquarters}</span>
+            </div>
+          )}
+
+          {/* Website */}
+          {website && (
+            <div className="flex items-center text-muted-foreground mb-6">
+              <Globe className="w-4 h-4 mr-2 text-accent" />
+              <a 
+                href={website.startsWith('http') ? website : `https://${website}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-sm font-medium hover:text-accent transition-colors"
+              >
+                {website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
+              </a>
+            </div>
+          )}
+        </div>
+
+        {/* Action button with animated arrow */}
+        <Button asChild className="w-full group bg-accent hover:bg-accent/90 text-accent-foreground">
+          <Link to={`/directory/company/${slug}`} className="flex items-center justify-center gap-2">
+            <span>View Company Profile</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+          </Link>
+        </Button>
       </div>
-      
-      {/* Full-width accent button */}
-      <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
-        <Link to={`/directory/company/${slug}`}>
-          View Company Profile
-        </Link>
-      </Button>
     </div>
   );
 }
