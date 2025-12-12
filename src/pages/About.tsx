@@ -26,21 +26,25 @@ const About = () => {
       name: "Rodrigo Santos",
       title: "CEO & Founder",
       bio: "Leading OCTG Index's mission to provide comprehensive industry intelligence to energy professionals worldwide.",
+      photo: "/images/team/rodrigo-santos.jpg",
     },
     {
       name: "Franklin Clarke",
       title: "Regional Coverage Director",
       bio: "Overseeing coverage across Europe, Australia, and Africa with deep expertise in global OCTG markets.",
+      photo: "/images/team/franklin-clarke.jpg",
     },
     {
       name: "Oliver Duncan",
       title: "Events & Calendar Director",
       bio: "Managing event coverage and industry calendar for Middle East and Asia-Pacific regions.",
+      photo: "/images/team/oliver-duncan.jpg",
     },
     {
       name: "Maria Oliveira",
       title: "Americas Correspondent",
       bio: "Providing in-depth coverage of North and South American OCTG markets and developments.",
+      photo: "/images/team/maria-oliveira.jpg",
     },
   ];
 
@@ -208,8 +212,12 @@ const About = () => {
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {teamMembers.map((member) => (
                 <div key={member.name} className="bg-card border border-border rounded-xl p-6">
-                  <div className="w-16 h-16 bg-accent/10 rounded-full flex items-center justify-center mb-4 mx-auto">
-                    <Users className="h-8 w-8 text-accent" />
+                  <div className="w-24 h-24 rounded-xl overflow-hidden mb-4 mx-auto">
+                    <img 
+                      src={member.photo} 
+                      alt={member.name}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                   <h3 className="font-display font-semibold text-center mb-1">{member.name}</h3>
                   <p className="text-sm text-accent text-center mb-3">{member.title}</p>
