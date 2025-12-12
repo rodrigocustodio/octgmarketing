@@ -137,15 +137,15 @@ const Index = () => {
     return { finalAnalysisArticles, finalQuickReadsArticles };
   }, [articles, usedIds]);
 
-  // Organization + WebSite Schema for SEO (Google SERP optimization)
+  // Organization + WebSite Schema for SEO - NewsMediaOrganization for news-first positioning
   const organizationSchema = {
     "@context": "https://schema.org",
-    "@type": "Organization",
+    "@type": ["Organization", "NewsMediaOrganization"],
     "@id": "https://octgindex.com/#organization",
     "name": "OCTG Index",
     "url": "https://octgindex.com",
     "logo": "https://octgindex.com/favicon.svg",
-    "description": "Global OCTG industry intelligence platform covering pricing, companies, CEOs, supply chain and market data.",
+    "description": "OCTG Index is a global energy industry news platform covering OCTG markets, supply chains, pricing intelligence, and major energy events worldwide.",
     "foundingDate": "2024",
     "address": {
       "@type": "PostalAddress",
@@ -158,6 +158,7 @@ const Index = () => {
       "email": "info@octgindex.com",
       "contactType": "customer service"
     },
+    "publishingPrinciples": "https://octgindex.com/editorial-policy",
     "sameAs": [
       "https://twitter.com/OCTGMarketing"
     ]
@@ -169,7 +170,7 @@ const Index = () => {
     "@id": "https://octgindex.com/#website",
     "name": "OCTG Index",
     "url": "https://octgindex.com",
-    "description": "Global OCTG industry intelligence platform covering pricing, companies, CEOs, supply chain and market data.",
+    "description": "OCTG Index is a global energy industry news platform covering OCTG markets, supply chains, pricing intelligence, and major energy events worldwide.",
     "publisher": {
       "@id": "https://octgindex.com/#organization"
     },
@@ -183,8 +184,8 @@ const Index = () => {
   return (
     <>
       <SEOHead
-        title="OCTG Index | Oil Country Tubular Goods Industry News & Analysis"
-        description="OCTG Index is the #1 source for oil country tubular goods news, pricing data, 200+ company profiles, CEO directory, and 60+ industry events. Updated daily."
+        title="OCTG Index | Energy Industry News & Market Intelligence"
+        description="OCTG Index is a global energy industry news platform covering OCTG markets, supply chains, pricing intelligence, and major energy events worldwide."
         canonical="https://octgindex.com"
       />
       
@@ -200,6 +201,13 @@ const Index = () => {
       
       <div className="min-h-screen bg-background">
         <Header />
+        
+        {/* Entity Declaration - Visible text for Google to understand site identity */}
+        <div className="container pt-6 pb-2">
+          <p className="text-center text-muted-foreground text-sm md:text-base max-w-4xl mx-auto">
+            OCTG Index is a global energy industry news platform covering OCTG markets, supply chains, pricing intelligence, and major energy events worldwide.
+          </p>
+        </div>
       
       <main>
         {/* Hero Section - Optimized for LCP */}

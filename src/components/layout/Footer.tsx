@@ -1,6 +1,7 @@
 import { Link } from "react-router-dom";
 import pipeIcon from "@/assets/logo-side-icon.png";
 
+// Footer links organized by NEWS-FIRST strategy priority
 const footerLinks = {
   news: [
     { name: "All News", href: "/news" },
@@ -11,19 +12,15 @@ const footerLinks = {
     { name: "Asia-Pacific", href: "/region/asia-pacific" },
     { name: "Australia", href: "/region/australia" },
   ],
-  products: [
-    { name: "All Products", href: "/octg-directory" },
-    { name: "Pipe Types", href: "/octg-directory/pipe-types" },
-    { name: "Material Grades", href: "/octg-directory/grades" },
-    { name: "Connections", href: "/octg-directory/connections" },
-    { name: "Accessories", href: "/octg-directory/accessories" },
-  ],
-  directories: [
-    { name: "Company Directory", href: "/directory" },
-    { name: "CEO Directory", href: "/ceo-directory" },
-    { name: "Product Directory", href: "/octg-directory" },
+  events: [
     { name: "Events Calendar", href: "/events" },
     { name: "Market Prices", href: "/pricing-index" },
+    { name: "All Topics", href: "/topics" },
+  ],
+  directory: [
+    { name: "Company Directory", href: "/directory" },
+    { name: "Product Directory", href: "/octg-directory" },
+    { name: "Global Leaders", href: "/ceo-directory" },
   ],
   connect: [
     { name: "Contact Us", href: "/contact" },
@@ -56,9 +53,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Products</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Events & Market</h4>
             <ul className="space-y-2">
-              {footerLinks.products.map((link) => (
+              {footerLinks.events.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.name}
@@ -68,9 +65,9 @@ export function Footer() {
             </ul>
           </div>
           <div>
-            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Directories</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Directory</h4>
             <ul className="space-y-2">
-              {footerLinks.directories.map((link) => (
+              {footerLinks.directory.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.name}
@@ -106,19 +103,17 @@ export function Footer() {
         </div>
         <div className="mt-12 pt-8 border-t border-border">
           <div className="grid lg:grid-cols-3 gap-8 mb-8">
-            {/* Logo + Company Description for E-E-A-T */}
+            {/* Logo + Company Description for E-E-A-T - News-first positioning */}
             <div className="lg:col-span-2">
               <div className="flex items-center gap-2 mb-3">
                 <img src={pipeIcon} alt="OCTG Index logo" className="h-8 w-8" />
                 <span className="font-display font-bold tracking-tight">OCTG Index</span>
               </div>
               <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
-                OCTG Index is the leading news and intelligence platform for the global 
-                Oil Country Tubular Goods industry. Founded in 2024 in Houston, Texas, 
-                we provide comprehensive coverage of market trends, company developments, 
-                pricing intelligence, and industry events to energy professionals worldwide. 
-                Our editorial team delivers accurate, timely reporting across all major 
-                oil and gas markets.
+                OCTG Index is a global energy industry news platform covering OCTG markets, 
+                supply chains, pricing intelligence, and major energy events worldwide. 
+                Founded in 2024 in Houston, Texas, our editorial team delivers accurate, 
+                timely reporting across all major oil and gas markets to energy professionals globally.
               </p>
             </div>
             

@@ -45,6 +45,26 @@
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap"
     },
     {
+      "source": "/sitemap-index.xml",
+      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=index"
+    },
+    {
+      "source": "/sitemap-news.xml",
+      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=news"
+    },
+    {
+      "source": "/sitemap-events.xml",
+      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=events"
+    },
+    {
+      "source": "/sitemap-directory.xml",
+      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=directory"
+    },
+    {
+      "source": "/sitemap-pages.xml",
+      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=pages"
+    },
+    {
       "source": "/og/:path*",
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/:path*"
     }
