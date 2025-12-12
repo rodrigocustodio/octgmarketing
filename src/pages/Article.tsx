@@ -7,6 +7,7 @@ import RelatedArticles from "@/components/articles/RelatedArticles";
 import { ArticleCard } from "@/components/articles/ArticleCard";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 import { OctgMarketingPromo } from "@/components/articles/OctgMarketingPromo";
+import { UpcomingEventCard } from "@/components/articles/UpcomingEventCard";
 import { ArticleAuthorBox } from "@/components/articles/ArticleAuthorBox";
 import { CompanySpotlightCard } from "@/components/articles/CompanySpotlightCard";
 import { Badge } from "@/components/ui/badge";
@@ -328,6 +329,11 @@ const Article = () => {
                     currentRegion={article.region?.name}
                   />
                 )}
+
+                {/* Upcoming Event */}
+                <div className="hidden lg:block">
+                  <UpcomingEventCard />
+                </div>
 
                 {/* OCTG Marketing Promo */}
                 <div className="hidden lg:block">
