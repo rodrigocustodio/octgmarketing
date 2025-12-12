@@ -22,6 +22,21 @@
       "source": "/articles",
       "destination": "/",
       "permanent": true
+    },
+    {
+      "source": "/market-prices",
+      "destination": "/pricing-index",
+      "permanent": true
+    },
+    {
+      "source": "/companies",
+      "destination": "/directory",
+      "permanent": true
+    },
+    {
+      "source": "/ceos",
+      "destination": "/ceo-directory",
+      "permanent": true
     }
   ],
   "rewrites": [

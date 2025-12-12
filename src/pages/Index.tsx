@@ -137,15 +137,15 @@ const Index = () => {
     return { finalAnalysisArticles, finalQuickReadsArticles };
   }, [articles, usedIds]);
 
-  // Organization + WebSite Schema for SEO
+  // Organization + WebSite Schema for SEO (Google SERP optimization)
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
     "@id": "https://octgindex.com/#organization",
     "name": "OCTG Index",
     "url": "https://octgindex.com",
-    "logo": "https://octgindex.com/favicon.png",
-    "description": "The leading news and intelligence platform for the global OCTG (Oil Country Tubular Goods) industry.",
+    "logo": "https://octgindex.com/favicon.svg",
+    "description": "Global OCTG industry intelligence platform covering pricing, companies, CEOs, supply chain and market data.",
     "foundingDate": "2024",
     "address": {
       "@type": "PostalAddress",
@@ -169,13 +169,13 @@ const Index = () => {
     "@id": "https://octgindex.com/#website",
     "name": "OCTG Index",
     "url": "https://octgindex.com",
-    "description": "Your source for OCTG industry news, market analysis, pricing trends, and insights on mills, manufacturers, and global supply chain developments.",
+    "description": "Global OCTG industry intelligence platform covering pricing, companies, CEOs, supply chain and market data.",
     "publisher": {
       "@id": "https://octgindex.com/#organization"
     },
     "potentialAction": {
       "@type": "SearchAction",
-      "target": "https://octgindex.com/?q={search_term_string}",
+      "target": "https://octgindex.com/search?q={search_term_string}",
       "query-input": "required name=search_term_string"
     }
   };
@@ -184,7 +184,7 @@ const Index = () => {
     <>
       <SEOHead
         title="OCTG Index | Oil Country Tubular Goods Industry News & Analysis"
-        description="Your source for OCTG industry news, market analysis, pricing trends, and insights on mills, manufacturers, and global supply chain developments."
+        description="OCTG Index is the #1 source for oil country tubular goods news, pricing data, 200+ company profiles, CEO directory, and 60+ industry events. Updated daily."
         canonical="https://octgindex.com"
       />
       

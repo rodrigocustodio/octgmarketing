@@ -2,7 +2,8 @@ import { Link } from "react-router-dom";
 import pipeIcon from "@/assets/logo-side-icon.png";
 
 const footerLinks = {
-  regions: [
+  news: [
+    { name: "All News", href: "/news" },
     { name: "Americas", href: "/region/americas" },
     { name: "Europe", href: "/region/europe" },
     { name: "Africa", href: "/region/africa" },
@@ -22,7 +23,7 @@ const footerLinks = {
     { name: "CEO Directory", href: "/ceo-directory" },
     { name: "Product Directory", href: "/octg-directory" },
     { name: "Events Calendar", href: "/events" },
-    { name: "Pricing Index", href: "/pricing-index" },
+    { name: "Market Prices", href: "/pricing-index" },
   ],
   connect: [
     { name: "Contact Us", href: "/contact" },
@@ -43,9 +44,9 @@ export function Footer() {
       <div className="container py-12">
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8">
           <div>
-            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">Regions</h4>
+            <h4 className="font-display text-base font-semibold tracking-tight mb-4 text-accent">News</h4>
             <ul className="space-y-2">
-              {footerLinks.regions.map((link) => (
+              {footerLinks.news.map((link) => (
                 <li key={link.href}>
                   <Link to={link.href} className="text-sm text-muted-foreground hover:text-foreground transition-colors">
                     {link.name}

@@ -52,7 +52,7 @@ Deno.serve(async (req) => {
 
     const urls: SitemapUrl[] = [];
 
-    // Static pages
+    // Static pages - Top-level category pages for sitelinks
     urls.push({
       loc: SITE_URL,
       lastmod: formatDate(null),
@@ -60,6 +60,23 @@ Deno.serve(async (req) => {
       priority: 1.0,
     });
 
+    // NEWS - Primary category page
+    urls.push({
+      loc: `${SITE_URL}/news`,
+      lastmod: formatDate(null),
+      changefreq: "daily",
+      priority: 0.95,
+    });
+
+    // MARKET PRICES - Primary category page
+    urls.push({
+      loc: `${SITE_URL}/pricing-index`,
+      lastmod: formatDate(null),
+      changefreq: "daily",
+      priority: 0.9,
+    });
+
+    // COMPANIES - Primary category page
     urls.push({
       loc: `${SITE_URL}/directory`,
       lastmod: formatDate(null),
@@ -67,13 +84,69 @@ Deno.serve(async (req) => {
       priority: 0.9,
     });
 
+    // CEOs - Primary category page
     urls.push({
       loc: `${SITE_URL}/ceo-directory`,
+      lastmod: formatDate(null),
+      changefreq: "weekly",
+      priority: 0.85,
+    });
+
+    // EVENTS - Primary category page
+    urls.push({
+      loc: `${SITE_URL}/events`,
+      lastmod: formatDate(null),
+      changefreq: "weekly",
+      priority: 0.85,
+    });
+
+    // PRODUCTS - Primary category page
+    urls.push({
+      loc: `${SITE_URL}/octg-directory`,
+      lastmod: formatDate(null),
+      changefreq: "weekly",
+      priority: 0.9,
+    });
+
+    // TOPICS - Primary category page
+    urls.push({
+      loc: `${SITE_URL}/topics`,
       lastmod: formatDate(null),
       changefreq: "weekly",
       priority: 0.8,
     });
 
+    // Search page
+    urls.push({
+      loc: `${SITE_URL}/search`,
+      lastmod: formatDate(null),
+      changefreq: "weekly",
+      priority: 0.6,
+    });
+
+    // Secondary pages
+    urls.push({
+      loc: `${SITE_URL}/contact`,
+      lastmod: formatDate(null),
+      changefreq: "monthly",
+      priority: 0.7,
+    });
+
+    urls.push({
+      loc: `${SITE_URL}/about`,
+      lastmod: formatDate(null),
+      changefreq: "monthly",
+      priority: 0.7,
+    });
+
+    urls.push({
+      loc: `${SITE_URL}/editorial-policy`,
+      lastmod: formatDate(null),
+      changefreq: "yearly",
+      priority: 0.5,
+    });
+
+    // Legal pages
     urls.push({
       loc: `${SITE_URL}/privacy`,
       lastmod: formatDate(null),
@@ -93,55 +166,6 @@ Deno.serve(async (req) => {
       lastmod: formatDate(null),
       changefreq: "yearly",
       priority: 0.3,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/about`,
-      lastmod: formatDate(null),
-      changefreq: "monthly",
-      priority: 0.7,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/editorial-policy`,
-      lastmod: formatDate(null),
-      changefreq: "yearly",
-      priority: 0.5,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/contact`,
-      lastmod: formatDate(null),
-      changefreq: "monthly",
-      priority: 0.8,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/events`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.8,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/pricing-index`,
-      lastmod: formatDate(null),
-      changefreq: "daily",
-      priority: 0.8,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/octg-directory`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.9,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/topics`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.7,
     });
 
     // Fetch regions

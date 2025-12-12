@@ -4,10 +4,19 @@ import { SEOHead } from "@/components/SEOHead";
 import { useSteelPrices } from "@/hooks/useSteelPrices";
 import { usePublishedArticles } from "@/hooks/useArticles";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Skeleton } from "@/components/ui/skeleton";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { TrendingUp, TrendingDown, Minus, Clock, BarChart3, Globe, Newspaper } from "lucide-react";
 import { format } from "date-fns";
 
@@ -73,11 +82,30 @@ export default function PricingIndex() {
   const pricingArticles = articles || [];
 
   // Schema.org structured data
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://octgindex.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Market Prices",
+        item: "https://octgindex.com/pricing-index"
+      }
+    ]
+  };
+
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "OCTG Pricing Index",
-    description: "Live steel prices and OCTG industry stock tracking for casing, tubing, drill pipe, and premium connections.",
+    name: "Market Prices – Global OCTG Pricing & Benchmarks",
+    description: "Live steel commodity prices and OCTG industry stock tracking. Monitor HRC, iron ore, steel scrap, billet prices and major OCTG manufacturers across Americas, Europe, Asia-Pacific, and Middle East.",
     url: "https://octgindex.com/pricing-index",
     publisher: {
       "@type": "Organization",
@@ -103,15 +131,19 @@ export default function PricingIndex() {
     },
   };
 
+  const structuredData = [breadcrumbSchema, schemaData];
+
   return (
     <>
       <SEOHead
-        title="OCTG Pricing Index | Steel & Pipe Market Trends"
-        description="Live steel commodity prices and OCTG industry stock tracking. Monitor HRC, iron ore, steel scrap, billet prices and major OCTG manufacturers by region."
+        title="Market Prices – Global OCTG Pricing & Benchmarks | OCTG Index"
+        description="Live steel commodity prices and OCTG industry stock tracking. Monitor HRC, iron ore, steel scrap, billet prices and major OCTG manufacturers across Americas, Europe, Asia-Pacific, and Middle East."
         canonical="https://octgindex.com/pricing-index"
         type="website"
       />
-      <script type="application/ld+json">{JSON.stringify(schemaData)}</script>
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
+      </Helmet>
 
       <Header />
 
@@ -119,15 +151,30 @@ export default function PricingIndex() {
         {/* Hero Section */}
         <section className="relative bg-gradient-to-b from-primary/5 via-background to-background py-12 md:py-16">
           <div className="container">
+            <Breadcrumb className="mb-6">
+              <BreadcrumbList>
+                <BreadcrumbItem>
+                  <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                </BreadcrumbItem>
+                <BreadcrumbSeparator />
+                <BreadcrumbItem>
+                  <BreadcrumbPage>Market Prices</BreadcrumbPage>
+                </BreadcrumbItem>
+              </BreadcrumbList>
+            </Breadcrumb>
+
             <div className="flex items-center gap-3 mb-4">
               <BarChart3 className="h-8 w-8 text-accent" />
               <Badge variant="secondary" className="text-xs">LIVE DATA</Badge>
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4">
-              OCTG Pricing Index
+              Market Prices – Global OCTG Pricing & Benchmarks
             </h1>
-            <p className="text-lg text-muted-foreground max-w-2xl mb-6">
-              Track steel commodity prices and OCTG industry stocks in real-time. Monitor market trends for casing, tubing, drill pipe, and premium connections across global markets.
+            <p className="text-lg text-muted-foreground max-w-3xl mb-6">
+              Track steel commodity prices and OCTG industry stocks in real-time. This section provides daily-updated 
+              pricing benchmarks for hot-rolled coil (HRC), iron ore, steel scrap, billet, and cold-rolled coil (CRC)—the 
+              essential raw materials for OCTG manufacturing. We also track stock prices of major publicly traded OCTG 
+              manufacturers and service providers across Americas, Europe, Asia-Pacific, Australia, and Middle East regions.
             </p>
             {latestUpdate && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
