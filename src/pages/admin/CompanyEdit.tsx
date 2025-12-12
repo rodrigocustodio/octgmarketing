@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useCompanyById, useUpdateCompany, useCreateCompany, useDeleteCompany, useGenerateCompanyDescription } from "@/hooks/useCompanies";
+import { useCompanyById, useUpdateCompany, useCreateCompany, useDeleteCompany, useGenerateCompanyDescription, useEnrichCompanyProfile } from "@/hooks/useCompanies";
 import { useRegions } from "@/hooks/useDirectory";
 import { INDUSTRY_ROLES } from "@/hooks/useDirectory";
 import type { Database } from "@/integrations/supabase/types";
@@ -30,7 +30,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Trash2, Sparkles, Loader2, ExternalLink } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Sparkles, Loader2, ExternalLink, Zap } from "lucide-react";
 
 type CompanyRole = Database["public"]["Enums"]["company_role"];
 
@@ -45,6 +45,9 @@ const CompanyEdit = () => {
   const createCompany = useCreateCompany();
   const deleteCompany = useDeleteCompany();
   const generateDescription = useGenerateCompanyDescription();
+  const enrichCompany = useEnrichCompanyProfile();
+
+  const [isEnriching, setIsEnriching] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -120,6 +123,65 @@ const CompanyEdit = () => {
     }
   };
 
+  const handleEnrichProfile = async () => {
+    if (!formData.name) {
+      toast.error("Please enter a company name first");
+      return;
+    }
+
+    setIsEnriching(true);
+    try {
+      const result = await enrichCompany.mutateAsync({
+        companyName: formData.name,
+        existingData: {
+          website: formData.website || null,
+          description: formData.description || null,
+          industry_role: formData.industry_role || null,
+          headquarters: formData.headquarters || null,
+          country: formData.country || null,
+        } as any,
+      });
+
+      // Map region slug to region_id
+      let newRegionId = formData.region_id;
+      if (result.region && !formData.region_id && regions) {
+        const matchedRegion = regions.find(r => 
+          r.slug.toLowerCase() === result.region?.toLowerCase() ||
+          r.name.toLowerCase().includes(result.region?.toLowerCase() || "")
+        );
+        if (matchedRegion) {
+          newRegionId = matchedRegion.id;
+        }
+      }
+
+      // Only update empty fields
+      let fieldsUpdated = 0;
+      setFormData((prev) => {
+        const updates: Partial<typeof prev> = {};
+        if (result.description && !prev.description) { updates.description = result.description; fieldsUpdated++; }
+        if (result.website && !prev.website) { updates.website = result.website; fieldsUpdated++; }
+        if (result.industry_role && !prev.industry_role) { updates.industry_role = result.industry_role; fieldsUpdated++; }
+        if (newRegionId && !prev.region_id) { updates.region_id = newRegionId; fieldsUpdated++; }
+        if (result.year_founded && !prev.year_founded) { updates.year_founded = result.year_founded.toString(); fieldsUpdated++; }
+        if (result.phone && !prev.phone) { updates.phone = result.phone; fieldsUpdated++; }
+        if (result.email && !prev.email) { updates.email = result.email; fieldsUpdated++; }
+        if (result.headquarters && !prev.headquarters) { updates.headquarters = result.headquarters; fieldsUpdated++; }
+        if (result.country && !prev.country) { updates.country = result.country; fieldsUpdated++; }
+        return { ...prev, ...updates };
+      });
+
+      if (fieldsUpdated > 0) {
+        toast.success(`Profile enriched with ${fieldsUpdated} field(s)`);
+      } else {
+        toast.info("No new data found - profile already complete");
+      }
+    } catch (error) {
+      console.error("Failed to enrich profile:", error);
+      toast.error("Failed to enrich profile");
+    } finally {
+      setIsEnriching(false);
+    }
+  };
 
   const handleSave = async () => {
     if (!formData.name || !formData.slug) {
@@ -206,26 +268,41 @@ const CompanyEdit = () => {
           </div>
           <div className="flex items-center gap-2">
             {!isNew && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                  <Button variant="destructive" size="sm">
-                    <Trash2 className="h-4 w-4 mr-2" />
-                    Delete
-                  </Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                  <AlertDialogHeader>
-                    <AlertDialogTitle>Delete Company</AlertDialogTitle>
-                    <AlertDialogDescription>
-                      Are you sure you want to delete this company? This action cannot be undone.
-                    </AlertDialogDescription>
-                  </AlertDialogHeader>
-                  <AlertDialogFooter>
-                    <AlertDialogCancel>Cancel</AlertDialogCancel>
-                    <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
-                  </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleEnrichProfile}
+                  disabled={isEnriching}
+                >
+                  {isEnriching ? (
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  ) : (
+                    <Zap className="h-4 w-4 mr-2" />
+                  )}
+                  Enrich Profile
+                </Button>
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                    <Button variant="destructive" size="sm">
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Delete
+                    </Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                    <AlertDialogHeader>
+                      <AlertDialogTitle>Delete Company</AlertDialogTitle>
+                      <AlertDialogDescription>
+                        Are you sure you want to delete this company? This action cannot be undone.
+                      </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                      <AlertDialogCancel>Cancel</AlertDialogCancel>
+                      <AlertDialogAction onClick={handleDelete}>Delete</AlertDialogAction>
+                    </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
             )}
             <Button onClick={handleSave} disabled={updateCompany.isPending || createCompany.isPending}>
               {(updateCompany.isPending || createCompany.isPending) ? (

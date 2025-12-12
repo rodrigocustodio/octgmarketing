@@ -67,9 +67,20 @@ const Companies = () => {
   const missingWebsite = companies?.filter(c => !c.website).length || 0;
   const missingRole = companies?.filter(c => !c.industry_role).length || 0;
   const missingRegion = companies?.filter(c => !c.region_id).length || 0;
-  const incompleteCount = companies?.filter(c => 
-    !c.description || !c.website || !c.industry_role || !c.region_id
-  ).length || 0;
+  
+  // Helper to count missing critical fields for a company
+  const getMissingFieldCount = (c: Company) => {
+    return [
+      !c.description,
+      !c.website, 
+      !c.industry_role,
+      !c.region_id,
+      !c.headquarters
+    ].filter(Boolean).length;
+  };
+  
+  // Only count companies with 2+ missing fields as truly incomplete
+  const incompleteCount = companies?.filter(c => getMissingFieldCount(c) >= 2).length || 0;
 
   const handleQuickGenerate = async (company: Company) => {
     setGeneratingIds(prev => new Set(prev).add(company.id));
@@ -289,13 +300,14 @@ const Companies = () => {
     }
   };
 
-  // Bulk enrichment
+  // Bulk enrichment - only process companies with 2+ missing fields
   const handleBulkEnrich = async () => {
-    const incompleteCompanies = companies?.filter(c => 
-      !c.description || !c.website || !c.industry_role || !c.region_id
-    ) || [];
+    const incompleteCompanies = companies?.filter(c => getMissingFieldCount(c) >= 2) || [];
     
-    if (incompleteCompanies.length === 0) return;
+    if (incompleteCompanies.length === 0) {
+      toast({ title: "All companies complete", description: "No companies need enrichment (all have 4+ of 5 key fields)" });
+      return;
+    }
     
     const totalBatches = Math.ceil(incompleteCompanies.length / BATCH_SIZE);
     
