@@ -74,6 +74,7 @@ const ArticleEdit = () => {
     status: "draft" as "draft" | "published" | "featured",
     region_id: "",
     hero_image_url: "",
+    event_id: "" as string | null,
   });
   const [selectedTopics, setSelectedTopics] = useState<string[]>([]);
   const [selectedCompanies, setSelectedCompanies] = useState<string[]>([]);
@@ -161,11 +162,23 @@ const ArticleEdit = () => {
     enabled: !!article?.slug,
   });
 
-  // Fetch regions, topics, companies
+  // Fetch regions, topics, companies, events
   const { data: regions } = useQuery({
     queryKey: ["regions"],
     queryFn: async () => {
       const { data, error } = await supabase.from("regions").select("*").order("name");
+      if (error) throw error;
+      return data;
+    },
+  });
+
+  const { data: events } = useQuery({
+    queryKey: ["events-for-select"],
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("events")
+        .select("id, name, start_date")
+        .order("start_date", { ascending: false });
       if (error) throw error;
       return data;
     },
@@ -200,6 +213,7 @@ const ArticleEdit = () => {
         status: article.status || "draft",
         region_id: article.region_id || "",
         hero_image_url: article.hero_image_url || "",
+        event_id: (article as any).event_id || null,
       });
     }
   }, [article]);
@@ -236,6 +250,7 @@ const ArticleEdit = () => {
         hero_image_url: formData.hero_image_url || null,
         author_id: authorId,
         publish_date: formData.status !== "draft" ? new Date().toISOString() : null,
+        event_id: formData.event_id || null,
       };
 
       let articleId = id;
@@ -751,6 +766,33 @@ const ArticleEdit = () => {
                     {regions?.map((region) => (
                       <SelectItem key={region.id} value={region.id}>
                         {region.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </CardContent>
+            </Card>
+
+            {/* Related Event */}
+            <Card>
+              <CardHeader>
+                <CardTitle>Related Event</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Select
+                  value={formData.event_id || "none"}
+                  onValueChange={(value) =>
+                    setFormData((prev) => ({ ...prev, event_id: value === "none" ? null : value }))
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select event (optional)" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="none">No event</SelectItem>
+                    {events?.map((event) => (
+                      <SelectItem key={event.id} value={event.id}>
+                        {event.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
