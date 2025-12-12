@@ -201,13 +201,6 @@ const Index = () => {
       
       <div className="min-h-screen bg-background">
         <Header />
-        
-        {/* Entity Declaration - Visible text for Google to understand site identity */}
-        <div className="container pt-6 pb-2">
-          <p className="text-center text-muted-foreground text-sm md:text-base max-w-4xl mx-auto">
-            OCTG Index is a global energy industry news platform covering OCTG markets, supply chains, pricing intelligence, and major energy events worldwide.
-          </p>
-        </div>
       
       <main>
         {/* Hero Section - Optimized for LCP */}
@@ -270,6 +263,15 @@ const Index = () => {
                 </Link>
               </div>
             )}
+          </div>
+        </section>
+
+        {/* Entity Declaration Strip - SEO identity statement */}
+        <section className="bg-muted/50 border-y border-border/30 py-3">
+          <div className="container">
+            <p className="text-center text-muted-foreground text-sm whitespace-nowrap overflow-x-auto">
+              OCTG Index is a global energy industry news platform covering OCTG markets, supply chains, pricing intelligence, and major energy events worldwide.
+            </p>
           </div>
         </section>
 
