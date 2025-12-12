@@ -42,35 +42,42 @@ export function BreakingNewsRow({ articles }: BreakingNewsRowProps) {
       
       <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {articles.slice(0, 3).map((article) => (
-          <Link key={article.id} to={`/article/${article.slug}`}>
-            <Card variant="interactive" className="h-full">
-              <CardContent className="p-0 flex gap-3 h-full">
-                {article.hero_image_url && (
-                  <div className="w-24 h-20 flex-shrink-0 overflow-hidden rounded-l-lg">
-                    <img 
-                      src={optimizeImageUrl(article.hero_image_url, { width: 200, quality: 75 })} 
-                      alt={article.title}
-                      width={96}
-                      height={80}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
-                    />
+          <div key={article.id} className="flex flex-col">
+            <Link to={`/article/${article.slug}`}>
+              <Card variant="interactive" className="h-full">
+                <CardContent className="p-0 flex gap-3 h-full">
+                  {article.hero_image_url && (
+                    <div className="w-24 h-20 flex-shrink-0 overflow-hidden rounded-l-lg">
+                      <img 
+                        src={optimizeImageUrl(article.hero_image_url, { width: 200, quality: 75 })} 
+                        alt={article.title}
+                        width={96}
+                        height={80}
+                        loading="lazy"
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                  )}
+                  <div className="py-2 pr-3 flex flex-col justify-center min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      {article.region && (
+                        <Badge variant="outline" className="text-[10px] px-1.5 py-0">{article.region.name}</Badge>
+                      )}
+                      <span className="text-[10px] text-muted-foreground">{formatDate(article.publish_date)}</span>
+                    </div>
+                    <h3 className="font-display text-sm font-semibold line-clamp-2">
+                      {article.title}
+                    </h3>
                   </div>
-                )}
-                <div className="py-2 pr-3 flex flex-col justify-center min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    {article.region && (
-                      <Badge variant="outline" className="text-[10px] px-1.5 py-0">{article.region.name}</Badge>
-                    )}
-                    <span className="text-[10px] text-muted-foreground">{formatDate(article.publish_date)}</span>
-                  </div>
-                  <h3 className="font-display text-sm font-semibold line-clamp-2">
-                    {article.title}
-                  </h3>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+                </CardContent>
+              </Card>
+            </Link>
+            {article.subtitle && (
+              <p className="text-sm text-muted-foreground line-clamp-2 mt-2 px-1">
+                {article.subtitle}
+              </p>
+            )}
+          </div>
         ))}
       </div>
     </section>
