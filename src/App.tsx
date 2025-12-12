@@ -33,6 +33,8 @@ import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
 import PricingIndex from "./pages/PricingIndex";
 import Contact from "./pages/Contact";
+import News from "./pages/News";
+import Search from "./pages/Search";
 
 // Admin pages
 import Dashboard from "./pages/admin/Dashboard";
@@ -69,6 +71,8 @@ const App = () => (
               <Sonner />
               <Routes>
                 <Route path="/" element={<Index />} />
+                <Route path="/news" element={<News />} />
+                <Route path="/search" element={<Search />} />
                 <Route path="/article/:slug" element={<Article />} />
                 <Route path="/region/:slug" element={<Region />} />
                 <Route path="/topic/:slug" element={<Topic />} />

@@ -23,7 +23,8 @@ const regions = [
 ];
 
 const mobileMenuLinks = {
-  regions: [
+  news: [
+    { name: "All News", href: "/news" },
     { name: "Americas", href: "/region/americas" },
     { name: "Europe", href: "/region/europe" },
     { name: "Africa", href: "/region/africa" },
@@ -39,9 +40,9 @@ const mobileMenuLinks = {
   ],
   directories: [
     { name: "Companies", href: "/directory" },
-    { name: "Global Leaders", href: "/ceo-directory" },
+    { name: "CEOs", href: "/ceo-directory" },
     { name: "Events", href: "/events" },
-    { name: "Pricing", href: "/pricing-index" },
+    { name: "Market Prices", href: "/pricing-index" },
   ],
 };
 
@@ -75,6 +76,9 @@ export function Header() {
           </Link>
 
           <nav className="hidden lg:flex items-center gap-1">
+            <Link to="/news">
+              <Button variant="nav" size="sm">News</Button>
+            </Link>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="nav" size="sm" className="gap-1">
@@ -99,16 +103,13 @@ export function Header() {
               <Button variant="nav" size="sm">Products</Button>
             </Link>
             <Link to="/ceo-directory">
-              <Button variant="nav" size="sm">Global Leaders</Button>
+              <Button variant="nav" size="sm">CEOs</Button>
             </Link>
             <Link to="/events">
               <Button variant="nav" size="sm">Events</Button>
             </Link>
-            <Link to="/contact">
-              <Button variant="nav" size="sm">Contact</Button>
-            </Link>
             <Link to="/pricing-index">
-              <Button variant="nav" size="sm">Pricing</Button>
+              <Button variant="nav" size="sm">Market Prices</Button>
             </Link>
           </nav>
 
@@ -155,11 +156,11 @@ export function Header() {
 
             {/* Grid layout matching footer */}
             <div className="grid grid-cols-2 gap-6">
-              {/* Regions */}
+              {/* News & Regions */}
               <div>
-                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">Regions</h3>
+                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">News</h3>
                 <ul className="space-y-2">
-                  {mobileMenuLinks.regions.map((link) => (
+                  {mobileMenuLinks.news.map((link) => (
                     <li key={link.href}>
                       <Link
                         to={link.href}

@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
+import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { SEOHead } from "@/components/SEOHead";
@@ -8,6 +9,14 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb";
 import { Calendar, MapPin, Users, Search, Star } from "lucide-react";
 import { useEvents, Event } from "@/hooks/useEvents";
 import { parseLocalDate } from "@/lib/utils";
@@ -170,6 +179,40 @@ const Events = () => {
   const upcomingByMonth = useMemo(() => groupEventsByMonth(filteredUpcoming), [filteredUpcoming]);
   const pastByMonth = useMemo(() => groupEventsByMonth(filteredPast), [filteredPast]);
 
+  // Schema.org structured data
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://octgindex.com"
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Events",
+        item: "https://octgindex.com/events"
+      }
+    ]
+  };
+
+  const collectionPageSchema = {
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "@id": "https://octgindex.com/events",
+    name: "Oil & Gas Events 2026 | OCTG Industry Calendar",
+    description: "Find 60+ oil, gas, and OCTG industry events for 2026. Discover energy conferences, petroleum exhibitions, and pipe & tube trade shows including ADIPEC, OTC, and Gastech.",
+    url: "https://octgindex.com/events",
+    isPartOf: {
+      "@type": "WebSite",
+      name: "OCTG Index",
+      url: "https://octgindex.com"
+    }
+  };
+
   return (
     <>
       <SEOHead
@@ -177,6 +220,10 @@ const Events = () => {
         description="Find 60+ oil, gas, and OCTG industry events for 2026. Discover energy conferences, petroleum exhibitions, and pipe & tube trade shows including ADIPEC, OTC, and Gastech."
         canonical="https://octgindex.com/events"
       />
+      <Helmet>
+        <script type="application/ld+json">{JSON.stringify([breadcrumbSchema, collectionPageSchema])}</script>
+      </Helmet>
+
       <div className="min-h-screen bg-background">
         <Header />
 
@@ -194,13 +241,32 @@ const Events = () => {
             
             {/* Content */}
             <div className="container relative z-10">
+              <Breadcrumb className="mb-6">
+                <BreadcrumbList>
+                  <BreadcrumbItem>
+                    <BreadcrumbLink href="/">Home</BreadcrumbLink>
+                  </BreadcrumbItem>
+                  <BreadcrumbSeparator />
+                  <BreadcrumbItem>
+                    <BreadcrumbPage>Events</BreadcrumbPage>
+                  </BreadcrumbItem>
+                </BreadcrumbList>
+              </Breadcrumb>
+
               <div className="max-w-3xl">
                 <Badge variant="outline" className="mb-4 border-border">2026 Event Calendar</Badge>
                 <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4 text-foreground">
-                  OCTG & Energy Events
+                  Oil & Gas Events – OCTG Industry Calendar
                 </h1>
-                <p className="text-xl text-muted-foreground">
-                  Discover major oil, gas, and energy conferences, exhibitions, and networking events worldwide.
+                <p className="text-lg text-muted-foreground mb-4">
+                  Discover 60+ major oil, gas, and energy conferences, exhibitions, and networking events worldwide. 
+                  Our events calendar covers key industry gatherings including ADIPEC, OTC, Gastech, and regional 
+                  OCTG trade shows where manufacturers, service providers, and energy professionals connect.
+                </p>
+                <p className="text-muted-foreground">
+                  Whether you're looking for pipe & tube exhibitions, oilfield services conferences, or energy 
+                  technology summits, find the events that matter to your business across Americas, Europe, 
+                  Middle East, Asia-Pacific, and Africa.
                 </p>
               </div>
 
