@@ -311,11 +311,11 @@ const Index = () => {
         {/* SECTION 2: Industry Focus Masonry */}
         <IndustryFocusMasonry articles={industryFocusArticles} />
 
-        {/* SECTION 3: Upcoming Events */}
-        <UpcomingEventsSection />
-
         {/* Featured Event Spotlight - 70/30 Video/Info Layout */}
         <FeaturedEventSpotlight />
+
+        {/* SECTION 3: Upcoming Events - 6 Cards */}
+        <UpcomingEventsSection />
 
         {/* SECTION 4: By Topic Rows */}
         <TopicRows articles={topicRowsArticles} usedIds={usedIds} />
