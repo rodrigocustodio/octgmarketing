@@ -538,7 +538,7 @@ export default function CompanyDetail() {
               {/* Browse More */}
               <Card>
                 <CardContent className="pt-6">
-                  <div className="space-y-2">
+                  <div className="space-y-4">
                     <Link to="/directory">
                       <Button variant="outline" className="w-full justify-start">
                         Browse All Companies
