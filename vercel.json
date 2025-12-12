@@ -41,74 +41,15 @@
   ],
   "rewrites": [
     {
-      "source": "/sitemap.xml",
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap"
-    },
-    {
-      "source": "/sitemap-index.xml",
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=index"
-    },
-    {
-      "source": "/sitemap-news.xml",
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=news"
-    },
-    {
-      "source": "/sitemap-events.xml",
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=events"
-    },
-    {
-      "source": "/sitemap-directory.xml",
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=directory"
-    },
-    {
-      "source": "/sitemap-pages.xml",
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=pages"
-    },
-    {
       "source": "/og/:path*",
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/:path*"
     }
   ],
   "headers": [
     {
-      "source": "/sitemap-index.xml",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
-        { "key": "Content-Type", "value": "application/xml" }
-      ]
-    },
-    {
-      "source": "/sitemap-news.xml",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
-        { "key": "Content-Type", "value": "application/xml" }
-      ]
-    },
-    {
-      "source": "/sitemap-events.xml",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
-        { "key": "Content-Type", "value": "application/xml" }
-      ]
-    },
-    {
-      "source": "/sitemap-directory.xml",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
-        { "key": "Content-Type", "value": "application/xml" }
-      ]
-    },
-    {
-      "source": "/sitemap-pages.xml",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
-        { "key": "Content-Type", "value": "application/xml" }
-      ]
-    },
-    {
       "source": "/sitemap.xml",
       "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
+        { "key": "Cache-Control", "value": "public, max-age=86400" },
         { "key": "Content-Type", "value": "application/xml" }
       ]
     },
