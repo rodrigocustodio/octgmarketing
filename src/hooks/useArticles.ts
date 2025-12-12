@@ -10,6 +10,14 @@ export interface ArticleAuthor {
   slug: string;
 }
 
+export interface ArticleCompany {
+  id: string;
+  name: string;
+  slug: string;
+  headquarters: string | null;
+  website: string | null;
+}
+
 export interface ArticleWithRegion {
   id: string;
   title: string;
@@ -26,6 +34,7 @@ export interface ArticleWithRegion {
     slug: string;
   } | null;
   author?: ArticleAuthor | null;
+  companies?: ArticleCompany[];
 }
 
 export function usePublishedArticles(limit?: number) {
@@ -119,7 +128,8 @@ export function useArticleBySlug(slug: string) {
   return useQuery({
     queryKey: ["article", slug],
     queryFn: async () => {
-      const { data, error } = await supabase
+      // Fetch article with region and author
+      const { data: article, error } = await supabase
         .from("articles")
         .select(`
           id,
@@ -139,7 +149,25 @@ export function useArticleBySlug(slug: string) {
         .maybeSingle();
 
       if (error) throw error;
-      return data as ArticleWithRegion | null;
+      if (!article) return null;
+
+      // Fetch associated companies for this article
+      const { data: articleCompanies } = await supabase
+        .from("article_companies")
+        .select(`
+          company:companies(id, name, slug, headquarters, website)
+        `)
+        .eq("article_id", article.id);
+
+      // Extract companies from the join result
+      const companies = articleCompanies
+        ?.map(ac => ac.company)
+        .filter((c): c is ArticleCompany => c !== null) || [];
+
+      return {
+        ...article,
+        companies
+      } as ArticleWithRegion;
     },
     enabled: !!slug,
   });

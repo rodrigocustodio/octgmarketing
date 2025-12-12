@@ -8,6 +8,7 @@ import { ArticleCard } from "@/components/articles/ArticleCard";
 import { NewsletterSignup } from "@/components/newsletter/NewsletterSignup";
 import { OctgMarketingPromo } from "@/components/articles/OctgMarketingPromo";
 import { ArticleAuthorBox } from "@/components/articles/ArticleAuthorBox";
+import { CompanySpotlightCard } from "@/components/articles/CompanySpotlightCard";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
@@ -19,7 +20,7 @@ import {
 } from "@/components/ui/breadcrumb";
 import { Calendar, Clock } from "lucide-react";
 import { useArticleBySlug, useRelatedArticles } from "@/hooks/useArticles";
-import { markdownToHtml } from "@/lib/markdown";
+import { markdownToHtml, splitMarkdownAtMiddle } from "@/lib/markdown";
 import { format } from "date-fns";
 import heroImage from "@/assets/hero-octg.jpg";
 import { generateArticleTitle, generateArticleDescription } from "@/lib/seo-utils";
@@ -52,8 +53,19 @@ const Article = () => {
 
   const canonicalUrl = `https://octgindex.com/article/${slug}`;
 
-  // Convert markdown body to HTML
-  const bodyHtml = article?.body ? markdownToHtml(article.body) : "";
+  // Get primary company for inline card (first associated company)
+  const primaryCompany = article?.companies?.[0] || null;
+
+  // Split markdown at middle for inline company card insertion
+  const [firstHalf, secondHalf] = article?.body 
+    ? splitMarkdownAtMiddle(article.body) 
+    : ['', ''];
+  
+  // Convert markdown to HTML
+  const firstHalfHtml = firstHalf ? markdownToHtml(firstHalf) : '';
+  const secondHalfHtml = secondHalf ? markdownToHtml(secondHalf) : '';
+  const fullBodyHtml = article?.body ? markdownToHtml(article.body) : '';
+  
   const readingTime = article?.body ? estimateReadingTime(article.body) : "5 min read";
 
   if (isLoading) {
@@ -103,7 +115,7 @@ const Article = () => {
     );
   }
 
-  // NewsArticle Schema for SEO
+  // NewsArticle Schema for SEO (with company mentions if available)
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": "NewsArticle",
@@ -132,7 +144,15 @@ const Article = () => {
     "mainEntityOfPage": {
       "@type": "WebPage",
       "@id": canonicalUrl
-    }
+    },
+    // Add company mentions for SEO
+    ...(primaryCompany && {
+      "mentions": {
+        "@type": "Organization",
+        "name": primaryCompany.name,
+        "url": `https://octgindex.com/directory/company/${primaryCompany.slug}`
+      }
+    })
   };
 
   // Breadcrumb Schema
@@ -267,10 +287,26 @@ const Article = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
               {/* Article Body */}
               <div className="lg:col-span-2">
-                <article 
-                  className="article-content max-w-none"
-                  dangerouslySetInnerHTML={{ __html: bodyHtml }}
-                />
+                {/* If we have a company and enough content to split, render split content with card */}
+                {primaryCompany && secondHalfHtml ? (
+                  <article className="article-content max-w-none">
+                    <div dangerouslySetInnerHTML={{ __html: firstHalfHtml }} />
+                    
+                    <CompanySpotlightCard
+                      name={primaryCompany.name}
+                      slug={primaryCompany.slug}
+                      headquarters={primaryCompany.headquarters}
+                      website={primaryCompany.website}
+                    />
+                    
+                    <div dangerouslySetInnerHTML={{ __html: secondHalfHtml }} />
+                  </article>
+                ) : (
+                  <article 
+                    className="article-content max-w-none"
+                    dangerouslySetInnerHTML={{ __html: fullBodyHtml }}
+                  />
+                )}
 
                 {/* Author Box with CTA */}
                 {article.author && (
