@@ -10,7 +10,7 @@ const inputVariants = cva(
       variant: {
         default: "border-input",
         ghost: "border-transparent bg-muted/50 focus-visible:bg-background",
-        bronze: "border-accent/30 focus-visible:border-accent focus-visible:ring-accent/30",
+        bronze: "border-accent/30 bg-muted focus-visible:border-accent focus-visible:ring-accent/30",
         steel: "border-primary/30 focus-visible:border-primary focus-visible:ring-primary/30",
       },
       inputSize: {
