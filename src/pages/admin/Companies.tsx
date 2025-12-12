@@ -67,6 +67,7 @@ const Companies = () => {
   const missingWebsite = companies?.filter(c => !c.website).length || 0;
   const missingRole = companies?.filter(c => !c.industry_role).length || 0;
   const missingRegion = companies?.filter(c => !c.region_id).length || 0;
+  const missingSolutions = companies?.filter(c => !c.solutions || (c.solutions as any[]).length === 0).length || 0;
   
   // Helper to count missing critical fields for a company
   const getMissingFieldCount = (c: Company) => {
@@ -75,7 +76,8 @@ const Companies = () => {
       !c.website, 
       !c.industry_role,
       !c.region_id,
-      !c.headquarters
+      !c.headquarters,
+      !c.solutions || (c.solutions as any[]).length === 0
     ].filter(Boolean).length;
   };
   
@@ -261,6 +263,9 @@ const Companies = () => {
       if (result.email && !company.email) updateData.email = result.email;
       if (result.headquarters && !company.headquarters) updateData.headquarters = result.headquarters;
       if (result.country && !company.country) updateData.country = result.country;
+      if (result.solutions && result.solutions.length > 0 && (!company.solutions || (company.solutions as any[]).length === 0)) {
+        updateData.solutions = result.solutions;
+      }
       
       if (Object.keys(updateData).length > 0) {
         await updateCompany.mutateAsync({
@@ -385,6 +390,9 @@ const Companies = () => {
           if (result.email && !company.email) updateData.email = result.email;
           if (result.headquarters && !company.headquarters) updateData.headquarters = result.headquarters;
           if (result.country && !company.country) updateData.country = result.country;
+          if (result.solutions && result.solutions.length > 0 && (!company.solutions || (company.solutions as any[]).length === 0)) {
+            updateData.solutions = result.solutions;
+          }
           
           if (Object.keys(updateData).length > 0) {
             await updateCompany.mutateAsync({
