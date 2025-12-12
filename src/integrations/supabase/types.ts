@@ -278,6 +278,7 @@ export type Database = {
           phone: string | null
           region_id: string | null
           slug: string
+          solutions: Json | null
           updated_at: string
           website: string | null
           year_founded: number | null
@@ -296,6 +297,7 @@ export type Database = {
           phone?: string | null
           region_id?: string | null
           slug: string
+          solutions?: Json | null
           updated_at?: string
           website?: string | null
           year_founded?: number | null
@@ -314,6 +316,7 @@ export type Database = {
           phone?: string | null
           region_id?: string | null
           slug?: string
+          solutions?: Json | null
           updated_at?: string
           website?: string | null
           year_founded?: number | null
