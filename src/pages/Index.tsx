@@ -19,6 +19,7 @@ import { TopicRows } from "@/components/home/TopicRows";
 import { QuickReadsGrid } from "@/components/home/QuickReadsGrid";
 import { AnalysisReportsSection } from "@/components/home/AnalysisReportsSection";
 import { UpcomingEventsSection } from "@/components/home/UpcomingEventsSection";
+import { FeaturedEventSpotlight } from "@/components/home/FeaturedEventSpotlight";
 
 function formatArticleDate(dateString: string | null): string {
   if (!dateString) return "";
@@ -312,6 +313,9 @@ const Index = () => {
 
         {/* SECTION 3: Upcoming Events */}
         <UpcomingEventsSection />
+
+        {/* Featured Event Spotlight - 70/30 Video/Info Layout */}
+        <FeaturedEventSpotlight />
 
         {/* SECTION 4: By Topic Rows */}
         <TopicRows articles={topicRowsArticles} usedIds={usedIds} />
