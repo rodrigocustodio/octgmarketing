@@ -325,7 +325,7 @@ serve(async (req) => {
       .from('companies')
       .select('id, name');
 
-    // Call OpenAI API with increased token limit for longer articles
+    // Call OpenAI API with JSON response format for reliable parsing
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -338,11 +338,12 @@ serve(async (req) => {
           { role: 'system', content: SYSTEM_PROMPT },
           { 
             role: 'user', 
-            content: `Rewrite this as original OCTG Index editorial content (1,800-2,200 words minimum with proper H2/H3 hierarchy and FAQ section). Do NOT reference or credit any external source:\n\n${source_name ? `Source: ${source_name}\n\n` : ''}Content:\n${content}` 
+            content: `Rewrite this as original OCTG Index editorial content (1,200-1,500 words with proper H2/H3 hierarchy and 3 FAQ questions). Do NOT reference or credit any external source:\n\n${source_name ? `Source: ${source_name}\n\n` : ''}Content:\n${content}` 
           }
         ],
         temperature: 0.7,
-        max_tokens: 8000,
+        max_tokens: 6000,
+        response_format: { type: "json_object" },
       }),
     });
 
@@ -355,22 +356,29 @@ serve(async (req) => {
     const data = await response.json();
     const responseContent = data.choices[0]?.message?.content;
 
+    // Check for truncation
+    const finishReason = data.choices[0]?.finish_reason;
+    if (finishReason === 'length') {
+      console.error('Response was truncated due to length limit');
+    }
+
     if (!responseContent) {
       throw new Error('No content returned from OpenAI');
     }
 
-    // Parse JSON response
+    // Parse JSON response with better error handling
     let parsed;
     try {
-      const jsonMatch = responseContent.match(/\{[\s\S]*\}/);
-      if (jsonMatch) {
-        parsed = JSON.parse(jsonMatch[0]);
-      } else {
-        throw new Error('No JSON found in response');
-      }
+      parsed = JSON.parse(responseContent);
     } catch (parseError) {
-      console.error('Failed to parse OpenAI response:', responseContent);
-      throw new Error('Failed to parse AI response');
+      console.error('Failed to parse OpenAI response:', responseContent.substring(0, 500) + '...');
+      throw new Error('Failed to parse AI response - response may have been truncated');
+    }
+
+    // Validate required fields
+    if (!parsed.title || !parsed.body_markdown) {
+      console.error('Missing required fields in response:', Object.keys(parsed));
+      throw new Error('AI response missing required fields (title or body_markdown)');
     }
 
     // Generate slug
