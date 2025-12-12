@@ -17,8 +17,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { TrendingUp, TrendingDown, Minus, Clock, BarChart3, Globe, Newspaper } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Clock, BarChart3, Globe, Newspaper, Info, AlertCircle } from "lucide-react";
 import { format } from "date-fns";
+import { CostPressureIndicator } from "@/components/market/CostPressureIndicator";
 
 function PriceChangeIndicator({ change, changePercent }: { change: number; changePercent: number }) {
   if (change > 0) {
@@ -81,7 +82,7 @@ export default function PricingIndex() {
   // Use the latest published articles for market news
   const pricingArticles = articles || [];
 
-  // Schema.org structured data
+  // Schema.org structured data - Updated for market intelligence positioning
   const breadcrumbSchema = {
     "@context": "https://schema.org",
     "@type": "BreadcrumbList",
@@ -104,8 +105,8 @@ export default function PricingIndex() {
   const schemaData = {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: "Market Prices – Global OCTG Pricing & Benchmarks",
-    description: "Live steel commodity prices and OCTG industry stock tracking. Monitor HRC, iron ore, steel scrap, billet prices and major OCTG manufacturers across Americas, Europe, Asia-Pacific, and Middle East.",
+    name: "Market Prices – OCTG Cost Drivers, Benchmarks & Industry Indicators",
+    description: "Track the raw material cost drivers, steel benchmarks, and industry indicators influencing OCTG pricing worldwide. Includes steel commodities, market sentiment, and energy-sector equity signals impacting casing and tubing markets.",
     url: "https://octgindex.com/pricing-index",
     publisher: {
       "@type": "Organization",
@@ -113,21 +114,10 @@ export default function PricingIndex() {
       url: "https://octgindex.com",
     },
     mainEntity: {
-      "@type": "ItemList",
-      name: "Steel & OCTG Price Index",
-      itemListElement: commodities.map((c, i) => ({
-        "@type": "ListItem",
-        position: i + 1,
-        item: {
-          "@type": "Product",
-          name: c.name,
-          offers: {
-            "@type": "Offer",
-            price: c.price,
-            priceCurrency: c.currency || "USD",
-          },
-        },
-      })),
+      "@type": "Dataset",
+      name: "OCTG Market Indicators",
+      description: "Steel commodity benchmarks and energy-sector equity indicators tracking cost pressures in OCTG manufacturing",
+      keywords: ["OCTG", "steel prices", "market indicators", "cost drivers", "energy sector"],
     },
   };
 
@@ -136,8 +126,8 @@ export default function PricingIndex() {
   return (
     <>
       <SEOHead
-        title="Market Prices – Global OCTG Pricing & Benchmarks | OCTG Index"
-        description="Live steel commodity prices and OCTG industry stock tracking. Monitor HRC, iron ore, steel scrap, billet prices and major OCTG manufacturers across Americas, Europe, Asia-Pacific, and Middle East."
+        title="Market Prices – OCTG Cost Drivers, Benchmarks & Industry Indicators | OCTG Index"
+        description="Track the raw material cost drivers, steel benchmarks, and industry indicators influencing OCTG pricing worldwide. Includes steel commodities, market sentiment, and energy-sector equity signals impacting casing and tubing markets."
         canonical="https://octgindex.com/pricing-index"
         type="website"
       />
@@ -165,16 +155,14 @@ export default function PricingIndex() {
 
             <div className="flex items-center gap-3 mb-4">
               <BarChart3 className="h-8 w-8 text-accent" />
-              <Badge variant="secondary" className="text-xs">LIVE DATA</Badge>
+              <Badge variant="secondary" className="text-xs">MARKET INTELLIGENCE</Badge>
             </div>
             <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4">
-              Market Prices – Global OCTG Pricing & Benchmarks
+              Market Prices – OCTG Cost Drivers, Benchmarks & Industry Indicators
             </h1>
             <p className="text-lg text-muted-foreground max-w-3xl mb-6">
-              Track steel commodity prices and OCTG industry stocks in real-time. This section provides daily-updated 
-              pricing benchmarks for hot-rolled coil (HRC), iron ore, steel scrap, billet, and cold-rolled coil (CRC)—the 
-              essential raw materials for OCTG manufacturing. We also track stock prices of major publicly traded OCTG 
-              manufacturers and service providers across Americas, Europe, Asia-Pacific, Australia, and Middle East regions.
+              Track the raw material cost drivers, steel benchmarks, and industry indicators influencing OCTG pricing worldwide. 
+              Includes steel commodities, market sentiment, and energy-sector equity signals impacting casing and tubing markets.
             </p>
             {latestUpdate && (
               <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -185,11 +173,51 @@ export default function PricingIndex() {
           </div>
         </section>
 
-        {/* Commodities Section */}
+        {/* Editorial Explainer Block - MANDATORY */}
+        <section className="container py-8">
+          <Card className="border-accent/30 bg-accent/5">
+            <CardContent className="p-6">
+              <div className="flex items-start gap-3">
+                <AlertCircle className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
+                <div>
+                  <h2 className="font-display text-lg font-semibold mb-3">About These Market Prices</h2>
+                  <div className="space-y-3 text-sm text-muted-foreground">
+                    <p>
+                      OCTG pricing is influenced by a combination of steel raw material costs, manufacturing capacity, 
+                      energy-sector investment cycles, and global market sentiment.
+                    </p>
+                    <p>
+                      This page tracks key input commodities (such as hot-rolled coil, billet, scrap, and iron ore) 
+                      alongside publicly traded energy and steel companies to provide directional insight into cost 
+                      pressure and market conditions impacting OCTG markets globally.
+                    </p>
+                    <p className="font-medium text-foreground">
+                      This data does not represent spot or contract OCTG pipe pricing.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* OCTG Cost Pressure Index - Signature Feature */}
+        {!pricesLoading && commodities.length > 0 && (
+          <section className="container py-6">
+            <CostPressureIndicator commodities={commodities} stocks={stocks} />
+          </section>
+        )}
+
+        {/* Commodities Section - Renamed */}
         <section className="container py-10">
-          <h2 className="font-display text-2xl font-bold tracking-tight mb-6">
-            Steel Commodities
-          </h2>
+          <div className="mb-6">
+            <h2 className="font-display text-2xl font-bold tracking-tight mb-2">
+              Steel & Raw Material Cost Drivers
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              These materials directly influence casing and tubing production costs and mill pricing behavior.
+            </p>
+          </div>
 
           {pricesLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -198,22 +226,28 @@ export default function PricingIndex() {
               ))}
             </div>
           ) : commodities.length > 0 ? (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
-              {commodities.map((commodity) => (
-                <Card key={commodity.id} className="bg-card hover:bg-card/80 transition-colors">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-medium text-muted-foreground">{commodity.symbol}</span>
-                      <PriceChangeIndicator change={commodity.change} changePercent={commodity.change_percent} />
-                    </div>
-                    <p className="font-display text-2xl font-bold tracking-tight">
-                      {formatPrice(commodity.price, commodity.currency)}
-                    </p>
-                    <p className="text-sm text-muted-foreground mt-1">{commodity.name}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+                {commodities.map((commodity) => (
+                  <Card key={commodity.id} className="bg-card hover:bg-card/80 transition-colors">
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between mb-2">
+                        <span className="text-sm font-medium text-muted-foreground">{commodity.symbol}</span>
+                        <PriceChangeIndicator change={commodity.change} changePercent={commodity.change_percent} />
+                      </div>
+                      <p className="font-display text-2xl font-bold tracking-tight">
+                        {formatPrice(commodity.price, commodity.currency)}
+                      </p>
+                      <p className="text-sm text-muted-foreground mt-1">{commodity.name}</p>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+              {/* Data Source Attribution */}
+              <p className="text-xs text-muted-foreground mt-4 italic">
+                Source: Exchange data, public market feeds, editorial aggregation
+              </p>
+            </>
           ) : (
             <Card className="bg-muted/50">
               <CardContent className="p-8 text-center">
@@ -223,66 +257,77 @@ export default function PricingIndex() {
           )}
         </section>
 
-        {/* Stocks by Region Section */}
+        {/* Stocks by Region Section - Renamed */}
         <section className="container py-10">
-          <div className="flex items-center gap-3 mb-6">
-            <Globe className="h-6 w-6 text-accent" />
-            <h2 className="font-display text-2xl font-bold tracking-tight">
-              OCTG Industry Stocks
-            </h2>
+          <div className="mb-6">
+            <div className="flex items-center gap-3 mb-2">
+              <Globe className="h-6 w-6 text-accent" />
+              <h2 className="font-display text-2xl font-bold tracking-tight">
+                Energy & Steel Equities – Market Sentiment Indicators
+              </h2>
+            </div>
+            <p className="text-sm text-muted-foreground">
+              Equity performance reflects capital investment cycles and market sentiment, not direct OCTG pipe pricing.
+            </p>
           </div>
 
           {pricesLoading ? (
             <Skeleton className="h-96" />
           ) : regions.length > 0 ? (
-            <Tabs defaultValue={regions[0]} className="w-full">
-              <TabsList className="mb-6 flex-wrap h-auto gap-1">
-                {regions.map((region) => (
-                  <TabsTrigger key={region} value={region} className="px-4">
-                    {region}
-                  </TabsTrigger>
-                ))}
-              </TabsList>
+            <>
+              <Tabs defaultValue={regions[0]} className="w-full">
+                <TabsList className="mb-6 flex-wrap h-auto gap-1">
+                  {regions.map((region) => (
+                    <TabsTrigger key={region} value={region} className="px-4">
+                      {region}
+                    </TabsTrigger>
+                  ))}
+                </TabsList>
 
-              {regions.map((region) => (
-                <TabsContent key={region} value={region}>
-                  <div className="rounded-lg border border-border overflow-hidden">
-                    <table className="w-full">
-                      <thead className="bg-muted/50">
-                        <tr>
-                          <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Symbol</th>
-                          <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Company</th>
-                          <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Price</th>
-                          <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Change</th>
-                          <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground hidden sm:table-cell">% Change</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border">
-                        {stocksByRegion[region].map((stock) => (
-                          <tr key={stock.id} className="hover:bg-muted/30 transition-colors">
-                            <td className="px-4 py-3">
-                              <span className="font-mono font-medium text-accent">{stock.symbol}</span>
-                            </td>
-                            <td className="px-4 py-3 text-sm">{stock.name}</td>
-                            <td className="px-4 py-3 text-right font-mono">
-                              {formatPrice(stock.price, stock.currency)}
-                            </td>
-                            <td className="px-4 py-3 text-right">
-                              <span className={stock.change > 0 ? "text-green-500" : stock.change < 0 ? "text-red-500" : "text-muted-foreground"}>
-                                {stock.change > 0 ? "+" : ""}{stock.change.toFixed(2)}
-                              </span>
-                            </td>
-                            <td className="px-4 py-3 text-right hidden sm:table-cell">
-                              <PriceChangeIndicator change={stock.change} changePercent={stock.change_percent} />
-                            </td>
+                {regions.map((region) => (
+                  <TabsContent key={region} value={region}>
+                    <div className="rounded-lg border border-border overflow-hidden">
+                      <table className="w-full">
+                        <thead className="bg-muted/50">
+                          <tr>
+                            <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Symbol</th>
+                            <th className="text-left px-4 py-3 text-sm font-medium text-muted-foreground">Company</th>
+                            <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Price</th>
+                            <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground">Change</th>
+                            <th className="text-right px-4 py-3 text-sm font-medium text-muted-foreground hidden sm:table-cell">% Change</th>
                           </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </TabsContent>
-              ))}
-            </Tabs>
+                        </thead>
+                        <tbody className="divide-y divide-border">
+                          {stocksByRegion[region].map((stock) => (
+                            <tr key={stock.id} className="hover:bg-muted/30 transition-colors">
+                              <td className="px-4 py-3">
+                                <span className="font-mono font-medium text-accent">{stock.symbol}</span>
+                              </td>
+                              <td className="px-4 py-3 text-sm">{stock.name}</td>
+                              <td className="px-4 py-3 text-right font-mono">
+                                {formatPrice(stock.price, stock.currency)}
+                              </td>
+                              <td className="px-4 py-3 text-right">
+                                <span className={stock.change > 0 ? "text-green-500" : stock.change < 0 ? "text-red-500" : "text-muted-foreground"}>
+                                  {stock.change > 0 ? "+" : ""}{stock.change.toFixed(2)}
+                                </span>
+                              </td>
+                              <td className="px-4 py-3 text-right hidden sm:table-cell">
+                                <PriceChangeIndicator change={stock.change} changePercent={stock.change_percent} />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
+                    </div>
+                  </TabsContent>
+                ))}
+              </Tabs>
+              {/* Data Source Attribution */}
+              <p className="text-xs text-muted-foreground mt-4 italic">
+                Source: Public stock exchange feeds, company filings
+              </p>
+            </>
           ) : (
             <Card className="bg-muted/50">
               <CardContent className="p-8 text-center">
@@ -292,18 +337,26 @@ export default function PricingIndex() {
           )}
         </section>
 
-        {/* Market Context Section */}
+        {/* Market Context Section - Renamed */}
         <section className="container py-10">
           <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-accent/20">
             <CardHeader>
-              <CardTitle className="font-display text-xl">About the OCTG Pricing Index</CardTitle>
+              <CardTitle className="font-display text-xl">About OCTG Market Intelligence</CardTitle>
             </CardHeader>
             <CardContent className="prose prose-sm dark:prose-invert max-w-none">
               <p>
-                The OCTG Pricing Index tracks key steel commodities and publicly traded companies in the oil country tubular goods sector. This includes manufacturers of casing, tubing, drill pipe, and premium connections used in oil and gas exploration and production.
+                OCTG Index tracks the forces shaping OCTG pricing — not the transactions themselves. We provide 
+                directional insight into cost pressures and market conditions by monitoring key input commodities 
+                and market sentiment indicators.
               </p>
               <p>
-                Key commodities tracked include Hot Rolled Coil (HRC), Cold Rolled Coil (CRC), iron ore, steel scrap, and steel billet—the raw materials essential to OCTG manufacturing. Stock prices represent major OCTG manufacturers and service providers across Americas, Europe, Asia-Pacific, Australia, and Middle East regions.
+                Key cost drivers tracked include Hot Rolled Coil (HRC), Cold Rolled Coil (CRC), iron ore, steel scrap, 
+                and steel billet—the raw materials essential to casing and tubing manufacturing. Equity indicators 
+                represent major energy and steel companies across Americas, Europe, Asia-Pacific, Australia, and 
+                Middle East regions, reflecting capital investment cycles and industry sentiment.
+              </p>
+              <p className="text-muted-foreground text-sm">
+                For specific OCTG pipe pricing inquiries, please contact manufacturers or distributors directly.
               </p>
             </CardContent>
           </Card>
