@@ -300,7 +300,7 @@ const Article = () => {
 
                 {/* Newsletter - Stay Informed */}
                 <div className="hidden lg:block">
-                  <NewsletterSignup />
+                  <NewsletterSignup variant="compact" />
                 </div>
 
                 {/* Share Buttons - below newsletter, sticky for visibility */}
