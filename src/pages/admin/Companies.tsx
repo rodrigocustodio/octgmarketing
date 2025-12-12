@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, Company } from "@/hooks/useCompanies";
+import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useEnrichCompanyProfile, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
 import { useRegions } from "@/hooks/useDirectory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check, Square } from "lucide-react";
+import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check, Square, Zap, Globe, Phone, Calendar, Briefcase, MapPin } from "lucide-react";
 import { INDUSTRY_ROLES } from "@/hooks/useDirectory";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
@@ -36,12 +36,15 @@ const Companies = () => {
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [descFilter, setDescFilter] = useState<string>("all");
+  const [enrichFilter, setEnrichFilter] = useState<string>("all");
   const [generatingIds, setGeneratingIds] = useState<Set<string>>(new Set());
+  const [enrichingIds, setEnrichingIds] = useState<Set<string>>(new Set());
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   
   // Bulk generation state
-  const BATCH_SIZE = 10;
+  const BATCH_SIZE = 3; // Smaller batch for enrichment (more API calls per company)
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
+  const [isBulkEnriching, setIsBulkEnriching] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({
     completed: 0,
     total: 0,
@@ -49,16 +52,24 @@ const Companies = () => {
     batchCurrent: 0,
     currentBatch: 0,
     totalBatches: 0,
+    fieldsUpdated: 0,
   });
   const shouldStopBulk = useRef(false);
   
   const generateDescription = useGenerateCompanyDescription();
+  const enrichCompany = useEnrichCompanyProfile();
   const updateCompany = useUpdateCompany();
   const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  // Count missing descriptions
+  // Count missing data
   const missingCount = companies?.filter(c => !c.description || c.description.length === 0).length || 0;
+  const missingWebsite = companies?.filter(c => !c.website).length || 0;
+  const missingRole = companies?.filter(c => !c.industry_role).length || 0;
+  const missingRegion = companies?.filter(c => !c.region_id).length || 0;
+  const incompleteCount = companies?.filter(c => 
+    !c.description || !c.website || !c.industry_role || !c.region_id
+  ).length || 0;
 
   const handleQuickGenerate = async (company: Company) => {
     setGeneratingIds(prev => new Set(prev).add(company.id));
@@ -121,6 +132,7 @@ const Companies = () => {
       batchCurrent: 0,
       currentBatch: 1,
       totalBatches,
+      fieldsUpdated: 0,
     });
     shouldStopBulk.current = false;
     
@@ -199,6 +211,214 @@ const Companies = () => {
     }
   };
 
+  // Single company enrichment
+  const handleEnrich = async (company: Company) => {
+    setEnrichingIds(prev => new Set(prev).add(company.id));
+    
+    try {
+      const result = await enrichCompany.mutateAsync({
+        companyName: company.name,
+        existingData: {
+          website: company.website,
+          description: company.description,
+          industry_role: company.industry_role,
+          headquarters: company.headquarters,
+          country: company.country,
+        },
+      });
+      
+      // Map region slug to region_id
+      let region_id = company.region_id;
+      if (result.region && regions) {
+        const matchedRegion = regions.find(r => 
+          r.slug.toLowerCase() === result.region?.toLowerCase() ||
+          r.name.toLowerCase().includes(result.region?.toLowerCase() || "")
+        );
+        if (matchedRegion) {
+          region_id = matchedRegion.id;
+        }
+      }
+      
+      // Build update object with only new/missing fields
+      const updateData: Record<string, any> = {};
+      if (result.description && !company.description) updateData.description = result.description;
+      if (result.website && !company.website) updateData.website = result.website;
+      if (result.industry_role && !company.industry_role) updateData.industry_role = result.industry_role;
+      if (region_id && !company.region_id) updateData.region_id = region_id;
+      if (result.year_founded && !company.year_founded) updateData.year_founded = result.year_founded;
+      if (result.phone && !company.phone) updateData.phone = result.phone;
+      if (result.email && !company.email) updateData.email = result.email;
+      if (result.headquarters && !company.headquarters) updateData.headquarters = result.headquarters;
+      if (result.country && !company.country) updateData.country = result.country;
+      
+      if (Object.keys(updateData).length > 0) {
+        await updateCompany.mutateAsync({
+          id: company.id,
+          data: updateData,
+        });
+        toast({ 
+          title: "Profile enriched", 
+          description: `Updated ${Object.keys(updateData).length} field(s)` 
+        });
+      } else {
+        toast({ title: "No new data found", description: "Company profile is already complete" });
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+      setCompletedIds(prev => new Set(prev).add(company.id));
+      
+      setTimeout(() => {
+        setCompletedIds(prev => {
+          const next = new Set(prev);
+          next.delete(company.id);
+          return next;
+        });
+      }, 3000);
+    } catch (error) {
+      toast({ 
+        title: "Enrichment failed", 
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive" 
+      });
+    } finally {
+      setEnrichingIds(prev => {
+        const next = new Set(prev);
+        next.delete(company.id);
+        return next;
+      });
+    }
+  };
+
+  // Bulk enrichment
+  const handleBulkEnrich = async () => {
+    const incompleteCompanies = companies?.filter(c => 
+      !c.description || !c.website || !c.industry_role || !c.region_id
+    ) || [];
+    
+    if (incompleteCompanies.length === 0) return;
+    
+    const totalBatches = Math.ceil(incompleteCompanies.length / BATCH_SIZE);
+    
+    setIsBulkEnriching(true);
+    setBulkProgress({
+      completed: 0,
+      total: incompleteCompanies.length,
+      current: "",
+      batchCurrent: 0,
+      currentBatch: 1,
+      totalBatches,
+      fieldsUpdated: 0,
+    });
+    shouldStopBulk.current = false;
+    
+    let successCount = 0;
+    let failCount = 0;
+    let totalFieldsUpdated = 0;
+    let batchNumber = 1;
+    
+    for (let i = 0; i < incompleteCompanies.length; i += BATCH_SIZE) {
+      if (shouldStopBulk.current) break;
+      
+      const batch = incompleteCompanies.slice(i, i + BATCH_SIZE);
+      flushSync(() => {
+        setBulkProgress(prev => ({ ...prev, currentBatch: batchNumber }));
+      });
+      
+      for (let j = 0; j < batch.length; j++) {
+        if (shouldStopBulk.current) {
+          toast({ title: "Bulk enrichment stopped", description: `Completed ${successCount} of ${incompleteCompanies.length}` });
+          break;
+        }
+        
+        const company = batch[j];
+        flushSync(() => {
+          setBulkProgress(prev => ({
+            ...prev,
+            current: company.name,
+            batchCurrent: j + 1,
+          }));
+        });
+        
+        try {
+          const result = await enrichCompany.mutateAsync({
+            companyName: company.name,
+            existingData: {
+              website: company.website,
+              description: company.description,
+              industry_role: company.industry_role,
+              headquarters: company.headquarters,
+              country: company.country,
+            },
+          });
+          
+          // Map region
+          let region_id = company.region_id;
+          if (result.region && regions) {
+            const matchedRegion = regions.find(r => 
+              r.slug.toLowerCase() === result.region?.toLowerCase() ||
+              r.name.toLowerCase().includes(result.region?.toLowerCase() || "")
+            );
+            if (matchedRegion) {
+              region_id = matchedRegion.id;
+            }
+          }
+          
+          const updateData: Record<string, any> = {};
+          if (result.description && !company.description) updateData.description = result.description;
+          if (result.website && !company.website) updateData.website = result.website;
+          if (result.industry_role && !company.industry_role) updateData.industry_role = result.industry_role;
+          if (region_id && !company.region_id) updateData.region_id = region_id;
+          if (result.year_founded && !company.year_founded) updateData.year_founded = result.year_founded;
+          if (result.phone && !company.phone) updateData.phone = result.phone;
+          if (result.email && !company.email) updateData.email = result.email;
+          if (result.headquarters && !company.headquarters) updateData.headquarters = result.headquarters;
+          if (result.country && !company.country) updateData.country = result.country;
+          
+          if (Object.keys(updateData).length > 0) {
+            await updateCompany.mutateAsync({
+              id: company.id,
+              data: updateData,
+            });
+            totalFieldsUpdated += Object.keys(updateData).length;
+          }
+          
+          successCount++;
+        } catch (error) {
+          console.error(`Failed to enrich ${company.name}:`, error);
+          failCount++;
+        }
+        
+        flushSync(() => {
+          setBulkProgress(prev => ({ 
+            ...prev, 
+            completed: prev.completed + 1,
+            fieldsUpdated: totalFieldsUpdated,
+          }));
+        });
+        
+        // Longer delay for enrichment (more API calls)
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+      batchNumber++;
+      
+      if (!shouldStopBulk.current && i + BATCH_SIZE < incompleteCompanies.length) {
+        await new Promise(resolve => setTimeout(resolve, 3000));
+      }
+    }
+    
+    queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+    setIsBulkEnriching(false);
+    
+    if (!shouldStopBulk.current) {
+      toast({ 
+        title: "Bulk enrichment complete", 
+        description: `Enriched ${successCount} companies, updated ${totalFieldsUpdated} fields${failCount > 0 ? `, ${failCount} failed` : ""}` 
+      });
+    }
+  };
+
   const handleStopBulk = () => {
     shouldStopBulk.current = true;
   };
@@ -214,7 +434,15 @@ const Companies = () => {
     else if (descFilter === "short") matchesDesc = descLength > 0 && descLength < 400;
     else if (descFilter === "good") matchesDesc = descLength >= 400;
     
-    return matchesSearch && matchesRegion && matchesRole && matchesDesc;
+    // Enrich filter
+    let matchesEnrich = true;
+    if (enrichFilter === "incomplete") {
+      matchesEnrich = !company.description || !company.website || !company.industry_role || !company.region_id;
+    } else if (enrichFilter === "complete") {
+      matchesEnrich = !!(company.description && company.website && company.industry_role && company.region_id);
+    }
+    
+    return matchesSearch && matchesRegion && matchesRole && matchesDesc && matchesEnrich;
   });
 
   const getDescriptionStatus = (description: string | null) => {
@@ -222,6 +450,15 @@ const Companies = () => {
     if (length === 0) return { label: "Missing", variant: "destructive" as const, icon: AlertCircle };
     if (length < 400) return { label: `${length} chars`, variant: "secondary" as const, icon: AlertCircle };
     return { label: `${length} chars`, variant: "default" as const, icon: CheckCircle2 };
+  };
+
+  const getCompletenessScore = (company: Company) => {
+    let score = 0;
+    if (company.description) score++;
+    if (company.website) score++;
+    if (company.industry_role) score++;
+    if (company.region_id) score++;
+    return score;
   };
 
   return (
@@ -235,8 +472,8 @@ const Companies = () => {
               Manage company profiles and descriptions
             </p>
           </div>
-          <div className="flex items-center gap-2">
-            {isBulkGenerating ? (
+          <div className="flex items-center gap-2 flex-wrap">
+            {(isBulkGenerating || isBulkEnriching) ? (
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
@@ -255,20 +492,32 @@ const Companies = () => {
                   variant="destructive"
                   size="sm"
                   onClick={handleStopBulk}
+                  aria-label="Stop bulk operation"
                 >
                   <Square className="h-4 w-4" />
                 </Button>
               </div>
             ) : (
-              <Button
-                variant="outline"
-                onClick={handleBulkGenerate}
-                disabled={missingCount === 0}
-                className="bg-accent/20 text-accent hover:bg-accent/30 border-accent/30"
-              >
-                <Sparkles className="h-4 w-4 mr-2" />
-                Generate All Missing ({missingCount})
-              </Button>
+              <>
+                <Button
+                  variant="outline"
+                  onClick={handleBulkEnrich}
+                  disabled={incompleteCount === 0}
+                  className="bg-primary/20 text-primary hover:bg-primary/30 border-primary/30"
+                >
+                  <Zap className="h-4 w-4 mr-2" />
+                  Enrich All Incomplete ({incompleteCount})
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleBulkGenerate}
+                  disabled={missingCount === 0}
+                  className="bg-accent/20 text-accent hover:bg-accent/30 border-accent/30"
+                >
+                  <Sparkles className="h-4 w-4 mr-2" />
+                  Generate Descriptions ({missingCount})
+                </Button>
+              </>
             )}
             <Button asChild>
               <Link to="/admin/companies/new">
@@ -280,25 +529,28 @@ const Companies = () => {
         </div>
 
         {/* Bulk Progress Panel */}
-        {isBulkGenerating && (
-          <div className="bg-card border border-accent/30 rounded-lg p-4">
+        {(isBulkGenerating || isBulkEnriching) && (
+          <div className={`bg-card border rounded-lg p-4 ${isBulkEnriching ? 'border-primary/30' : 'border-accent/30'}`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-accent/20 flex items-center justify-center">
-                  <Loader2 className="h-5 w-5 animate-spin text-accent" />
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${isBulkEnriching ? 'bg-primary/20' : 'bg-accent/20'}`}>
+                  <Loader2 className={`h-5 w-5 animate-spin ${isBulkEnriching ? 'text-primary' : 'text-accent'}`} />
                 </div>
                 <div>
                   <p className="font-medium text-foreground">
-                    Generating: <span className="text-accent">{bulkProgress.current}</span>
+                    {isBulkEnriching ? 'Enriching' : 'Generating'}: <span className={isBulkEnriching ? 'text-primary' : 'text-accent'}>{bulkProgress.current}</span>
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Batch {bulkProgress.currentBatch} of {bulkProgress.totalBatches} • 
                     Item {bulkProgress.batchCurrent} of {Math.min(BATCH_SIZE, bulkProgress.total - (bulkProgress.currentBatch - 1) * BATCH_SIZE)}
+                    {isBulkEnriching && bulkProgress.fieldsUpdated > 0 && (
+                      <span className="ml-2">• {bulkProgress.fieldsUpdated} fields updated</span>
+                    )}
                   </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className="text-lg font-bold text-accent">
+                <p className={`text-lg font-bold ${isBulkEnriching ? 'text-primary' : 'text-accent'}`}>
                   {bulkProgress.completed} / {bulkProgress.total}
                 </p>
                 <p className="text-xs text-muted-foreground">
@@ -315,27 +567,41 @@ const Companies = () => {
 
         {/* Stats */}
         {companies && (
-          <div className="grid grid-cols-4 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4">
             <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground">Total Companies</p>
+              <p className="text-sm text-muted-foreground">Total</p>
               <p className="text-2xl font-bold">{companies.length}</p>
             </div>
             <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground">Missing Description</p>
-              <p className="text-2xl font-bold text-destructive">
-                {companies.filter(c => !c.description || c.description.length === 0).length}
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <AlertCircle className="h-3 w-3" /> No Description
               </p>
+              <p className="text-2xl font-bold text-destructive">{missingCount}</p>
             </div>
             <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground">Short (&lt;400 chars)</p>
-              <p className="text-2xl font-bold text-yellow-500">
-                {companies.filter(c => c.description && c.description.length > 0 && c.description.length < 400).length}
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <Globe className="h-3 w-3" /> No Website
               </p>
+              <p className="text-2xl font-bold text-yellow-500">{missingWebsite}</p>
             </div>
             <div className="bg-card border border-border rounded-lg p-4">
-              <p className="text-sm text-muted-foreground">Good (400+ chars)</p>
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <Briefcase className="h-3 w-3" /> No Role
+              </p>
+              <p className="text-2xl font-bold text-yellow-500">{missingRole}</p>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <MapPin className="h-3 w-3" /> No Region
+              </p>
+              <p className="text-2xl font-bold text-yellow-500">{missingRegion}</p>
+            </div>
+            <div className="bg-card border border-border rounded-lg p-4">
+              <p className="text-sm text-muted-foreground flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3" /> Complete
+              </p>
               <p className="text-2xl font-bold text-green-500">
-                {companies.filter(c => c.description && c.description.length >= 400).length}
+                {companies.filter(c => c.description && c.website && c.industry_role && c.region_id).length}
               </p>
             </div>
           </div>
@@ -354,7 +620,7 @@ const Companies = () => {
           </div>
           
           <Select value={regionFilter} onValueChange={setRegionFilter}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="All Regions" />
             </SelectTrigger>
             <SelectContent>
@@ -368,7 +634,7 @@ const Companies = () => {
           </Select>
 
           <Select value={roleFilter} onValueChange={setRoleFilter}>
-            <SelectTrigger className="w-[180px]">
+            <SelectTrigger className="w-[160px]">
               <SelectValue placeholder="All Roles" />
             </SelectTrigger>
             <SelectContent>
@@ -382,14 +648,25 @@ const Companies = () => {
           </Select>
 
           <Select value={descFilter} onValueChange={setDescFilter}>
-            <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder="Description Status" />
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Description" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All Statuses</SelectItem>
+              <SelectItem value="all">All Descriptions</SelectItem>
               <SelectItem value="missing">Missing</SelectItem>
               <SelectItem value="short">Short (&lt;400)</SelectItem>
               <SelectItem value="good">Good (400+)</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={enrichFilter} onValueChange={setEnrichFilter}>
+            <SelectTrigger className="w-[160px]">
+              <SelectValue placeholder="Completeness" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Profiles</SelectItem>
+              <SelectItem value="incomplete">Incomplete</SelectItem>
+              <SelectItem value="complete">Complete</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -499,11 +776,27 @@ const Companies = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <Button variant="ghost" size="sm" asChild aria-label="Edit company">
-                          <Link to={`/admin/companies/${company.id}`}>
-                            <Edit className="h-4 w-4" />
-                          </Link>
-                        </Button>
+                        <div className="flex items-center gap-1">
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-xs bg-primary/20 text-primary hover:bg-primary/30"
+                            onClick={() => handleEnrich(company)}
+                            disabled={enrichingIds.has(company.id) || isBulkEnriching || isBulkGenerating}
+                            aria-label="Enrich company profile"
+                          >
+                            {enrichingIds.has(company.id) ? (
+                              <Loader2 className="h-4 w-4 animate-spin" />
+                            ) : (
+                              <Zap className="h-3 w-3" />
+                            )}
+                          </Button>
+                          <Button variant="ghost" size="sm" asChild aria-label="Edit company">
+                            <Link to={`/admin/companies/${company.id}`}>
+                              <Edit className="h-4 w-4" />
+                            </Link>
+                          </Button>
+                        </div>
                       </TableCell>
                     </TableRow>
                   );

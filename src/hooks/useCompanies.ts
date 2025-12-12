@@ -118,3 +118,28 @@ export const useGenerateCompanyDescription = () => {
     },
   });
 };
+
+export type EnrichedCompanyData = {
+  website?: string | null;
+  description?: string | null;
+  industry_role?: string | null;
+  region?: string | null;
+  year_founded?: number | null;
+  phone?: string | null;
+  email?: string | null;
+  headquarters?: string | null;
+  country?: string | null;
+};
+
+export const useEnrichCompanyProfile = () => {
+  return useMutation({
+    mutationFn: async ({ companyName, existingData }: { companyName: string; existingData?: Partial<Company> }) => {
+      const { data, error } = await supabase.functions.invoke("enrich-company-profile", {
+        body: { companyName, existingData },
+      });
+
+      if (error) throw error;
+      return data as EnrichedCompanyData;
+    },
+  });
+};
