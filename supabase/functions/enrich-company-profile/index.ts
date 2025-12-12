@@ -108,7 +108,8 @@ serve(async (req) => {
     // Step 1: Search for company information using Firecrawl
     if (firecrawlApiKey) {
       try {
-        const searchQuery = `${companyName} company headquarters website contact founded year industry oil gas energy OCTG`;
+        // More targeted search query for official company info
+        const searchQuery = `"${companyName}" official website about us headquarters founded`;
         console.log(`Searching web for: ${searchQuery}`);
 
         const searchResponse = await fetch("https://api.firecrawl.dev/v1/search", {
@@ -190,7 +191,16 @@ Return a JSON object with these fields:
 - headquarters: City and country of headquarters (string or null)
 - country: Country of headquarters (string or null)
 
-RULES:
+CRITICAL WEBSITE RULES:
+- ONLY include the company's OFFICIAL corporate website
+- The website domain should match or closely relate to the company name
+- NEVER include LinkedIn, Wikipedia, Bloomberg, Reuters, news sites, or industry directories
+- NEVER include URLs that are clearly about the company but not their official site
+- If you cannot find a verified official website, return null - DO NOT GUESS
+- Valid examples: "https://tenaris.com", "https://vallourec.com", "https://tmk-group.com"
+- Invalid examples: LinkedIn profiles, Wikipedia pages, news articles, directory listings
+
+OTHER RULES:
 - Only include factual, verifiable information
 - If a field cannot be determined, return null
 - For description: Write about what they do, where they operate, key products/services, industry significance

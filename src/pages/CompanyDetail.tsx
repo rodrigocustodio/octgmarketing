@@ -419,7 +419,7 @@ export default function CompanyDetail() {
                   <div>
                     <h3 className="font-medium mb-2">What does {company.name} do?</h3>
                     <p className="text-muted-foreground text-sm">
-                      {company.description || `${company.name} is a ${categoryLabel.toLowerCase()} company in the OCTG (Oil Country Tubular Goods) industry${company.country ? `, headquartered in ${company.country}` : ""}.`}
+                      {`${company.name} is a ${categoryLabel.toLowerCase()} company${company.headquarters ? ` headquartered in ${company.headquarters}` : company.country ? ` based in ${company.country}` : ""}, specializing in the OCTG (Oil Country Tubular Goods) sector${company.region ? ` serving the ${company.region.name} market` : ""}.`}
                     </p>
                   </div>
                   {(company.headquarters || company.country) && (
