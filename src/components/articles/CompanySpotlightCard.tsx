@@ -22,7 +22,7 @@ export function CompanySpotlightCard({
       <div className="w-1.5 bg-accent flex-shrink-0" />
 
       {/* Main content */}
-      <div className="flex-1 p-6 flex flex-col justify-between">
+      <div className="flex-1 px-6 py-4 flex flex-col justify-between">
         <div>
           {/* Company name */}
           <h3 className="text-2xl font-bold text-foreground mb-2 tracking-tight">
