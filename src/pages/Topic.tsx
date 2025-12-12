@@ -173,19 +173,19 @@ const Topic = () => {
             )}
           </section>
 
-          {/* Newsletter CTA */}
-          <section className="bg-card border-t border-border">
-            <div className="container py-12 sm:py-16">
-              <div className="max-w-2xl mx-auto text-center">
-                <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight mb-4">
-                  Stay Updated on {topic.name}
-                </h2>
-                <p className="text-muted-foreground mb-8">
-                  Get the latest {topic.name} news and analysis delivered to your inbox weekly.
-                </p>
-                <div className="max-w-md mx-auto">
-                  <NewsletterSignup />
-                </div>
+          {/* Newsletter CTA with Background Image */}
+          <section className="relative overflow-hidden border-t border-border">
+            {/* Background Image */}
+            <div 
+              className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+              style={{ backgroundImage: `url('/images/newsletter-bg.jpg')` }}
+            />
+            {/* Dark Gradient Overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/60" />
+            {/* Content Container */}
+            <div className="relative z-10 container py-12 sm:py-16">
+              <div className="max-w-2xl mx-auto">
+                <NewsletterSignup />
               </div>
             </div>
           </section>
