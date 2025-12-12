@@ -17,21 +17,25 @@ export function CompanySpotlightCard({
 }: CompanySpotlightCardProps) {
   return (
     <div className="my-8 rounded-lg border-l-4 border-accent bg-muted/30 p-5 not-prose">
-      <h4 className="flex items-center gap-2 font-display text-base font-semibold text-foreground mb-2">
+      {/* Title row - icon aligned */}
+      <div className="flex items-center gap-2.5 mb-3">
         <Building2 className="h-4 w-4 text-accent flex-shrink-0" />
-        Learn More About {name}
-      </h4>
+        <h4 className="font-display text-base font-semibold text-foreground">
+          Learn More About {name}
+        </h4>
+      </div>
       
-      <div className="space-y-1 text-sm text-muted-foreground mb-3 pl-6">
+      {/* Details - icons vertically aligned with title icon */}
+      <div className="space-y-2 text-sm text-muted-foreground mb-4">
         {headquarters && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <MapPin className="h-4 w-4 flex-shrink-0 opacity-70" />
             <span>{headquarters}</span>
           </div>
         )}
         
         {website && (
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <Globe className="h-4 w-4 flex-shrink-0 opacity-70" />
             <a 
               href={website.startsWith('http') ? website : `https://${website}`}
@@ -45,7 +49,8 @@ export function CompanySpotlightCard({
         )}
       </div>
       
-      <div className="pl-6">
+      {/* Button - indented to align with text start */}
+      <div className="ml-[26px]">
         <Button asChild variant="outline" size="sm" className="gap-1.5">
           <Link to={`/directory/company/${slug}`}>
             View Company Profile
