@@ -24,7 +24,7 @@ import { CostPressureIndicator } from "@/components/market/CostPressureIndicator
 function PriceChangeIndicator({ change, changePercent }: { change: number; changePercent: number }) {
   if (change > 0) {
     return (
-      <span className="flex items-center gap-1 text-green-500">
+      <span className="flex items-center justify-end gap-1 text-green-500">
         <TrendingUp className="h-4 w-4" />
         <span>+{changePercent.toFixed(2)}%</span>
       </span>
@@ -32,14 +32,14 @@ function PriceChangeIndicator({ change, changePercent }: { change: number; chang
   }
   if (change < 0) {
     return (
-      <span className="flex items-center gap-1 text-red-500">
+      <span className="flex items-center justify-end gap-1 text-red-500">
         <TrendingDown className="h-4 w-4" />
         <span>{changePercent.toFixed(2)}%</span>
       </span>
     );
   }
   return (
-    <span className="flex items-center gap-1 text-muted-foreground">
+    <span className="flex items-center justify-end gap-1 text-muted-foreground">
       <Minus className="h-4 w-4" />
       <span>0.00%</span>
     </span>
