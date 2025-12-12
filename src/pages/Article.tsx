@@ -103,6 +103,64 @@ const Article = () => {
     );
   }
 
+  // NewsArticle Schema for SEO
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    "headline": article.title,
+    "description": article.subtitle || "",
+    "image": article.hero_image_url || "https://octgindex.com/og-default.png",
+    "datePublished": article.publish_date || article.created_at,
+    "dateModified": article.publish_date || article.created_at,
+    "author": article.author ? {
+      "@type": "Person",
+      "name": article.author.name,
+      "jobTitle": article.author.title
+    } : {
+      "@type": "Organization",
+      "name": "OCTG Index Editorial Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "@id": "https://octgindex.com/#organization",
+      "name": "OCTG Index",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://octgindex.com/favicon.png"
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": canonicalUrl
+    }
+  };
+
+  // Breadcrumb Schema
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "name": "Home",
+        "item": "https://octgindex.com"
+      },
+      ...(article.region ? [{
+        "@type": "ListItem",
+        "position": 2,
+        "name": article.region.name,
+        "item": `https://octgindex.com/region/${article.region.slug}`
+      }] : []),
+      {
+        "@type": "ListItem",
+        "position": article.region ? 3 : 2,
+        "name": article.title,
+        "item": canonicalUrl
+      }
+    ]
+  };
+
   return (
     <>
       <SEOHead
@@ -113,6 +171,16 @@ const Article = () => {
         type="article"
         publishedTime={article.publish_date || undefined}
         section={article.region?.name}
+      />
+      
+      {/* Inject Schema.org structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
       />
 
       <div className="min-h-screen bg-background flex flex-col">

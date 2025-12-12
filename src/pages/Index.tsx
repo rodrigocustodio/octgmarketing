@@ -137,6 +137,49 @@ const Index = () => {
     return { finalAnalysisArticles, finalQuickReadsArticles };
   }, [articles, usedIds]);
 
+  // Organization + WebSite Schema for SEO
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "@id": "https://octgindex.com/#organization",
+    "name": "OCTG Index",
+    "url": "https://octgindex.com",
+    "logo": "https://octgindex.com/favicon.png",
+    "description": "The leading news and intelligence platform for the global OCTG (Oil Country Tubular Goods) industry.",
+    "foundingDate": "2024",
+    "address": {
+      "@type": "PostalAddress",
+      "addressLocality": "Houston",
+      "addressRegion": "Texas",
+      "addressCountry": "USA"
+    },
+    "contactPoint": {
+      "@type": "ContactPoint",
+      "email": "info@octgindex.com",
+      "contactType": "customer service"
+    },
+    "sameAs": [
+      "https://twitter.com/OCTGMarketing"
+    ]
+  };
+
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": "https://octgindex.com/#website",
+    "name": "OCTG Index",
+    "url": "https://octgindex.com",
+    "description": "Your source for OCTG industry news, market analysis, pricing trends, and insights on mills, manufacturers, and global supply chain developments.",
+    "publisher": {
+      "@id": "https://octgindex.com/#organization"
+    },
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://octgindex.com/?q={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
   return (
     <>
       <SEOHead
@@ -144,6 +187,17 @@ const Index = () => {
         description="Your source for OCTG industry news, market analysis, pricing trends, and insights on mills, manufacturers, and global supply chain developments."
         canonical="https://octgindex.com"
       />
+      
+      {/* Inject Schema.org structured data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+      />
+      
       <div className="min-h-screen bg-background">
         <Header />
       
