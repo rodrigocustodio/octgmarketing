@@ -108,58 +108,70 @@ export function NewsletterSignup({ variant = 'default' }: NewsletterSignupProps)
     );
   }
 
-  // Default full-width variant - Clean corporate design
+  // Default full-width variant - Corporate design with background image
   return (
-    <section className="bg-muted/50 border border-border rounded-xl p-8 sm:p-10">
-      <div className="max-w-xl mx-auto text-center space-y-6">
-        {/* Heading with accent icon */}
-        <div className="flex items-center justify-center gap-3">
-          <Mail className="h-6 w-6 text-accent" />
-          <h2 className="font-display text-2xl sm:text-3xl font-bold">
-            Stay Informed
-          </h2>
-        </div>
-        
-        {/* Subtitle */}
-        <p className="text-muted-foreground text-lg">
-          Get weekly OCTG industry insights and market intelligence delivered to your inbox.
-        </p>
-        
-        {/* Form OR Success State */}
-        {!isSubscribed ? (
-          <div className="space-y-4">
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
-              <Input
-                type="email"
-                placeholder="Enter your email address"
-                value={email}
-                onChange={(e) => {
-                  setEmail(e.target.value);
-                  if (error) setError(null);
-                }}
-                className="flex-1"
-                aria-invalid={!!error}
-              />
-              <Button type="submit" variant="bronze" size="lg" disabled={loading}>
-                {loading ? "Subscribing..." : "Subscribe"}
-              </Button>
-            </form>
-            {error && <p className="text-sm text-destructive">{error}</p>}
-            <p className="text-xs text-muted-foreground">
-              No spam • Unsubscribe anytime • Weekly insights delivered
-            </p>
+    <section className="relative overflow-hidden rounded-xl">
+      {/* Background Image */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: `url('/images/newsletter-bg.jpg')` }}
+      />
+      
+      {/* Dark Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-r from-background via-background/90 to-background/70" />
+      
+      {/* Content Container */}
+      <div className="relative z-10 p-8 sm:p-12">
+        <div className="max-w-xl mx-auto text-center space-y-6">
+          {/* Heading with accent icon */}
+          <div className="flex items-center justify-center gap-3">
+            <Mail className="h-6 w-6 text-accent" />
+            <h2 className="font-display text-2xl sm:text-3xl font-bold">
+              Stay Informed
+            </h2>
           </div>
-        ) : (
-          <div className="py-6 space-y-3 animate-fade-in">
-            <div className="w-14 h-14 rounded-full bg-gradient-to-r from-octg-bronze via-octg-gold to-octg-copper flex items-center justify-center mx-auto">
-              <Check className="w-7 h-7 text-white" />
+          
+          {/* Subtitle */}
+          <p className="text-muted-foreground text-lg">
+            Get weekly OCTG industry insights and market intelligence delivered to your inbox.
+          </p>
+          
+          {/* Form OR Success State */}
+          {!isSubscribed ? (
+            <div className="space-y-4">
+              <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3">
+                <Input
+                  type="email"
+                  placeholder="Enter your email address"
+                  value={email}
+                  onChange={(e) => {
+                    setEmail(e.target.value);
+                    if (error) setError(null);
+                  }}
+                  className="flex-1"
+                  aria-invalid={!!error}
+                />
+                <Button type="submit" variant="bronze" size="lg" disabled={loading}>
+                  {loading ? "Subscribing..." : "Subscribe"}
+                </Button>
+              </form>
+              {error && <p className="text-sm text-destructive">{error}</p>}
+              <p className="text-xs text-muted-foreground">
+                No spam • Unsubscribe anytime • Weekly insights delivered
+              </p>
             </div>
-            <p className="font-semibold text-xl text-accent">You're In!</p>
-            <p className="text-muted-foreground">
-              Welcome to the OCTG Index newsletter.
-            </p>
-          </div>
-        )}
+          ) : (
+            <div className="py-6 space-y-3 animate-fade-in">
+              <div className="w-14 h-14 rounded-full bg-gradient-to-r from-octg-bronze via-octg-gold to-octg-copper flex items-center justify-center mx-auto">
+                <Check className="w-7 h-7 text-white" />
+              </div>
+              <p className="font-semibold text-xl text-accent">You're In!</p>
+              <p className="text-muted-foreground">
+                Welcome to the OCTG Index newsletter.
+              </p>
+            </div>
+          )}
+        </div>
       </div>
     </section>
   );
