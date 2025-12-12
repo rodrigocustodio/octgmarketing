@@ -26,10 +26,12 @@ const footerLinks = {
   ],
   connect: [
     { name: "Contact Us", href: "/contact" },
+    { name: "About Us", href: "/about" },
   ],
   legal: [
     { name: "Privacy Policy", href: "/privacy" },
     { name: "Terms & Conditions", href: "/terms" },
+    { name: "Editorial Policy", href: "/editorial-policy" },
     { name: "Newsletter Terms", href: "/newsletter-terms" },
     { name: "Admin", href: "/auth" },
   ],

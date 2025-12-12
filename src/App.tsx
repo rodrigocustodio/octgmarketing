@@ -24,6 +24,8 @@ import CEODetail from "./pages/CEODetail";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
 import NewsletterTerms from "./pages/NewsletterTerms";
+import About from "./pages/About";
+import EditorialPolicy from "./pages/EditorialPolicy";
 import OctgDirectory from "./pages/OctgDirectory";
 import OctgCategory from "./pages/OctgCategory";
 import ProductDetail from "./pages/ProductDetail";
@@ -87,6 +89,8 @@ const App = () => (
                 <Route path="/privacy" element={<PrivacyPolicy />} />
                 <Route path="/terms" element={<TermsAndConditions />} />
                 <Route path="/newsletter-terms" element={<NewsletterTerms />} />
+                <Route path="/about" element={<About />} />
+                <Route path="/editorial-policy" element={<EditorialPolicy />} />
                 <Route path="/auth" element={<Auth />} />
                 
                 {/* Admin Routes */}

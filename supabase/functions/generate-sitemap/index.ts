@@ -95,6 +95,55 @@ Deno.serve(async (req) => {
       priority: 0.3,
     });
 
+    urls.push({
+      loc: `${SITE_URL}/about`,
+      lastmod: formatDate(null),
+      changefreq: "monthly",
+      priority: 0.7,
+    });
+
+    urls.push({
+      loc: `${SITE_URL}/editorial-policy`,
+      lastmod: formatDate(null),
+      changefreq: "yearly",
+      priority: 0.5,
+    });
+
+    urls.push({
+      loc: `${SITE_URL}/contact`,
+      lastmod: formatDate(null),
+      changefreq: "monthly",
+      priority: 0.8,
+    });
+
+    urls.push({
+      loc: `${SITE_URL}/events`,
+      lastmod: formatDate(null),
+      changefreq: "weekly",
+      priority: 0.8,
+    });
+
+    urls.push({
+      loc: `${SITE_URL}/pricing-index`,
+      lastmod: formatDate(null),
+      changefreq: "daily",
+      priority: 0.8,
+    });
+
+    urls.push({
+      loc: `${SITE_URL}/octg-directory`,
+      lastmod: formatDate(null),
+      changefreq: "weekly",
+      priority: 0.9,
+    });
+
+    urls.push({
+      loc: `${SITE_URL}/topics`,
+      lastmod: formatDate(null),
+      changefreq: "weekly",
+      priority: 0.7,
+    });
+
     // Fetch regions
     const { data: regions, error: regionsError } = await supabase
       .from("regions")
@@ -207,6 +256,76 @@ Deno.serve(async (req) => {
           lastmod: formatDate(executive.updated_at),
           changefreq: "monthly",
           priority: 0.5,
+        });
+      }
+    }
+
+    // Fetch events
+    const { data: events, error: eventsError } = await supabase
+      .from("events")
+      .select("slug, updated_at");
+
+    if (eventsError) {
+      console.error("Error fetching events:", eventsError);
+    } else if (events) {
+      console.log(`Found ${events.length} events`);
+      for (const event of events) {
+        urls.push({
+          loc: `${SITE_URL}/events/${event.slug}`,
+          lastmod: formatDate(event.updated_at),
+          changefreq: "monthly",
+          priority: 0.6,
+        });
+      }
+    }
+
+    // Fetch products with their categories
+    const { data: products, error: productsError } = await supabase
+      .from("products")
+      .select("slug, updated_at, category_id");
+
+    // Fetch all product categories for mapping
+    const { data: allCategories } = await supabase
+      .from("product_categories")
+      .select("id, slug");
+    
+    const categoryMap = new Map<string, string>();
+    if (allCategories) {
+      for (const cat of allCategories) {
+        categoryMap.set(cat.id, cat.slug);
+      }
+    }
+
+    if (productsError) {
+      console.error("Error fetching products:", productsError);
+    } else if (products) {
+      console.log(`Found ${products.length} products`);
+      for (const product of products) {
+        const categorySlug = product.category_id ? categoryMap.get(product.category_id) || "uncategorized" : "uncategorized";
+        urls.push({
+          loc: `${SITE_URL}/octg-directory/${categorySlug}/${product.slug}`,
+          lastmod: formatDate(product.updated_at),
+          changefreq: "monthly",
+          priority: 0.5,
+        });
+      }
+    }
+
+    // Fetch product categories
+    const { data: productCategories, error: productCategoriesError } = await supabase
+      .from("product_categories")
+      .select("slug, updated_at");
+
+    if (productCategoriesError) {
+      console.error("Error fetching product categories:", productCategoriesError);
+    } else if (productCategories) {
+      console.log(`Found ${productCategories.length} product categories`);
+      for (const category of productCategories) {
+        urls.push({
+          loc: `${SITE_URL}/octg-directory/${category.slug}`,
+          lastmod: formatDate(category.updated_at),
+          changefreq: "weekly",
+          priority: 0.7,
         });
       }
     }
