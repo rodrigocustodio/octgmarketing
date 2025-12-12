@@ -3,10 +3,9 @@ import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
-  "Content-Type": "application/xml",
 };
 
-const SITE_URL = "https://octgindex.com";
+const BASE_URL = "https://octgindex.com";
 
 interface SitemapUrl {
   loc: string;
@@ -38,348 +37,352 @@ function generateUrlEntry(url: SitemapUrl): string {
   </url>`;
 }
 
+function generateSitemapXml(urls: SitemapUrl[]): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map(generateUrlEntry).join("\n")}
+</urlset>`;
+}
+
+function generateSitemapIndex(sitemaps: { loc: string; lastmod: string }[]): string {
+  return `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${sitemaps.map(s => `  <sitemap>
+    <loc>${escapeXml(s.loc)}</loc>
+    <lastmod>${s.lastmod}</lastmod>
+  </sitemap>`).join("\n")}
+</sitemapindex>`;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
+    const url = new URL(req.url);
+    const type = url.searchParams.get("type") || "index";
+
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
     const supabase = createClient(supabaseUrl, supabaseKey);
 
-    console.log("Generating dynamic sitemap...");
+    const today = formatDate(null);
+    let xmlContent = "";
 
-    const urls: SitemapUrl[] = [];
+    console.log(`Generating sitemap type: ${type}`);
 
-    // Static pages - Top-level category pages for sitelinks
-    urls.push({
-      loc: SITE_URL,
-      lastmod: formatDate(null),
-      changefreq: "daily",
-      priority: 1.0,
-    });
-
-    // NEWS - Primary category page
-    urls.push({
-      loc: `${SITE_URL}/news`,
-      lastmod: formatDate(null),
-      changefreq: "daily",
-      priority: 0.95,
-    });
-
-    // MARKET PRICES - Primary category page
-    urls.push({
-      loc: `${SITE_URL}/pricing-index`,
-      lastmod: formatDate(null),
-      changefreq: "daily",
-      priority: 0.9,
-    });
-
-    // COMPANIES - Primary category page
-    urls.push({
-      loc: `${SITE_URL}/directory`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.9,
-    });
-
-    // CEOs - Primary category page
-    urls.push({
-      loc: `${SITE_URL}/ceo-directory`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.85,
-    });
-
-    // EVENTS - Primary category page
-    urls.push({
-      loc: `${SITE_URL}/events`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.85,
-    });
-
-    // PRODUCTS - Primary category page
-    urls.push({
-      loc: `${SITE_URL}/octg-directory`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.9,
-    });
-
-    // TOPICS - Primary category page
-    urls.push({
-      loc: `${SITE_URL}/topics`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.8,
-    });
-
-    // Search page
-    urls.push({
-      loc: `${SITE_URL}/search`,
-      lastmod: formatDate(null),
-      changefreq: "weekly",
-      priority: 0.6,
-    });
-
-    // Secondary pages
-    urls.push({
-      loc: `${SITE_URL}/contact`,
-      lastmod: formatDate(null),
-      changefreq: "monthly",
-      priority: 0.7,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/about`,
-      lastmod: formatDate(null),
-      changefreq: "monthly",
-      priority: 0.7,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/editorial-policy`,
-      lastmod: formatDate(null),
-      changefreq: "yearly",
-      priority: 0.5,
-    });
-
-    // Legal pages
-    urls.push({
-      loc: `${SITE_URL}/privacy`,
-      lastmod: formatDate(null),
-      changefreq: "yearly",
-      priority: 0.3,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/terms`,
-      lastmod: formatDate(null),
-      changefreq: "yearly",
-      priority: 0.3,
-    });
-
-    urls.push({
-      loc: `${SITE_URL}/newsletter-terms`,
-      lastmod: formatDate(null),
-      changefreq: "yearly",
-      priority: 0.3,
-    });
-
-    // Fetch regions
-    const { data: regions, error: regionsError } = await supabase
-      .from("regions")
-      .select("slug, updated_at");
-
-    if (regionsError) {
-      console.error("Error fetching regions:", regionsError);
-    } else if (regions) {
-      console.log(`Found ${regions.length} regions`);
-      for (const region of regions) {
-        // Region news page
-        urls.push({
-          loc: `${SITE_URL}/region/${region.slug}`,
-          lastmod: formatDate(region.updated_at),
-          changefreq: "daily",
-          priority: 0.8,
-        });
-        // Directory region page
-        urls.push({
-          loc: `${SITE_URL}/directory/region/${region.slug}`,
-          lastmod: formatDate(region.updated_at),
-          changefreq: "weekly",
-          priority: 0.7,
-        });
-      }
+    // ============================================
+    // SITEMAP INDEX - Master sitemap pointing to all others
+    // ============================================
+    if (type === "index") {
+      const sitemaps = [
+        { loc: `${BASE_URL}/sitemap-news.xml`, lastmod: today },
+        { loc: `${BASE_URL}/sitemap-events.xml`, lastmod: today },
+        { loc: `${BASE_URL}/sitemap-directory.xml`, lastmod: today },
+        { loc: `${BASE_URL}/sitemap-pages.xml`, lastmod: today },
+      ];
+      xmlContent = generateSitemapIndex(sitemaps);
+      console.log("Generated sitemap index with 4 sitemaps");
     }
 
-    // Fetch topics
-    const { data: topics, error: topicsError } = await supabase
-      .from("topics")
-      .select("slug, updated_at");
+    // ============================================
+    // NEWS SITEMAP - Articles (PRIMARY SEO DRIVER)
+    // ============================================
+    else if (type === "news") {
+      const urls: SitemapUrl[] = [];
 
-    if (topicsError) {
-      console.error("Error fetching topics:", topicsError);
-    } else if (topics) {
-      console.log(`Found ${topics.length} topics`);
-      for (const topic of topics) {
-        urls.push({
-          loc: `${SITE_URL}/topic/${topic.slug}`,
-          lastmod: formatDate(topic.updated_at),
-          changefreq: "weekly",
-          priority: 0.7,
-        });
-      }
-    }
-
-    // Directory categories (static list based on company_role enum)
-    const categories = ["mill", "yard", "inspection", "drilling", "logistics", "software", "trading"];
-    for (const category of categories) {
+      // Main news page
       urls.push({
-        loc: `${SITE_URL}/directory/category/${category}`,
-        lastmod: formatDate(null),
+        loc: `${BASE_URL}/news`,
+        lastmod: today,
+        changefreq: "daily",
+        priority: 0.9,
+      });
+
+      // All published articles
+      const { data: articles } = await supabase
+        .from("articles")
+        .select("slug, publish_date, updated_at, status")
+        .in("status", ["published", "featured"])
+        .order("publish_date", { ascending: false });
+
+      if (articles) {
+        console.log(`Found ${articles.length} articles for news sitemap`);
+        for (const article of articles) {
+          urls.push({
+            loc: `${BASE_URL}/article/${article.slug}`,
+            lastmod: formatDate(article.updated_at || article.publish_date),
+            changefreq: "weekly",
+            priority: article.status === "featured" ? 0.9 : 0.8,
+          });
+        }
+      }
+
+      // Region pages (news by region)
+      const { data: regions } = await supabase.from("regions").select("slug, updated_at");
+      if (regions) {
+        for (const region of regions) {
+          urls.push({
+            loc: `${BASE_URL}/region/${region.slug}`,
+            lastmod: formatDate(region.updated_at),
+            changefreq: "daily",
+            priority: 0.8,
+          });
+        }
+      }
+
+      // Topic pages (news by topic)
+      const { data: topics } = await supabase.from("topics").select("slug, updated_at");
+      if (topics) {
+        for (const topic of topics) {
+          urls.push({
+            loc: `${BASE_URL}/topic/${topic.slug}`,
+            lastmod: formatDate(topic.updated_at),
+            changefreq: "daily",
+            priority: 0.7,
+          });
+        }
+      }
+
+      xmlContent = generateSitemapXml(urls);
+      console.log(`Generated news sitemap with ${urls.length} URLs`);
+    }
+
+    // ============================================
+    // EVENTS SITEMAP - Energy Events (SECONDARY PILLAR)
+    // ============================================
+    else if (type === "events") {
+      const urls: SitemapUrl[] = [];
+
+      // Main events page
+      urls.push({
+        loc: `${BASE_URL}/events`,
+        lastmod: today,
+        changefreq: "weekly",
+        priority: 0.8,
+      });
+
+      // Individual events
+      const { data: events } = await supabase
+        .from("events")
+        .select("slug, start_date, updated_at")
+        .order("start_date", { ascending: true });
+
+      if (events) {
+        console.log(`Found ${events.length} events for events sitemap`);
+        const now = new Date();
+        for (const event of events) {
+          const eventDate = new Date(event.start_date);
+          const isUpcoming = eventDate >= now;
+          
+          urls.push({
+            loc: `${BASE_URL}/events/${event.slug}`,
+            lastmod: formatDate(event.updated_at),
+            changefreq: isUpcoming ? "weekly" : "monthly",
+            priority: isUpcoming ? 0.8 : 0.5,
+          });
+        }
+      }
+
+      xmlContent = generateSitemapXml(urls);
+      console.log(`Generated events sitemap with ${urls.length} URLs`);
+    }
+
+    // ============================================
+    // DIRECTORY SITEMAP - Companies, CEOs, Products (SUPPORTING LAYER)
+    // ============================================
+    else if (type === "directory") {
+      const urls: SitemapUrl[] = [];
+
+      // Main directory pages
+      urls.push({
+        loc: `${BASE_URL}/directory`,
+        lastmod: today,
         changefreq: "weekly",
         priority: 0.7,
       });
-    }
+      urls.push({
+        loc: `${BASE_URL}/ceo-directory`,
+        lastmod: today,
+        changefreq: "weekly",
+        priority: 0.7,
+      });
+      urls.push({
+        loc: `${BASE_URL}/octg-directory`,
+        lastmod: today,
+        changefreq: "monthly",
+        priority: 0.7,
+      });
 
-    // Fetch published articles
-    const { data: articles, error: articlesError } = await supabase
-      .from("articles")
-      .select("slug, updated_at, publish_date")
-      .in("status", ["published", "featured"])
-      .order("publish_date", { ascending: false });
+      // Companies
+      const { data: companies } = await supabase
+        .from("companies")
+        .select("slug, updated_at")
+        .order("name");
 
-    if (articlesError) {
-      console.error("Error fetching articles:", articlesError);
-    } else if (articles) {
-      console.log(`Found ${articles.length} published articles`);
-      for (const article of articles) {
-        urls.push({
-          loc: `${SITE_URL}/article/${article.slug}`,
-          lastmod: formatDate(article.updated_at || article.publish_date),
-          changefreq: "monthly",
-          priority: 0.6,
-        });
+      if (companies) {
+        console.log(`Found ${companies.length} companies for directory sitemap`);
+        for (const company of companies) {
+          urls.push({
+            loc: `${BASE_URL}/directory/company/${company.slug}`,
+            lastmod: formatDate(company.updated_at),
+            changefreq: "monthly",
+            priority: 0.6,
+          });
+        }
       }
-    }
 
-    // Fetch companies
-    const { data: companies, error: companiesError } = await supabase
-      .from("companies")
-      .select("slug, updated_at");
+      // Executives/CEOs
+      const { data: executives } = await supabase
+        .from("executives")
+        .select("slug, updated_at")
+        .order("name");
 
-    if (companiesError) {
-      console.error("Error fetching companies:", companiesError);
-    } else if (companies) {
-      console.log(`Found ${companies.length} companies`);
-      for (const company of companies) {
-        urls.push({
-          loc: `${SITE_URL}/directory/company/${company.slug}`,
-          lastmod: formatDate(company.updated_at),
-          changefreq: "monthly",
-          priority: 0.6,
-        });
+      if (executives) {
+        console.log(`Found ${executives.length} executives for directory sitemap`);
+        for (const exec of executives) {
+          urls.push({
+            loc: `${BASE_URL}/ceo/${exec.slug}`,
+            lastmod: formatDate(exec.updated_at),
+            changefreq: "monthly",
+            priority: 0.6,
+          });
+        }
       }
-    }
 
-    // Fetch executives
-    const { data: executives, error: executivesError } = await supabase
-      .from("executives")
-      .select("slug, updated_at");
+      // Product categories
+      const { data: categories } = await supabase
+        .from("product_categories")
+        .select("id, slug, updated_at")
+        .order("sort_order");
 
-    if (executivesError) {
-      console.error("Error fetching executives:", executivesError);
-    } else if (executives) {
-      console.log(`Found ${executives.length} executives`);
-      for (const executive of executives) {
+      const categoryMap = new Map<string, string>();
+      if (categories) {
+        for (const cat of categories) {
+          categoryMap.set(cat.id, cat.slug);
+          urls.push({
+            loc: `${BASE_URL}/octg-directory/${cat.slug}`,
+            lastmod: formatDate(cat.updated_at),
+            changefreq: "monthly",
+            priority: 0.6,
+          });
+        }
+      }
+
+      // Individual products
+      const { data: products } = await supabase
+        .from("products")
+        .select("slug, updated_at, category_id")
+        .order("sort_order");
+
+      if (products) {
+        console.log(`Found ${products.length} products for directory sitemap`);
+        for (const product of products) {
+          const categorySlug = product.category_id ? categoryMap.get(product.category_id) : null;
+          if (categorySlug) {
+            urls.push({
+              loc: `${BASE_URL}/octg-directory/${categorySlug}/${product.slug}`,
+              lastmod: formatDate(product.updated_at),
+              changefreq: "monthly",
+              priority: 0.5,
+            });
+          }
+        }
+      }
+
+      // Directory region pages
+      const { data: regions } = await supabase.from("regions").select("slug");
+      if (regions) {
+        for (const region of regions) {
+          urls.push({
+            loc: `${BASE_URL}/directory/region/${region.slug}`,
+            lastmod: today,
+            changefreq: "monthly",
+            priority: 0.5,
+          });
+        }
+      }
+
+      // Directory category pages (company roles)
+      const companyRoles = ["mill", "yard", "inspection", "drilling", "logistics", "software", "trading"];
+      for (const role of companyRoles) {
         urls.push({
-          loc: `${SITE_URL}/ceo/${executive.slug}`,
-          lastmod: formatDate(executive.updated_at),
+          loc: `${BASE_URL}/directory/category/${role}`,
+          lastmod: today,
           changefreq: "monthly",
           priority: 0.5,
         });
       }
+
+      xmlContent = generateSitemapXml(urls);
+      console.log(`Generated directory sitemap with ${urls.length} URLs`);
     }
 
-    // Fetch events
-    const { data: events, error: eventsError } = await supabase
-      .from("events")
-      .select("slug, updated_at");
+    // ============================================
+    // PAGES SITEMAP - Static/Core Pages
+    // ============================================
+    else if (type === "pages") {
+      const urls: SitemapUrl[] = [
+        // Homepage - highest priority
+        { loc: BASE_URL, lastmod: today, changefreq: "daily", priority: 1.0 },
+        
+        // Core navigation pages
+        { loc: `${BASE_URL}/pricing-index`, lastmod: today, changefreq: "daily", priority: 0.8 },
+        { loc: `${BASE_URL}/topics`, lastmod: today, changefreq: "weekly", priority: 0.7 },
+        { loc: `${BASE_URL}/search`, lastmod: today, changefreq: "monthly", priority: 0.5 },
+        
+        // About & Contact (E-E-A-T)
+        { loc: `${BASE_URL}/about`, lastmod: today, changefreq: "monthly", priority: 0.6 },
+        { loc: `${BASE_URL}/contact`, lastmod: today, changefreq: "monthly", priority: 0.6 },
+        { loc: `${BASE_URL}/editorial-policy`, lastmod: today, changefreq: "yearly", priority: 0.4 },
+        
+        // Legal pages
+        { loc: `${BASE_URL}/privacy`, lastmod: today, changefreq: "yearly", priority: 0.3 },
+        { loc: `${BASE_URL}/terms`, lastmod: today, changefreq: "yearly", priority: 0.3 },
+        { loc: `${BASE_URL}/newsletter-terms`, lastmod: today, changefreq: "yearly", priority: 0.3 },
+      ];
 
-    if (eventsError) {
-      console.error("Error fetching events:", eventsError);
-    } else if (events) {
-      console.log(`Found ${events.length} events`);
-      for (const event of events) {
-        urls.push({
-          loc: `${SITE_URL}/events/${event.slug}`,
-          lastmod: formatDate(event.updated_at),
-          changefreq: "monthly",
-          priority: 0.6,
-        });
-      }
+      xmlContent = generateSitemapXml(urls);
+      console.log(`Generated pages sitemap with ${urls.length} URLs`);
     }
 
-    // Fetch products with their categories
-    const { data: products, error: productsError } = await supabase
-      .from("products")
-      .select("slug, updated_at, category_id");
-
-    // Fetch all product categories for mapping
-    const { data: allCategories } = await supabase
-      .from("product_categories")
-      .select("id, slug");
-    
-    const categoryMap = new Map<string, string>();
-    if (allCategories) {
-      for (const cat of allCategories) {
-        categoryMap.set(cat.id, cat.slug);
-      }
+    // Default fallback - return sitemap index
+    else {
+      const sitemaps = [
+        { loc: `${BASE_URL}/sitemap-news.xml`, lastmod: today },
+        { loc: `${BASE_URL}/sitemap-events.xml`, lastmod: today },
+        { loc: `${BASE_URL}/sitemap-directory.xml`, lastmod: today },
+        { loc: `${BASE_URL}/sitemap-pages.xml`, lastmod: today },
+      ];
+      xmlContent = generateSitemapIndex(sitemaps);
     }
 
-    if (productsError) {
-      console.error("Error fetching products:", productsError);
-    } else if (products) {
-      console.log(`Found ${products.length} products`);
-      for (const product of products) {
-        const categorySlug = product.category_id ? categoryMap.get(product.category_id) || "uncategorized" : "uncategorized";
-        urls.push({
-          loc: `${SITE_URL}/octg-directory/${categorySlug}/${product.slug}`,
-          lastmod: formatDate(product.updated_at),
-          changefreq: "monthly",
-          priority: 0.5,
-        });
-      }
-    }
-
-    // Fetch product categories
-    const { data: productCategories, error: productCategoriesError } = await supabase
-      .from("product_categories")
-      .select("slug, updated_at");
-
-    if (productCategoriesError) {
-      console.error("Error fetching product categories:", productCategoriesError);
-    } else if (productCategories) {
-      console.log(`Found ${productCategories.length} product categories`);
-      for (const category of productCategories) {
-        urls.push({
-          loc: `${SITE_URL}/octg-directory/${category.slug}`,
-          lastmod: formatDate(category.updated_at),
-          changefreq: "weekly",
-          priority: 0.7,
-        });
-      }
-    }
-
-    // Generate XML
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${urls.map(generateUrlEntry).join("\n")}
-</urlset>`;
-
-    console.log(`Generated sitemap with ${urls.length} URLs`);
-
-    return new Response(xml, {
+    return new Response(xmlContent, {
       headers: {
         ...corsHeaders,
+        "Content-Type": "application/xml; charset=utf-8",
         "Cache-Control": "public, max-age=3600, s-maxage=3600",
       },
     });
   } catch (error) {
-    console.error("Error generating sitemap:", error);
-    return new Response(
-      `<?xml version="1.0" encoding="UTF-8"?>
+    console.error("Sitemap generation error:", error);
+    
+    // Fallback minimal sitemap
+    const fallback = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://octgindex.com/</loc>
+    <loc>${BASE_URL}</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
-</urlset>`,
-      { headers: corsHeaders }
-    );
+</urlset>`;
+    
+    return new Response(fallback, {
+      headers: {
+        ...corsHeaders,
+        "Content-Type": "application/xml; charset=utf-8",
+      },
+    });
   }
 });

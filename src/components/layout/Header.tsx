@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import pipeIcon from "@/assets/logo-side-icon.png";
 
+// NEWS-FIRST navigation priority order
 const regions = [
   { name: "Americas", slug: "americas" },
   { name: "Europe", slug: "europe" },
@@ -22,6 +23,14 @@ const regions = [
   { name: "Australia", slug: "australia" },
 ];
 
+// Directory links grouped for dropdown
+const directoryLinks = [
+  { name: "Companies", href: "/directory" },
+  { name: "Products", href: "/octg-directory" },
+  { name: "Global Leaders", href: "/ceo-directory" },
+];
+
+// Mobile menu organized by NEWS-FIRST priority
 const mobileMenuLinks = {
   news: [
     { name: "All News", href: "/news" },
@@ -32,17 +41,14 @@ const mobileMenuLinks = {
     { name: "Asia-Pacific", href: "/region/asia-pacific" },
     { name: "Australia", href: "/region/australia" },
   ],
-  products: [
-    { name: "All Products", href: "/octg-directory" },
-    { name: "Pipe Types", href: "/octg-directory/pipe-types" },
-    { name: "Material Grades", href: "/octg-directory/grades" },
-    { name: "Connections", href: "/octg-directory/connections" },
-  ],
-  directories: [
-    { name: "Companies", href: "/directory" },
-    { name: "CEOs", href: "/ceo-directory" },
-    { name: "Events", href: "/events" },
+  eventsMarket: [
+    { name: "Events Calendar", href: "/events" },
     { name: "Market Prices", href: "/pricing-index" },
+  ],
+  directory: [
+    { name: "Companies", href: "/directory" },
+    { name: "Products", href: "/octg-directory" },
+    { name: "Global Leaders", href: "/ceo-directory" },
   ],
 };
 
@@ -75,6 +81,7 @@ export function Header() {
             </div>
           </Link>
 
+          {/* Desktop Navigation - NEWS-FIRST priority order */}
           <nav className="hidden lg:flex items-center gap-1">
             <Link to="/news">
               <Button variant="nav" size="sm">News</Button>
@@ -96,21 +103,29 @@ export function Header() {
                 ))}
               </DropdownMenuContent>
             </DropdownMenu>
-            <Link to="/directory">
-              <Button variant="nav" size="sm">Companies</Button>
-            </Link>
-            <Link to="/octg-directory">
-              <Button variant="nav" size="sm">Products</Button>
-            </Link>
-            <Link to="/ceo-directory">
-              <Button variant="nav" size="sm">CEOs</Button>
-            </Link>
             <Link to="/events">
               <Button variant="nav" size="sm">Events</Button>
             </Link>
             <Link to="/pricing-index">
               <Button variant="nav" size="sm">Market Prices</Button>
             </Link>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="nav" size="sm" className="gap-1">
+                  Directory
+                  <ChevronDown className="h-3 w-3" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-40">
+                {directoryLinks.map((link) => (
+                  <DropdownMenuItem key={link.href} asChild>
+                    <Link to={link.href} className="w-full cursor-pointer">
+                      {link.name}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
 
           <div className="flex items-center gap-2">
@@ -154,7 +169,7 @@ export function Header() {
               Search
             </Button>
 
-            {/* Grid layout matching footer */}
+            {/* Grid layout - NEWS-FIRST priority */}
             <div className="grid grid-cols-2 gap-6">
               {/* News & Regions */}
               <div>
@@ -174,11 +189,11 @@ export function Header() {
                 </ul>
               </div>
 
-              {/* Products */}
+              {/* Events & Market */}
               <div>
-                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">Products</h3>
+                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">Events & Market</h3>
                 <ul className="space-y-2">
-                  {mobileMenuLinks.products.map((link) => (
+                  {mobileMenuLinks.eventsMarket.map((link) => (
                     <li key={link.href}>
                       <Link
                         to={link.href}
@@ -192,11 +207,11 @@ export function Header() {
                 </ul>
               </div>
 
-              {/* Directories */}
+              {/* Directory */}
               <div className="col-span-2">
-                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">Directories</h3>
-                <ul className="grid grid-cols-2 gap-2">
-                  {mobileMenuLinks.directories.map((link) => (
+                <h3 className="text-sm font-semibold text-accent uppercase tracking-wide mb-3">Directory</h3>
+                <ul className="grid grid-cols-3 gap-2">
+                  {mobileMenuLinks.directory.map((link) => (
                     <li key={link.href}>
                       <Link
                         to={link.href}
