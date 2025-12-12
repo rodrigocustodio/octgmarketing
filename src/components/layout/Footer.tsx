@@ -104,19 +104,41 @@ export function Footer() {
           </div>
         </div>
         <div className="mt-12 pt-8 border-t border-border">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-            <div className="flex items-center gap-2">
-              <img src={pipeIcon} alt="" className="h-8 w-8" />
-              <span className="font-display font-bold tracking-tight">OCTG Index</span>
+          <div className="grid lg:grid-cols-3 gap-8 mb-8">
+            {/* Logo + Company Description for E-E-A-T */}
+            <div className="lg:col-span-2">
+              <div className="flex items-center gap-2 mb-3">
+                <img src={pipeIcon} alt="OCTG Index logo" className="h-8 w-8" />
+                <span className="font-display font-bold tracking-tight">OCTG Index</span>
+              </div>
+              <p className="text-sm text-muted-foreground max-w-xl leading-relaxed">
+                OCTG Index is the leading news and intelligence platform for the global 
+                Oil Country Tubular Goods industry. Founded in 2024 in Houston, Texas, 
+                we provide comprehensive coverage of market trends, company developments, 
+                pricing intelligence, and industry events to energy professionals worldwide. 
+                Our editorial team delivers accurate, timely reporting across all major 
+                oil and gas markets.
+              </p>
             </div>
-            <div className="flex flex-col sm:flex-row gap-4 sm:gap-8 text-sm text-muted-foreground">
-              <span>info@octgindex.com</span>
-              <span>Houston, Texas, USA</span>
-              <span>Global Coverage</span>
+            
+            {/* Contact Info */}
+            <div className="text-sm text-muted-foreground space-y-2">
+              <p className="font-medium text-foreground">Contact Us</p>
+              <p>info@octgindex.com</p>
+              <p>Houston, Texas, USA</p>
+              <p className="text-xs">Global Coverage • 24/7 News Desk</p>
             </div>
+          </div>
+          
+          <div className="flex flex-col sm:flex-row justify-between items-center gap-4 border-t border-border/50 pt-4">
             <p className="text-sm text-muted-foreground">
               © {new Date().getFullYear()} OCTG Index. All rights reserved.
             </p>
+            <div className="flex gap-6 text-xs text-muted-foreground">
+              <span>Trusted by Energy Professionals</span>
+              <span>•</span>
+              <span>Independent Editorial</span>
+            </div>
           </div>
         </div>
       </div>
