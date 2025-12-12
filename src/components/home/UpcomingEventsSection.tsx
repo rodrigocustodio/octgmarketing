@@ -25,13 +25,7 @@ export function UpcomingEventsSection() {
 
   if (isLoading) {
     return (
-      <section className="container py-12">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h2 className="font-display text-2xl font-bold tracking-tight">Upcoming Events</h2>
-            <p className="text-muted-foreground mt-1">Industry conferences in the next 60 days</p>
-          </div>
-        </div>
+      <section className="container py-12 pt-0">
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {[...Array(6)].map((_, i) => (
             <Skeleton key={i} className="h-48 rounded-xl" />
@@ -46,19 +40,7 @@ export function UpcomingEventsSection() {
   }
 
   return (
-    <section className="container py-12">
-      <div className="flex items-center justify-between mb-8">
-        <div>
-          <h2 className="font-display text-2xl font-bold tracking-tight">Upcoming Events</h2>
-          <p className="text-muted-foreground mt-1">Industry conferences in the next 60 days</p>
-        </div>
-        <Link to="/events">
-          <Button variant="outline" size="sm">
-            View All Events <ArrowRight className="ml-2 h-4 w-4" />
-          </Button>
-        </Link>
-      </div>
-
+    <section className="container py-12 pt-0">
       <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         {events.map((event, index) => (
           <Link key={event.id} to={`/events/${event.slug}`}>
