@@ -16,7 +16,7 @@ export function CompanySpotlightCard({
   website 
 }: CompanySpotlightCardProps) {
   return (
-    <div className="my-8 flex w-full rounded-xl shadow-lg overflow-hidden border border-border bg-muted hover:shadow-xl transition-shadow duration-300 not-prose">
+    <div className="my-4 flex w-full rounded-xl shadow-lg overflow-hidden border border-border bg-muted hover:shadow-xl transition-shadow duration-300 not-prose">
       
       {/* Left accent bar */}
       <div className="w-1.5 bg-accent flex-shrink-0" />
