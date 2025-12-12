@@ -54,7 +54,7 @@ export function CompanySpotlightCard({
         </div>
 
         {/* Action button with animated arrow */}
-        <Button asChild className="w-full group bg-accent hover:bg-accent/90 text-white">
+        <Button asChild className="w-full group bg-accent hover:bg-accent/90 !text-white">
           <Link to={`/directory/company/${slug}`} className="flex items-center justify-center gap-2">
             <span>View Company Profile</span>
             <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
