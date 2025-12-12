@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Building2, MapPin, Globe, ArrowRight } from "lucide-react";
+import { MapPin, Globe } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 interface CompanySpotlightCardProps {
@@ -16,32 +16,29 @@ export function CompanySpotlightCard({
   website 
 }: CompanySpotlightCardProps) {
   return (
-    <div className="my-8 rounded-lg border-l-4 border-accent bg-muted/30 p-5 not-prose">
-      {/* Title row - icon aligned */}
-      <div className="flex items-center gap-2.5 mb-3">
-        <Building2 className="h-4 w-4 text-accent flex-shrink-0" />
-        <h4 className="font-display text-base font-semibold text-foreground">
-          Learn More About {name}
-        </h4>
-      </div>
+    <div className="my-8 rounded-xl bg-muted/50 p-6 not-prose text-center">
+      {/* Company name as main title */}
+      <h4 className="font-display text-xl font-bold text-foreground mb-3">
+        {name}
+      </h4>
       
-      {/* Details - icons vertically aligned with title icon */}
-      <div className="space-y-2 text-sm text-muted-foreground mb-4">
+      {/* Details - centered with inline icons */}
+      <div className="space-y-1.5 text-sm text-muted-foreground mb-4">
         {headquarters && (
-          <div className="flex items-center gap-2.5">
-            <MapPin className="h-4 w-4 flex-shrink-0 opacity-70" />
+          <div className="flex items-center justify-center gap-1.5">
+            <MapPin className="h-3.5 w-3.5 flex-shrink-0" />
             <span>{headquarters}</span>
           </div>
         )}
         
         {website && (
-          <div className="flex items-center gap-2.5">
-            <Globe className="h-4 w-4 flex-shrink-0 opacity-70" />
+          <div className="flex items-center justify-center gap-1.5">
+            <Globe className="h-3.5 w-3.5 flex-shrink-0" />
             <a 
               href={website.startsWith('http') ? website : `https://${website}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-accent hover:underline truncate"
+              className="hover:text-accent hover:underline"
             >
               {website.replace(/^https?:\/\//, '').replace(/\/$/, '')}
             </a>
@@ -49,15 +46,12 @@ export function CompanySpotlightCard({
         )}
       </div>
       
-      {/* Button - indented to align with text start */}
-      <div className="ml-[26px]">
-        <Button asChild variant="outline" size="sm" className="gap-1.5">
-          <Link to={`/directory/company/${slug}`}>
-            View Company Profile
-            <ArrowRight className="h-3.5 w-3.5" />
-          </Link>
-        </Button>
-      </div>
+      {/* Full-width accent button */}
+      <Button asChild className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+        <Link to={`/directory/company/${slug}`}>
+          View Company Profile
+        </Link>
+      </Button>
     </div>
   );
 }
