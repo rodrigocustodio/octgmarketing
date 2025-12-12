@@ -22,6 +22,12 @@ export function FeaturedEventSpotlight() {
   if (isLoading) {
     return (
       <section className="container py-12">
+        <div className="flex items-center justify-between mb-8">
+          <div>
+            <h2 className="font-display text-2xl font-bold tracking-tight">Upcoming Events</h2>
+            <p className="text-muted-foreground mt-1">Industry conferences in the next 60 days</p>
+          </div>
+        </div>
         <div className="grid lg:grid-cols-10 gap-8">
           <div className="lg:col-span-7">
             <Skeleton className="w-full aspect-video rounded-xl" />
@@ -42,6 +48,19 @@ export function FeaturedEventSpotlight() {
 
   return (
     <section className="container py-12">
+      {/* Section Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="font-display text-2xl font-bold tracking-tight">Upcoming Events</h2>
+          <p className="text-muted-foreground mt-1">Industry conferences in the next 60 days</p>
+        </div>
+        <Link to="/events">
+          <Button variant="outline" size="sm">
+            View All Events <ArrowRight className="ml-2 h-4 w-4" />
+          </Button>
+        </Link>
+      </div>
+
       <div className="grid lg:grid-cols-10 gap-8 items-stretch">
         
         {/* LEFT SIDE - 70% (7 of 10 columns) */}
