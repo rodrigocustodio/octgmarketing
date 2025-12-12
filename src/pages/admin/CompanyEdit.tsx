@@ -30,7 +30,7 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
-import { ArrowLeft, Save, Trash2, Sparkles, Loader2, ExternalLink, Zap } from "lucide-react";
+import { ArrowLeft, Save, Trash2, Sparkles, Loader2, ExternalLink, Zap, Plus, X } from "lucide-react";
 
 type CompanyRole = Database["public"]["Enums"]["company_role"];
 
@@ -63,6 +63,7 @@ const CompanyEdit = () => {
     description: "",
     notes: "",
     logo_url: "",
+    solutions: [] as { title: string; description: string }[],
   });
 
   useEffect(() => {
@@ -81,6 +82,7 @@ const CompanyEdit = () => {
         description: company.description || "",
         notes: company.notes || "",
         logo_url: company.logo_url || "",
+        solutions: Array.isArray((company as any).solutions) ? (company as any).solutions : [],
       });
     }
   }, [company]);
@@ -167,6 +169,11 @@ const CompanyEdit = () => {
         if (result.email && !prev.email) { updates.email = result.email; fieldsUpdated++; }
         if (result.headquarters && !prev.headquarters) { updates.headquarters = result.headquarters; fieldsUpdated++; }
         if (result.country && !prev.country) { updates.country = result.country; fieldsUpdated++; }
+        // Add solutions if we got them and don't have any
+        if (result.solutions && Array.isArray(result.solutions) && result.solutions.length > 0 && prev.solutions.length === 0) {
+          updates.solutions = result.solutions;
+          fieldsUpdated++;
+        }
         return { ...prev, ...updates };
       });
 
@@ -204,6 +211,7 @@ const CompanyEdit = () => {
         description: formData.description || null,
         notes: formData.notes || null,
         logo_url: formData.logo_url || null,
+        solutions: formData.solutions.length > 0 ? formData.solutions : null,
       };
 
       if (isNew) {
@@ -491,6 +499,72 @@ const CompanyEdit = () => {
                     <span className="text-green-500 text-xs">✓ Perfect length!</span>
                   )}
                 </div>
+              </CardContent>
+            </Card>
+
+            {/* Solutions */}
+            <Card>
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle>Solutions & Services</CardTitle>
+                  {formData.solutions.length < 5 && (
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setFormData((prev) => ({
+                        ...prev,
+                        solutions: [...prev.solutions, { title: "", description: "" }]
+                      }))}
+                    >
+                      <Plus className="h-4 w-4 mr-1" />
+                      Add
+                    </Button>
+                  )}
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                {formData.solutions.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No solutions added. Use "Enrich Profile" to auto-generate or add manually.</p>
+                ) : (
+                  formData.solutions.map((solution, idx) => (
+                    <div key={idx} className="p-3 border rounded-lg space-y-2">
+                      <div className="flex items-center justify-between gap-2">
+                        <Input
+                          value={solution.title}
+                          onChange={(e) => {
+                            const newSolutions = [...formData.solutions];
+                            newSolutions[idx] = { ...newSolutions[idx], title: e.target.value };
+                            setFormData((prev) => ({ ...prev, solutions: newSolutions }));
+                          }}
+                          placeholder="Solution title (2-4 words)"
+                          className="flex-1"
+                        />
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          onClick={() => {
+                            const newSolutions = formData.solutions.filter((_, i) => i !== idx);
+                            setFormData((prev) => ({ ...prev, solutions: newSolutions }));
+                          }}
+                        >
+                          <X className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <Input
+                        value={solution.description}
+                        onChange={(e) => {
+                          const newSolutions = [...formData.solutions];
+                          newSolutions[idx] = { ...newSolutions[idx], description: e.target.value };
+                          setFormData((prev) => ({ ...prev, solutions: newSolutions }));
+                        }}
+                        placeholder="One-line description (max 15 words)"
+                      />
+                    </div>
+                  ))
+                )}
+                <p className="text-xs text-muted-foreground">
+                  {formData.solutions.length}/5 solutions (minimum 3 recommended)
+                </p>
               </CardContent>
             </Card>
 

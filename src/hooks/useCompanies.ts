@@ -129,6 +129,7 @@ export type EnrichedCompanyData = {
   email?: string | null;
   headquarters?: string | null;
   country?: string | null;
+  solutions?: { title: string; description: string }[] | null;
 };
 
 export const useEnrichCompanyProfile = () => {

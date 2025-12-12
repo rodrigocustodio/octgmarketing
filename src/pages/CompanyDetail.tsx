@@ -29,6 +29,7 @@ import {
   Mail,
   Calendar,
   ArrowRight,
+  CheckCircle,
 } from "lucide-react";
 import { useCompanyBySlug, useSimilarCompanies, INDUSTRY_ROLES } from "@/hooks/useDirectory";
 import { generateCompanyTitle, generateCompanyDescription } from "@/lib/seo-utils";
@@ -410,18 +411,34 @@ export default function CompanyDetail() {
                 </Card>
               )}
 
+              {/* Solutions Section */}
+              {(company as any).solutions && Array.isArray((company as any).solutions) && (company as any).solutions.length > 0 && (
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Solutions & Services</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-4">
+                      {(company as any).solutions.map((solution: { title: string; description: string }, idx: number) => (
+                        <li key={idx} className="flex gap-3">
+                          <CheckCircle className="h-5 w-5 text-accent flex-shrink-0 mt-0.5" />
+                          <div>
+                            <h4 className="font-medium">{solution.title}</h4>
+                            <p className="text-sm text-muted-foreground">{solution.description}</p>
+                          </div>
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+
               {/* FAQ Section for AI Search */}
               <Card>
                 <CardHeader>
                   <CardTitle>Frequently Asked Questions</CardTitle>
                 </CardHeader>
                 <CardContent className="space-y-6">
-                  <div>
-                    <h3 className="font-medium mb-2">What does {company.name} do?</h3>
-                    <p className="text-muted-foreground text-sm">
-                      {`${company.name} is a ${categoryLabel.toLowerCase()} company${company.headquarters ? ` headquartered in ${company.headquarters}` : company.country ? ` based in ${company.country}` : ""}, specializing in the OCTG (Oil Country Tubular Goods) sector${company.region ? ` serving the ${company.region.name} market` : ""}.`}
-                    </p>
-                  </div>
                   {(company.headquarters || company.country) && (
                     <div>
                       <h3 className="font-medium mb-2">Where is {company.name} located?</h3>
@@ -440,6 +457,12 @@ export default function CompanyDetail() {
                       </p>
                     </div>
                   )}
+                  <div>
+                    <h3 className="font-medium mb-2">What industry does {company.name} operate in?</h3>
+                    <p className="text-muted-foreground text-sm">
+                      {`${company.name} operates in the OCTG (Oil Country Tubular Goods) sector as a ${categoryLabel.toLowerCase()} company${company.region ? `, primarily serving the ${company.region.name} market` : ""}.`}
+                    </p>
+                  </div>
                 </CardContent>
               </Card>
             </div>

@@ -75,6 +75,54 @@ function detectIndustryRole(text: string): string | null {
   return bestMatch?.role || null;
 }
 
+// Validate website URL - reject known non-official domains
+function validateWebsiteUrl(url: string | null, companyName: string): string | null {
+  if (!url) return null;
+  
+  const lowerUrl = url.toLowerCase();
+  const lowerCompany = companyName.toLowerCase().replace(/[^a-z0-9]/g, "");
+  
+  // Reject known non-official domains
+  const invalidDomains = [
+    "linkedin.com", "wikipedia.org", "bloomberg.com", "reuters.com",
+    "zoominfo.com", "dnb.com", "crunchbase.com", "glassdoor.com",
+    "indeed.com", "facebook.com", "twitter.com", "youtube.com",
+    "businesswire.com", "prnewswire.com", "globenewswire.com"
+  ];
+  
+  for (const domain of invalidDomains) {
+    if (lowerUrl.includes(domain)) {
+      console.log(`Rejecting invalid domain: ${url}`);
+      return null;
+    }
+  }
+  
+  // Check if URL looks like a valid corporate domain
+  try {
+    const urlObj = new URL(url);
+    const hostname = urlObj.hostname.toLowerCase();
+    
+    // Accept if domain contains company name (or abbreviation)
+    const companyWords = lowerCompany.split(/\s+/).filter(w => w.length > 2);
+    const domainContainsCompany = companyWords.some(word => 
+      hostname.includes(word) || hostname.replace(/[^a-z0-9]/g, "").includes(word)
+    );
+    
+    // Accept common corporate TLDs
+    const validTlds = [".com", ".net", ".org", ".co", ".io", ".energy", ".global"];
+    const hasValidTld = validTlds.some(tld => hostname.endsWith(tld) || hostname.includes(tld + "."));
+    
+    if (domainContainsCompany || hasValidTld) {
+      return url;
+    }
+    
+    console.log(`Website doesn't match company name pattern: ${url}`);
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -104,13 +152,41 @@ serve(async (req) => {
 
     let searchResults = "";
     let websiteContent = "";
+    let foundWebsites: string[] = [];
 
     // Step 1: Search for company information using Firecrawl
     if (firecrawlApiKey) {
       try {
-        // More targeted search query for official company info
-        const searchQuery = `"${companyName}" official website about us headquarters founded`;
-        console.log(`Searching web for: ${searchQuery}`);
+        // First search: Official website focused
+        const websiteQuery = `"${companyName}" official website`;
+        console.log(`Searching for official website: ${websiteQuery}`);
+
+        const websiteResponse = await fetch("https://api.firecrawl.dev/v1/search", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${firecrawlApiKey}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            query: websiteQuery,
+            limit: 5,
+          }),
+        });
+
+        if (websiteResponse.ok) {
+          const websiteData = await websiteResponse.json();
+          if (websiteData.data && websiteData.data.length > 0) {
+            // Collect potential website URLs
+            foundWebsites = websiteData.data
+              .map((r: any) => r.url)
+              .filter((url: string) => validateWebsiteUrl(url, companyName));
+            console.log(`Found ${foundWebsites.length} potential official websites`);
+          }
+        }
+
+        // Second search: Company info for description/details
+        const infoQuery = `"${companyName}" company about headquarters founded OCTG energy oil gas`;
+        console.log(`Searching for company info: ${infoQuery}`);
 
         const searchResponse = await fetch("https://api.firecrawl.dev/v1/search", {
           method: "POST",
@@ -119,7 +195,7 @@ serve(async (req) => {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            query: searchQuery,
+            query: infoQuery,
             limit: 5,
             scrapeOptions: {
               formats: ["markdown"],
@@ -129,7 +205,7 @@ serve(async (req) => {
 
         if (searchResponse.ok) {
           const searchData = await searchResponse.json();
-          console.log(`Found ${searchData.data?.length || 0} search results`);
+          console.log(`Found ${searchData.data?.length || 0} info results`);
 
           if (searchData.data && searchData.data.length > 0) {
             searchResults = searchData.data
@@ -190,15 +266,24 @@ Return a JSON object with these fields:
 - email: General contact email (string or null)
 - headquarters: City and country of headquarters (string or null)
 - country: Country of headquarters (string or null)
+- solutions: Array of 3-5 key company solutions/services. Each object must have:
+  - title: Short name (2-4 words, e.g., "Premium OCTG Products")
+  - description: One-line description (max 15 words, e.g., "API-certified casing and tubing for oil and gas drilling operations")
 
 CRITICAL WEBSITE RULES:
 - ONLY include the company's OFFICIAL corporate website
 - The website domain should match or closely relate to the company name
-- NEVER include LinkedIn, Wikipedia, Bloomberg, Reuters, news sites, or industry directories
+- NEVER include LinkedIn, Wikipedia, Bloomberg, Reuters, news sites, ZoomInfo, Crunchbase, or industry directories
 - NEVER include URLs that are clearly about the company but not their official site
 - If you cannot find a verified official website, return null - DO NOT GUESS
 - Valid examples: "https://tenaris.com", "https://vallourec.com", "https://tmk-group.com"
 - Invalid examples: LinkedIn profiles, Wikipedia pages, news articles, directory listings
+
+SOLUTIONS RULES:
+- Extract 3-5 key products, services, or capabilities the company offers
+- Each solution should be distinct and specific to the company
+- Focus on their main business offerings in the OCTG/energy sector
+- If you cannot identify specific solutions, create general ones based on their industry role
 
 OTHER RULES:
 - Only include factual, verifiable information
@@ -213,12 +298,14 @@ OTHER RULES:
 Existing data we have:
 ${JSON.stringify(existingData || {}, null, 2)}
 
+${foundWebsites.length > 0 ? `Potential official websites found:\n${foundWebsites.join("\n")}` : ""}
+
 Web search results:
 ${searchResults || "No search results available"}
 
 ${websiteContent ? `Official website content:\n${websiteContent}` : ""}
 
-Return a complete JSON object with all available fields.`;
+Return a complete JSON object with all available fields including solutions array.`;
 
     console.log("Calling OpenAI to extract structured data...");
 
@@ -234,7 +321,7 @@ Return a complete JSON object with all available fields.`;
           { role: "system", content: systemPrompt },
           { role: "user", content: userPrompt },
         ],
-        max_tokens: 1000,
+        max_tokens: 1500,
         temperature: 0.3,
         response_format: { type: "json_object" },
       }),
@@ -261,6 +348,16 @@ Return a complete JSON object with all available fields.`;
       throw new Error("Invalid JSON response from OpenAI");
     }
 
+    // Validate and clean website URL
+    if (extractedData.website) {
+      extractedData.website = validateWebsiteUrl(extractedData.website, companyName);
+    }
+    
+    // If AI didn't find website but we found valid ones, use the first
+    if (!extractedData.website && foundWebsites.length > 0) {
+      extractedData.website = foundWebsites[0];
+    }
+
     // Fallback region detection from extracted data
     if (!extractedData.region && extractedData.country) {
       extractedData.region = detectRegion(extractedData.country);
@@ -274,12 +371,18 @@ Return a complete JSON object with all available fields.`;
       extractedData.industry_role = detectIndustryRole(extractedData.description);
     }
 
+    // Ensure solutions is an array
+    if (!Array.isArray(extractedData.solutions)) {
+      extractedData.solutions = [];
+    }
+
     console.log(`Enrichment complete for ${companyName}:`, {
       hasWebsite: !!extractedData.website,
       hasDescription: !!extractedData.description,
       hasIndustryRole: !!extractedData.industry_role,
       hasRegion: !!extractedData.region,
       hasYearFounded: !!extractedData.year_founded,
+      solutionsCount: extractedData.solutions?.length || 0,
     });
 
     return new Response(
