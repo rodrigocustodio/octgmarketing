@@ -1,4 +1,8 @@
-Sitemap: https://octgindex.com/sitemap.xml
+Sitemap: https://octgindex.com/sitemap-index.xml
+Sitemap: https://octgindex.com/sitemap-news.xml
+Sitemap: https://octgindex.com/sitemap-events.xml
+Sitemap: https://octgindex.com/sitemap-directory.xml
+Sitemap: https://octgindex.com/sitemap-pages.xml
 
 User-agent: Googlebot
 Allow: /
