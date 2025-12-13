@@ -1,0 +1,1 @@
+ALTER TYPE company_role ADD VALUE 'consulting';

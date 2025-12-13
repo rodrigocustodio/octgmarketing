@@ -1205,6 +1205,7 @@ export type Database = {
         | "logistics"
         | "software"
         | "trading"
+        | "consulting"
       contact_reason:
         | "advertisement"
         | "media_partnership"
@@ -1355,6 +1356,7 @@ export const Constants = {
         "logistics",
         "software",
         "trading",
+        "consulting",
       ],
       contact_reason: [
         "advertisement",
