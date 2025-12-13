@@ -28,6 +28,7 @@ interface OpportunityResearchDialogProps {
   regionId: string | null;
   topicId: string | null;
   articleCount: number;
+  queueItemId?: string;
   onArticleGenerated?: () => void;
 }
 
@@ -39,6 +40,7 @@ export default function OpportunityResearchDialog({
   regionId,
   topicId,
   articleCount,
+  queueItemId,
   onArticleGenerated,
 }: OpportunityResearchDialogProps) {
   const navigate = useNavigate();
@@ -91,7 +93,19 @@ export default function OpportunityResearchDialog({
         suggested_topic_ids: topicId ? [topicId] : [],
       }));
       
-      // Mark the queue item as published
+      // Mark the queue item as published BEFORE navigating
+      if (queueItemId) {
+        const { error: updateError } = await supabase
+          .from("editorial_queue")
+          .update({ last_published_at: new Date().toISOString() })
+          .eq("id", queueItemId);
+        
+        if (updateError) {
+          console.error("Failed to update queue item:", updateError);
+        }
+      }
+      
+      // Notify parent to refetch
       onArticleGenerated?.();
       
       onOpenChange(false);
