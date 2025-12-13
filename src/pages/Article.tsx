@@ -267,7 +267,7 @@ const Article = () => {
 
               {/* Subtitle - with background bars on mobile for readability */}
               {article.subtitle && (
-                <p className="text-lg sm:text-xl text-muted-foreground max-w-xl lg:max-w-[40%] mb-6">
+                <p className="text-lg sm:text-xl text-white sm:text-muted-foreground max-w-xl lg:max-w-[40%] mb-6">
                   <span className="sm:bg-transparent bg-black/60 box-decoration-clone px-2 sm:px-0 leading-relaxed">
                     {article.subtitle}
                   </span>
