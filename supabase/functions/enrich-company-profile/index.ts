@@ -80,7 +80,6 @@ function validateWebsiteUrl(url: string | null, companyName: string): string | n
   if (!url) return null;
   
   const lowerUrl = url.toLowerCase();
-  const lowerCompany = companyName.toLowerCase().replace(/[^a-z0-9]/g, "");
   
   // Reject known non-official domains
   const invalidDomains = [
@@ -97,28 +96,51 @@ function validateWebsiteUrl(url: string | null, companyName: string): string | n
     }
   }
   
-  // Check if URL looks like a valid corporate domain
   try {
     const urlObj = new URL(url);
-    const hostname = urlObj.hostname.toLowerCase();
+    const hostname = urlObj.hostname.toLowerCase().replace("www.", "");
     
-    // Accept if domain contains company name (or abbreviation)
-    const companyWords = lowerCompany.split(/\s+/).filter(w => w.length > 2);
-    const domainContainsCompany = companyWords.some(word => 
-      hostname.includes(word) || hostname.replace(/[^a-z0-9]/g, "").includes(word)
+    // FIX: Extract company words BEFORE stripping special chars
+    const companyWords = companyName.toLowerCase()
+      .split(/[\s\-\_\.\&\,]+/)
+      .filter(w => w.length > 2 && !["the", "and", "inc", "ltd", "llc", "corp", "plc", "co", "group"].includes(w));
+    
+    // Also create a concatenated version for single-word domains
+    const concatenated = companyName.toLowerCase().replace(/[^a-z0-9]/g, "");
+    
+    // Extract just the domain name without TLD for comparison
+    const domainParts = hostname.split(".");
+    const domainName = domainParts.length > 1 ? domainParts.slice(0, -1).join("") : hostname;
+    
+    // Check if domain contains any company word OR the concatenated name matches
+    const domainContainsCompanyWord = companyWords.some(word => 
+      hostname.includes(word) || domainName.includes(word)
     );
     
-    // Accept common corporate TLDs
-    const validTlds = [".com", ".net", ".org", ".co", ".io", ".energy", ".global"];
+    // Check if concatenated company name matches domain
+    const concatenatedMatch = domainName.includes(concatenated) || 
+      concatenated.includes(domainName.replace(/[^a-z0-9]/g, ""));
+    
+    // Valid corporate TLDs (expanded)
+    const validTlds = [
+      ".com", ".net", ".org", ".co", ".io", ".energy", ".global", 
+      ".ae", ".sa", ".cn", ".jp", ".uk", ".de", ".fr", ".it", ".au",
+      ".ca", ".br", ".mx", ".ru", ".in", ".sg", ".my", ".id", ".nl",
+      ".no", ".se", ".dk", ".fi", ".at", ".ch", ".be", ".pl"
+    ];
     const hasValidTld = validTlds.some(tld => hostname.endsWith(tld) || hostname.includes(tld + "."));
     
-    if (domainContainsCompany || hasValidTld) {
+    console.log(`URL validation for ${companyName}: domain=${hostname}, words=${companyWords.join(",")}, wordMatch=${domainContainsCompanyWord}, concatMatch=${concatenatedMatch}, validTld=${hasValidTld}`);
+    
+    // Accept if any company word matches OR concatenated matches OR has valid corporate TLD
+    if (domainContainsCompanyWord || concatenatedMatch || hasValidTld) {
       return url;
     }
     
-    console.log(`Website doesn't match company name pattern: ${url}`);
+    console.log(`Website rejected - no match: ${url}`);
     return null;
   } catch {
+    console.log(`Invalid URL format: ${url}`);
     return null;
   }
 }
