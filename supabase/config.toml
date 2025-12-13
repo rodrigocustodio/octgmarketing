@@ -74,3 +74,6 @@ verify_jwt = false
 
 [functions.scrape-adipec-exhibitors]
 verify_jwt = false
+
+[functions.cleanup-junk-companies]
+verify_jwt = false

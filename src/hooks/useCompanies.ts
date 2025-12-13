@@ -183,3 +183,27 @@ export const useScrapeAdipecExhibitors = () => {
     },
   });
 };
+
+export type CleanupJunkResult = {
+  success: boolean;
+  deletedCount: number;
+  sampleDeleted?: string[];
+  message?: string;
+  error?: string;
+};
+
+export const useCleanupJunkCompanies = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("cleanup-junk-companies");
+
+      if (error) throw error;
+      return data as CleanupJunkResult;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+    },
+  });
+};

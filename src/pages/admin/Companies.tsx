@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useEnrichCompanyProfile, useFindCompanyWebsite, useScrapeAdipecExhibitors, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
+import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useEnrichCompanyProfile, useFindCompanyWebsite, useScrapeAdipecExhibitors, useCleanupJunkCompanies, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
 import { useRegions } from "@/hooks/useDirectory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,14 +21,24 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check, Square, Zap, Globe, Phone, Calendar, Briefcase, MapPin, Download } from "lucide-react";
+import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check, Square, Zap, Globe, Phone, Calendar, Briefcase, MapPin, Download, Trash2 } from "lucide-react";
 import { INDUSTRY_ROLES } from "@/hooks/useDirectory";
 
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
+
+const BATCH_SIZE = 10; // Increased batch size for better throughput
 
 const Companies = () => {
   const { data: companies, isLoading } = useCompaniesAdmin();
@@ -43,8 +53,11 @@ const Companies = () => {
   const [enrichingIds, setEnrichingIds] = useState<Set<string>>(new Set());
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
   
+  // Cleanup dialog state
+  const [showCleanupDialog, setShowCleanupDialog] = useState(false);
+  const [isCleaningUp, setIsCleaningUp] = useState(false);
+  
   // Bulk generation state
-  const BATCH_SIZE = 3; // Smaller batch for enrichment (more API calls per company)
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [isBulkEnriching, setIsBulkEnriching] = useState(false);
   const [isFindingWebsites, setIsFindingWebsites] = useState(false);
@@ -64,9 +77,13 @@ const Companies = () => {
   const enrichCompany = useEnrichCompanyProfile();
   const findWebsite = useFindCompanyWebsite();
   const scrapeAdipec = useScrapeAdipecExhibitors();
+  const cleanupJunk = useCleanupJunkCompanies();
   const updateCompany = useUpdateCompany();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+  
+  // Count junk entries (starts with underscore or contains "/_")
+  const junkCount = companies?.filter(c => c.name.startsWith("_") || c.name.includes("/_")).length || 0;
 
   // Handle Find Companies from ADIPEC
   const handleFindCompanies = async () => {
@@ -98,6 +115,38 @@ const Companies = () => {
       });
     } finally {
       setIsFindingCompanies(false);
+    }
+  };
+
+  // Handle Cleanup Junk Companies
+  const handleCleanupJunk = async () => {
+    setIsCleaningUp(true);
+    
+    try {
+      const result = await cleanupJunk.mutateAsync();
+      
+      if (result.success) {
+        toast({ 
+          title: "Cleanup complete!", 
+          description: `Deleted ${result.deletedCount} junk entries` 
+        });
+        setShowCleanupDialog(false);
+      } else {
+        toast({ 
+          title: "Cleanup failed", 
+          description: result.error || "Unknown error",
+          variant: "destructive" 
+        });
+      }
+    } catch (error) {
+      console.error('Error cleaning up junk companies:', error);
+      toast({ 
+        title: "Cleanup failed", 
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive" 
+      });
+    } finally {
+      setIsCleaningUp(false);
     }
   };
 
@@ -684,6 +733,16 @@ const Companies = () => {
               </div>
             ) : (
               <>
+                {junkCount > 0 && (
+                  <Button
+                    variant="outline"
+                    onClick={() => setShowCleanupDialog(true)}
+                    className="bg-destructive/20 text-destructive hover:bg-destructive/30 border-destructive/30"
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Cleanup Junk ({junkCount})
+                  </Button>
+                )}
                 <Button
                   variant="outline"
                   onClick={handleFindCompanies}
@@ -708,7 +767,7 @@ const Companies = () => {
                   className="bg-primary/20 text-primary hover:bg-primary/30 border-primary/30"
                 >
                   <Zap className="h-4 w-4 mr-2" />
-                  Enrich All Incomplete ({incompleteCount})
+                  Bulk Enrich 10 at a time ({incompleteCount})
                 </Button>
                 <Button
                   variant="outline"
@@ -1061,6 +1120,39 @@ const Companies = () => {
           </p>
         )}
       </div>
+
+      {/* Cleanup Junk Confirmation Dialog */}
+      <Dialog open={showCleanupDialog} onOpenChange={setShowCleanupDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Junk Company Entries?</DialogTitle>
+            <DialogDescription>
+              This will permanently delete {junkCount} entries that appear to be ADIPEC category tags 
+              (names starting with "_" or containing "/_") rather than real companies.
+              <br /><br />
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCleanupDialog(false)} disabled={isCleaningUp}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleCleanupJunk} disabled={isCleaningUp}>
+              {isCleaningUp ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete {junkCount} Entries
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </AdminLayout>
   );
 };
