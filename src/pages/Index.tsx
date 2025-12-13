@@ -207,7 +207,7 @@ const Index = () => {
         {/* Hero Section - 50/50 Split Layout, Optimized for LCP */}
         <section className="relative overflow-hidden min-h-[400px] sm:h-[500px]">
           {/* Left half gradient - solid dark coverage for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/60 lg:via-50% lg:to-transparent z-10" />
+          <div className="absolute inset-0 bg-gradient-to-r from-black from-0% via-black/60 via-30% to-transparent to-70% z-10" />
           {/* Right half image - sharp and visible */}
           <img
             src={optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
@@ -217,7 +217,7 @@ const Index = () => {
             fetchPriority="high"
             loading="eager"
             decoding="sync"
-            className="absolute right-0 top-0 w-full lg:w-[55%] h-full object-cover object-left"
+            className="absolute inset-0 w-full h-full object-cover object-center"
           />
           <div className="container relative z-20 py-10 sm:py-24">
             {isLoading ? (
