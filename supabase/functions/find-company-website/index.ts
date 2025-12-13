@@ -57,109 +57,78 @@ function isValidCorporateDomain(url: string): boolean {
   }
 }
 
-async function searchWithFirecrawl(companyName: string, apiKey: string): Promise<string | null> {
+async function searchWithPerplexity(companyName: string, apiKey: string): Promise<string | null> {
   try {
-    console.log(`Firecrawl search for: ${companyName}`);
+    console.log(`Perplexity search for: ${companyName}`);
     
-    const response = await fetch('https://api.firecrawl.dev/v1/search', {
+    const response = await fetch('https://api.perplexity.ai/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        query: `"${companyName}" official website`,
-        limit: 5,
+        model: 'sonar',
+        messages: [
+          { 
+            role: 'system', 
+            content: `You are a company research assistant. Find the official corporate website for companies.
+            
+RULES:
+- Return ONLY the official company website domain (e.g., "shell.com", "tenaris.com")
+- DO NOT return LinkedIn, Wikipedia, news sites, or social media pages
+- DO NOT return URLs with paths - just the root domain
+- If the company has multiple regional sites, return the main global/corporate site
+- If you cannot find the official website with certainty, respond with "NOT_FOUND"
+- Return just the domain, nothing else. No https://, no www., just the domain.` 
+          },
+          { 
+            role: 'user', 
+            content: `What is the official corporate website for "${companyName}"? This company operates in the OCTG (Oil Country Tubular Goods), oil & gas, or energy industry. Return only the domain name.` 
+          }
+        ],
       }),
     });
 
     if (!response.ok) {
-      console.log(`Firecrawl search failed: ${response.status}`);
+      const errorText = await response.text();
+      console.log(`Perplexity search failed: ${response.status} - ${errorText}`);
       return null;
     }
 
     const data = await response.json();
-    console.log(`Firecrawl returned ${data.data?.length || 0} results`);
+    const aiResponse = data.choices?.[0]?.message?.content?.trim() || '';
     
-    if (data.data && Array.isArray(data.data)) {
-      for (const result of data.data) {
-        const url = result.url;
-        if (url && isValidCorporateDomain(url)) {
-          // Validate it actually exists
-          if (await validateDomainExists(url)) {
-            console.log(`Firecrawl found valid website: ${url}`);
-            return url;
-          }
-        }
-      }
+    console.log(`Perplexity response: ${aiResponse}`);
+
+    if (!aiResponse || aiResponse === 'NOT_FOUND' || aiResponse.toLowerCase().includes('not found')) {
+      return null;
     }
-    
-    return null;
+
+    // Clean up the domain
+    let domain = aiResponse
+      .replace(/^https?:\/\//i, '')
+      .replace(/^www\./i, '')
+      .replace(/\/.*$/, '')
+      .trim()
+      .toLowerCase();
+
+    // Basic validation
+    if (!domain.includes('.') || domain.length < 4) {
+      console.log(`Invalid domain format: ${domain}`);
+      return null;
+    }
+
+    if (!isValidCorporateDomain(domain)) {
+      console.log(`Blocked domain detected: ${domain}`);
+      return null;
+    }
+
+    return domain;
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    console.log(`Firecrawl error: ${message}`);
+    console.log(`Perplexity error: ${message}`);
     return null;
-  }
-}
-
-async function getOpenAIDomainSuggestions(companyName: string, apiKey: string): Promise<string[]> {
-  try {
-    console.log(`Getting OpenAI domain suggestions for: ${companyName}`);
-    
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${apiKey}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        messages: [
-          {
-            role: 'system',
-            content: `You are a domain name expert. Given a company name, suggest the most likely official website domains.
-            
-Rules:
-- Return ONLY domain names (e.g., "vitol.com", "shell.com")
-- Do NOT include http:// or https://
-- Prioritize .com domains, then country TLDs
-- Consider common patterns: companyname.com, company-name.com, companygroup.com
-- For acronyms like "XCMG" suggest: xcmg.com
-- For names like "Venture Global LNG" suggest: venturegloballng.com, venturegoballng.com
-- Return 3-5 suggestions, most likely first
-- Return ONLY a JSON array of strings, nothing else`
-          },
-          {
-            role: 'user',
-            content: `What are the most likely official website domains for the company "${companyName}"? Return only a JSON array.`
-          }
-        ],
-        temperature: 0.3,
-        max_tokens: 200,
-      }),
-    });
-
-    if (!response.ok) {
-      console.log(`OpenAI request failed: ${response.status}`);
-      return [];
-    }
-
-    const data = await response.json();
-    const content = data.choices?.[0]?.message?.content || "";
-    
-    // Parse the JSON array from the response
-    const match = content.match(/\[[\s\S]*?\]/);
-    if (match) {
-      const suggestions = JSON.parse(match[0]) as string[];
-      console.log(`OpenAI suggestions: ${suggestions.join(", ")}`);
-      return suggestions.filter(s => typeof s === 'string' && s.length > 0);
-    }
-    
-    return [];
-  } catch (err) {
-    const message = err instanceof Error ? err.message : String(err);
-    console.log(`OpenAI error: ${message}`);
-    return [];
   }
 }
 
@@ -180,51 +149,53 @@ serve(async (req) => {
 
     console.log(`\n=== Finding website for: ${companyName} ===`);
 
-    const firecrawlApiKey = Deno.env.get('FIRECRAWL_API_KEY');
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    const perplexityApiKey = Deno.env.get('PERPLEXITY_API_KEY');
 
-    if (!openaiApiKey) {
+    if (!perplexityApiKey) {
       return new Response(
-        JSON.stringify({ success: false, error: 'OpenAI API key not configured' }),
+        JSON.stringify({ success: false, error: 'Perplexity API key not configured' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
-    // Strategy 1: Try Firecrawl search first
-    if (firecrawlApiKey) {
-      const firecrawlResult = await searchWithFirecrawl(companyName, firecrawlApiKey);
-      if (firecrawlResult) {
-        console.log(`SUCCESS via Firecrawl: ${firecrawlResult}`);
-        return new Response(
-          JSON.stringify({ success: true, website: firecrawlResult, source: 'firecrawl' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
-    }
-
-    // Strategy 2: Get OpenAI suggestions and validate each
-    const suggestions = await getOpenAIDomainSuggestions(companyName, openaiApiKey);
+    // Use Perplexity to find the website (it has real-time web search)
+    const domain = await searchWithPerplexity(companyName, perplexityApiKey);
     
-    for (const domain of suggestions) {
-      if (!isValidCorporateDomain(domain)) {
-        console.log(`Skipping invalid domain: ${domain}`);
-        continue;
-      }
-      
-      const isValid = await validateDomainExists(domain);
-      if (isValid) {
-        const fullUrl = domain.startsWith("http") ? domain : `https://${domain}`;
-        console.log(`SUCCESS via OpenAI+validation: ${fullUrl}`);
-        return new Response(
-          JSON.stringify({ success: true, website: fullUrl, source: 'openai_validated' }),
-          { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-        );
-      }
+    if (!domain) {
+      console.log(`No website found for: ${companyName}`);
+      return new Response(
+        JSON.stringify({ success: false, website: null, error: 'No valid website found' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
     }
 
-    console.log(`No valid website found for: ${companyName}`);
+    // Validate the domain exists
+    const isValid = await validateDomainExists(domain);
+    
+    if (isValid) {
+      const fullUrl = `https://${domain}`;
+      console.log(`SUCCESS: ${fullUrl}`);
+      return new Response(
+        JSON.stringify({ success: true, website: fullUrl, source: 'perplexity_validated' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Try with www prefix as fallback
+    const isValidWww = await validateDomainExists(`www.${domain}`);
+    if (isValidWww) {
+      const fullUrl = `https://www.${domain}`;
+      console.log(`SUCCESS (www): ${fullUrl}`);
+      return new Response(
+        JSON.stringify({ success: true, website: fullUrl, source: 'perplexity_validated' }),
+        { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Return unverified if validation failed but we got a domain
+    console.log(`Returning unverified domain: ${domain}`);
     return new Response(
-      JSON.stringify({ success: false, website: null, error: 'No valid website found' }),
+      JSON.stringify({ success: true, website: `https://${domain}`, source: 'perplexity_unverified', verified: false }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
 
