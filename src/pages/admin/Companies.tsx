@@ -1076,10 +1076,10 @@ const Companies = () => {
                       </TableCell>
                       <TableCell>
                         <div className="flex items-center gap-2">
-                          <Badge variant={descStatus.variant} className="gap-1">
-                            <descStatus.icon className="h-3 w-3" />
-                            {descStatus.label}
-                          </Badge>
+                      <Badge variant={descStatus.variant} className="gap-1 whitespace-nowrap">
+                        <descStatus.icon className="h-3 w-3" />
+                        {descStatus.label}
+                      </Badge>
                           <Button
                             variant="ghost"
                             size="sm"
