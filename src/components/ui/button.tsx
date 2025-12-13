@@ -18,7 +18,7 @@ const buttonVariants = cva(
         bronze: "bg-gradient-bronze text-accent-foreground hover:shadow-glow-bronze shadow-md font-semibold tracking-wide",
         steel: "bg-gradient-steel text-primary-foreground hover:shadow-glow-steel shadow-md font-semibold tracking-wide",
         hero: "bg-accent text-accent-foreground hover:bg-accent/90 shadow-lg hover:shadow-glow-bronze font-display text-base font-bold tracking-tight px-8 py-3",
-        "hero-outline": "border-2 border-accent bg-transparent text-accent hover:bg-accent hover:text-accent-foreground font-display text-base font-bold tracking-tight px-8 py-3",
+        "hero-outline": "border-2 border-accent bg-background/80 backdrop-blur-sm text-accent hover:bg-accent hover:text-accent-foreground font-display text-base font-bold tracking-tight px-8 py-3",
         nav: "text-muted-foreground hover:text-foreground hover:bg-muted font-medium",
         "nav-active": "text-accent bg-accent/10 font-medium",
       },
