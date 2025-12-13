@@ -15,7 +15,8 @@ import {
   Building2,
   CalendarDays,
   Package,
-  BarChart3
+  BarChart3,
+  ClipboardCheck
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -70,6 +71,11 @@ const navItems = [
     title: "Companies",
     href: "/admin/companies",
     icon: Building2,
+  },
+  {
+    title: "Company Audit",
+    href: "/admin/company-audit",
+    icon: ClipboardCheck,
   },
   {
     title: "Products",
