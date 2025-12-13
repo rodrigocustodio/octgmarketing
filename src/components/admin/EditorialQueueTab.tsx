@@ -237,16 +237,17 @@ export default function EditorialQueueTab() {
                     <div className="flex items-center gap-2">
                       <Button 
                         size="sm" 
-                        variant="ghost"
+                        variant="outline"
+                        className="text-green-600 border-green-600 hover:bg-green-600/10"
                         onClick={(e) => handleMarkPublished(e, item)}
                         disabled={markPublishedMutation.isPending}
-                        title="Mark as published (moves to end of queue)"
                       >
                         {markPublishedMutation.isPending ? (
-                          <Loader2 className="h-4 w-4 animate-spin" />
+                          <Loader2 className="h-4 w-4 mr-1 animate-spin" />
                         ) : (
-                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                          <CheckCircle2 className="h-4 w-4 mr-1" />
                         )}
+                        Done
                       </Button>
                       <Button size="sm" variant="outline">
                         <Search className="h-4 w-4 mr-2" />
