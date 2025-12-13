@@ -1110,11 +1110,11 @@ const Companies = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        <div className="flex items-center gap-1">
+                        <div className="flex items-center gap-3">
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 px-2 text-xs bg-primary/20 text-primary hover:bg-primary/30"
+                            className="h-8 w-8 p-0 bg-primary/20 text-primary hover:bg-primary/30"
                             onClick={() => handleEnrich(company)}
                             disabled={enrichingIds.has(company.id) || isBulkEnriching || isBulkGenerating}
                             aria-label="Enrich company profile"
@@ -1122,10 +1122,13 @@ const Companies = () => {
                             {enrichingIds.has(company.id) ? (
                               <Loader2 className="h-4 w-4 animate-spin" />
                             ) : (
-                              <Zap className="h-3 w-3" />
+                              <Zap className="h-4 w-4" />
                             )}
                           </Button>
-                          <Button variant="ghost" size="sm" asChild aria-label="Edit company">
+                          
+                          <div className="h-5 w-px bg-border" />
+                          
+                          <Button variant="ghost" size="sm" className="h-8 w-8 p-0" asChild aria-label="Edit company">
                             <Link to={`/admin/companies/${company.id}`}>
                               <Edit className="h-4 w-4" />
                             </Link>
@@ -1133,7 +1136,7 @@ const Companies = () => {
                           <Button
                             variant="ghost"
                             size="sm"
-                            className="h-7 px-2 text-destructive hover:bg-destructive/10"
+                            className="h-8 w-8 p-0 text-destructive hover:bg-destructive/10"
                             onClick={() => {
                               setCompanyToDelete(company);
                               setShowDeleteDialog(true);
