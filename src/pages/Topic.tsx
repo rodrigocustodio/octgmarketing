@@ -101,16 +101,15 @@ const Topic = () => {
         <Header />
 
         <main className="flex-1">
-          {/* Hero Section */}
-          <section className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-transparent z-10" />
-            <div 
-              className="absolute inset-0 opacity-40 dark:opacity-50"
-              style={{
-                backgroundImage: `url(${heroImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center right',
-              }}
+          {/* Hero Section - 50/50 Split Layout */}
+          <section className="relative overflow-hidden min-h-[280px] sm:min-h-[350px]">
+            {/* Left half gradient - solid coverage for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background to-background/80 lg:to-transparent lg:via-50% z-10" />
+            {/* Right half image - sharp and visible */}
+            <img 
+              src={heroImage}
+              alt=""
+              className="absolute right-0 top-0 w-full lg:w-[55%] h-full object-cover object-left"
             />
             
             <div className="container relative z-20 py-12 sm:py-20">
@@ -134,12 +133,12 @@ const Topic = () => {
               </Breadcrumb>
 
               {/* Title */}
-              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4">
+              <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 max-w-xl lg:max-w-[45%]">
                 {topic.name}
               </h1>
 
               {/* Description */}
-              <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl">
+              <p className="text-lg sm:text-xl text-muted-foreground max-w-xl lg:max-w-[40%]">
                 {description}
               </p>
             </div>
