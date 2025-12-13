@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useEnrichCompanyProfile, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
+import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useEnrichCompanyProfile, useFindCompanyWebsite, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
 import { useRegions } from "@/hooks/useDirectory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -59,6 +59,7 @@ const Companies = () => {
   
   const generateDescription = useGenerateCompanyDescription();
   const enrichCompany = useEnrichCompanyProfile();
+  const findWebsite = useFindCompanyWebsite();
   const updateCompany = useUpdateCompany();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -495,26 +496,20 @@ const Companies = () => {
         });
         
         try {
-          const result = await enrichCompany.mutateAsync({
-            companyName: company.name,
-            existingData: {
-              website: null, // Force website search
-              description: company.description,
-              industry_role: company.industry_role,
-              headquarters: company.headquarters,
-              country: company.country,
-            },
-          });
+          // Use dedicated find-company-website function with HTTP validation
+          const result = await findWebsite.mutateAsync(company.name);
           
-          // Only save the website field
-          if (result.website) {
+          // Only save if website was found and validated
+          if (result.success && result.website) {
             await updateCompany.mutateAsync({
               id: company.id,
               data: { website: result.website },
             });
             foundCount++;
+            console.log(`Found website for ${company.name}: ${result.website} (source: ${result.source})`);
           } else {
             notFoundCount++;
+            console.log(`No website found for ${company.name}: ${result.error || 'unknown'}`);
           }
         } catch (error) {
           console.error(`Failed to find website for ${company.name}:`, error);

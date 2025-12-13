@@ -144,3 +144,16 @@ export const useEnrichCompanyProfile = () => {
     },
   });
 };
+
+export const useFindCompanyWebsite = () => {
+  return useMutation({
+    mutationFn: async (companyName: string) => {
+      const { data, error } = await supabase.functions.invoke("find-company-website", {
+        body: { companyName },
+      });
+
+      if (error) throw error;
+      return data as { success: boolean; website: string | null; source?: string; error?: string };
+    },
+  });
+};
