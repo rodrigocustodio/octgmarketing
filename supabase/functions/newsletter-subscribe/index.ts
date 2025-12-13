@@ -220,14 +220,20 @@ serve(async (req) => {
   try {
     const { email }: SubscribeRequest = await req.json();
 
-    console.log(`[newsletter-subscribe] Processing subscription for ${email}`);
-
-    if (!email || !email.includes("@")) {
+    // Strong email validation regex (RFC 5322 compliant)
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+    
+    if (!email || !emailRegex.test(email)) {
+      console.log(`[newsletter-subscribe] Invalid email format rejected`);
       return new Response(
-        JSON.stringify({ error: "Invalid email address" }),
+        JSON.stringify({ error: "Invalid email address format" }),
         { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
       );
     }
+
+    // Anonymize email in logs for privacy
+    const maskedEmail = email.replace(/(.{2})(.*)(@.*)/, '$1***$3');
+    console.log(`[newsletter-subscribe] Processing subscription for ${maskedEmail}`);
 
     // Save to Supabase database
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;

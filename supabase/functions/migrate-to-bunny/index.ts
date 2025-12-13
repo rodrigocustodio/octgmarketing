@@ -89,14 +89,50 @@ serve(async (req) => {
       );
     }
 
+    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+
+    // Authentication check - require admin role
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.log('[migrate-to-bunny] Unauthorized - no auth header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.log('[migrate-to-bunny] Unauthorized - invalid token');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check admin role
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    
+    const userRoles = roles?.map(r => r.role) || [];
+    if (!userRoles.includes('admin')) {
+      console.log('[migrate-to-bunny] Forbidden - admin role required');
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - admin role required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const body = await req.json().catch(() => ({}));
     const table = body.table || "both";
     const limit = body.limit || 50;
     const dryRun = body.dryRun || false;
 
-    console.log(`[migrate-to-bunny] Starting migration: table=${table}, limit=${limit}, dryRun=${dryRun}`);
-
-    const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY);
+    console.log(`[migrate-to-bunny] Starting migration by admin ${user.id}: table=${table}, limit=${limit}, dryRun=${dryRun}`);
 
     const migrated: MigrationResult[] = [];
     const failed: MigrationResult[] = [];

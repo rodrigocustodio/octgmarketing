@@ -16,9 +16,45 @@ serve(async (req) => {
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
 
+    // Authentication check - require admin role
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      console.log('[cleanup-storage] Unauthorized - no auth header');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const token = authHeader.replace('Bearer ', '');
+    const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+    
+    if (authError || !user) {
+      console.log('[cleanup-storage] Unauthorized - invalid token');
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check admin role
+    const { data: roles } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id);
+    
+    const userRoles = roles?.map(r => r.role) || [];
+    if (!userRoles.includes('admin')) {
+      console.log('[cleanup-storage] Forbidden - admin role required');
+      return new Response(
+        JSON.stringify({ error: 'Forbidden - admin role required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const { dryRun = true } = await req.json();
     
-    console.log(`[cleanup-storage] Starting cleanup, dryRun=${dryRun}`);
+    console.log(`[cleanup-storage] Starting cleanup by admin ${user.id}, dryRun=${dryRun}`);
 
     // List all files in uploads folder
     const { data: uploadFiles, error: listError } = await supabase.storage
