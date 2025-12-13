@@ -276,7 +276,8 @@ export default function EditorialQueueTab() {
           regionId={selectedItem.regionId}
           topicId={selectedItem.topicId}
           articleCount={selectedItem.articleCount}
-          onArticleGenerated={handleArticleGenerated}
+          queueItemId={selectedItem.id}
+          onArticleGenerated={() => refetch()}
         />
       )}
     </div>
