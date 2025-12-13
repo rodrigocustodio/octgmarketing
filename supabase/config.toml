@@ -1,5 +1,8 @@
 project_id = "mlhngmnuxoetnlesnxgu"
 
+[functions.find-company-website]
+verify_jwt = false
+
 [functions.update-company-websites]
 verify_jwt = false
 
@@ -64,4 +67,7 @@ verify_jwt = false
 verify_jwt = false
 
 [functions.newsletter-subscribe]
+verify_jwt = false
+
+[functions.enrich-company-profile]
 verify_jwt = false
