@@ -270,7 +270,7 @@ const Index = () => {
         {/* Entity Declaration Strip - SEO identity statement */}
         <section className="bg-muted/50 border-y border-border/30 py-3">
           <div className="container">
-            <p className="text-center text-muted-foreground text-sm whitespace-nowrap overflow-x-auto">
+            <p className="text-center text-muted-foreground text-sm sm:whitespace-nowrap">
               OCTG Index is a global energy industry news platform covering OCTG markets, supply chains, pricing intelligence, and major energy events worldwide.
             </p>
           </div>
