@@ -23,9 +23,18 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { TrendingUp, TrendingDown, Minus, Clock, BarChart3, Globe, Newspaper, Info, AlertCircle, Building2 } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Clock, BarChart3, Globe, Newspaper, Info, AlertCircle, Building2, Layers } from "lucide-react";
 import { format } from "date-fns";
 import { CostPressureIndicator } from "@/components/market/CostPressureIndicator";
+
+// Commodity units mapping
+const COMMODITY_UNITS: Record<string, string> = {
+  "HRC": "/ton",
+  "CRC": "/ton",
+  "BILLET": "/ton",
+  "SCRAP": "/ton",
+  "IRON_ORE": "/ton",
+};
 
 function PriceChangeIndicator({ change, changePercent }: { change: number; changePercent: number }) {
   if (change > 0) {
@@ -69,7 +78,7 @@ function InfoTooltip({ content }: { content: string }) {
     <TooltipProvider>
       <Tooltip>
         <TooltipTrigger asChild>
-          <button className="text-muted-foreground hover:text-foreground transition-colors ml-1">
+          <button className="text-muted-foreground hover:text-foreground transition-colors ml-1" aria-label="More information">
             <Info className="h-3.5 w-3.5" />
           </button>
         </TooltipTrigger>
@@ -78,6 +87,18 @@ function InfoTooltip({ content }: { content: string }) {
         </TooltipContent>
       </Tooltip>
     </TooltipProvider>
+  );
+}
+
+// State-owned entities that have no public equity
+const STATE_OWNED_ENTITIES = [
+  "ADNOC", "QatarEnergy", "ENOC", "PDO", "Saudi Aramco", "Aramco", 
+  "Petronas", "ONGC", "Kuwait Petroleum", "NIOC", "Sonatrach"
+];
+
+function isStateOwned(name: string): boolean {
+  return STATE_OWNED_ENTITIES.some(entity => 
+    name.toLowerCase().includes(entity.toLowerCase())
   );
 }
 
@@ -170,7 +191,7 @@ export default function PricingIndex() {
       <Header />
 
       <main className="min-h-screen bg-background">
-        {/* Hero Section */}
+        {/* SECTION 1: Hero + Market Context Banner */}
         <section className="relative bg-gradient-to-b from-primary/5 via-background to-background py-12 md:py-16">
           <div className="container">
             <Breadcrumb className="mb-6">
@@ -198,8 +219,9 @@ export default function PricingIndex() {
               {/* Left: Subtitle + last updated */}
               <div>
                 <p className="text-lg text-muted-foreground mb-4">
-                  Track the raw material cost drivers, steel benchmarks, and industry indicators influencing OCTG pricing worldwide. 
-                  Includes steel commodities, market sentiment, and energy-sector equity signals impacting casing and tubing markets.
+                  Directional cost drivers and market sentiment influencing OCTG pricing.
+                  <br />
+                  <strong className="text-foreground">Not spot or contract pipe prices.</strong>
                 </p>
                 {latestUpdate && (
                   <div className="flex items-center gap-2 text-sm text-muted-foreground">
@@ -226,24 +248,21 @@ export default function PricingIndex() {
           </div>
         </section>
 
-        {/* OCTG Cost Pressure Index - Signature Feature */}
-        {!pricesLoading && commodities.length > 0 && (
-          <section className="container py-6">
-            <CostPressureIndicator commodities={commodities} stocks={stocks} />
-          </section>
-        )}
-
-        {/* Commodities Section */}
+        {/* SECTION 2: Steel & Raw Material Benchmarks (OCTG Cost Inputs) */}
         <section className="container py-10">
           <div className="mb-6">
             <div className="flex items-center gap-2 mb-2">
+              <Layers className="h-6 w-6 text-amber-500" />
               <h2 className="font-display text-2xl font-bold tracking-tight">
-                Steel & Raw Material Cost Drivers
+                Steel & Raw Material Benchmarks
               </h2>
-              <InfoTooltip content="These materials directly influence casing and tubing production costs. Data is editorial and directional—not transactional." />
+              <Badge className="bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30 text-[10px]">
+                OCTG COST INPUTS
+              </Badge>
+              <InfoTooltip content="These commodities form the primary cost base for casing, tubing, and line pipe manufacturing. Indicative benchmark—not a transaction price." />
             </div>
             <p className="text-sm text-muted-foreground">
-              These materials directly influence casing and tubing production costs and mill pricing behavior.
+              These commodities form the primary cost base for casing, tubing, and line pipe manufacturing.
             </p>
           </div>
 
@@ -257,27 +276,37 @@ export default function PricingIndex() {
             <>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
                 {commodities.map((commodity) => (
-                  <Card key={commodity.id} className="bg-card hover:bg-card/80 transition-colors">
+                  <Card 
+                    key={commodity.id} 
+                    className="bg-card hover:bg-card/80 transition-colors border-l-4 border-l-amber-500/60"
+                  >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-1">
                           <span className="text-sm font-medium text-muted-foreground">{commodity.symbol}</span>
-                          <InfoTooltip content="Input commodity used as cost-pressure proxy. Not transactional." />
+                          <InfoTooltip content="Indicative benchmark. Not a transaction price." />
                         </div>
                         <PriceChangeIndicator change={commodity.change} changePercent={commodity.change_percent} />
                       </div>
-                      <p className="font-display text-2xl font-bold tracking-tight">
-                        {formatPrice(commodity.price, commodity.currency)}
-                      </p>
+                      <div className="flex items-baseline gap-1">
+                        <p className="font-display text-2xl font-bold tracking-tight">
+                          {formatPrice(commodity.price, commodity.currency)}
+                        </p>
+                        <span className="text-xs text-muted-foreground">
+                          {COMMODITY_UNITS[commodity.symbol] || "/ton"}
+                        </span>
+                      </div>
                       <p className="text-sm text-muted-foreground mt-1">{commodity.name}</p>
-                      <Badge variant="outline" className="mt-2 text-[10px]">Cost Driver</Badge>
+                      <Badge className="mt-2 text-[10px] bg-amber-500/20 text-amber-700 dark:text-amber-300 border-amber-500/30">
+                        COST INPUT
+                      </Badge>
                     </CardContent>
                   </Card>
                 ))}
               </div>
               {/* Data Source Attribution */}
               <p className="text-xs text-muted-foreground mt-4 italic">
-                Source: Exchange data, public market feeds, editorial aggregation. Editorial indicator—not transactional.
+                Source: Exchange data, public market feeds, editorial aggregation. Global reference benchmark—not transactional.
               </p>
             </>
           ) : (
@@ -289,7 +318,19 @@ export default function PricingIndex() {
           )}
         </section>
 
-        {/* Stocks by Region Section */}
+        {/* SECTION 3: OCTG Cost Pressure Index - Bridge Section */}
+        {!pricesLoading && commodities.length > 0 && (
+          <section className="container py-6">
+            <div className="mb-4">
+              <p className="text-xs text-muted-foreground text-center">
+                Composite indicator derived from steel benchmarks and energy equity sentiment
+              </p>
+            </div>
+            <CostPressureIndicator commodities={commodities} stocks={stocks} />
+          </section>
+        )}
+
+        {/* SECTION 4: Energy & Steel Equities - Market Sentiment Indicators */}
         <section className="container py-10">
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
@@ -321,21 +362,33 @@ export default function PricingIndex() {
                   <TabsContent key={region} value={region}>
                     {/* Regional Industry Anchors Section */}
                     {anchorsByRegion[region] && anchorsByRegion[region].length > 0 && (
-                      <div className="mb-6">
+                      <div className="mb-6 p-4 rounded-lg bg-muted/30 border border-border/50">
                         <div className="flex items-center gap-2 mb-3">
                           <Building2 className="h-4 w-4 text-accent" />
                           <h3 className="text-sm font-semibold text-muted-foreground">
                             Regional Industry Anchors — Strategic NOCs & EPCs
                           </h3>
-                          <InfoTooltip content="Non-equity entities included for regional authority and industry context. No live pricing." />
+                          <InfoTooltip content="State-owned entities included for regional authority. No public equity available for these companies." />
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {anchorsByRegion[region].map((anchor) => (
-                            <Badge key={anchor.id} variant="secondary" className="px-3 py-1.5">
+                            <Badge 
+                              key={anchor.id} 
+                              variant="secondary" 
+                              className="px-3 py-1.5 bg-muted border border-border"
+                            >
                               {anchor.name}
+                              {isStateOwned(anchor.name) && (
+                                <span className="ml-2 text-[9px] text-muted-foreground uppercase tracking-wide">
+                                  STATE-OWNED
+                                </span>
+                              )}
                             </Badge>
                           ))}
                         </div>
+                        <p className="text-[10px] text-muted-foreground mt-3 italic">
+                          State-owned entities included for regional authority — no public equity available.
+                        </p>
                       </div>
                     )}
 
@@ -378,7 +431,7 @@ export default function PricingIndex() {
               </Tabs>
               {/* Equity-based indicator label */}
               <div className="mt-4 flex items-center gap-2">
-                <Badge variant="outline" className="text-[10px]">Market Sentiment Proxy</Badge>
+                <Badge variant="outline" className="text-[10px]">MARKET SENTIMENT</Badge>
                 <p className="text-xs text-muted-foreground italic">
                   Equity-based indicator — delayed market data. Source: Public stock exchange feeds, company filings.
                 </p>
@@ -391,6 +444,40 @@ export default function PricingIndex() {
               </CardContent>
             </Card>
           )}
+        </section>
+
+        {/* SECTION 5: How to Read This Page - Trust Builder */}
+        <section className="container py-10">
+          <Card className="border-accent/30 bg-gradient-to-br from-accent/5 to-primary/5">
+            <CardHeader className="pb-3">
+              <div className="flex items-center gap-2">
+                <AlertCircle className="h-5 w-5 text-accent" />
+                <CardTitle className="font-display text-lg">How to Interpret OCTG Market Indicators</CardTitle>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3 text-sm">
+                <li className="flex items-start gap-3">
+                  <span className="text-amber-500 font-bold text-lg leading-none">→</span>
+                  <span><strong>Commodities</strong> — Cost pressure signals (steel, iron ore, scrap prices)</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-accent font-bold text-lg leading-none">→</span>
+                  <span><strong>Equities</strong> — Investment sentiment & capital cycles</span>
+                </li>
+                <li className="flex items-start gap-3">
+                  <span className="text-primary font-bold text-lg leading-none">→</span>
+                  <span><strong>Cost Pressure Index</strong> — Directional signal (Tightening / Neutral / Softening)</span>
+                </li>
+                <li className="flex items-start gap-3 pt-2 border-t border-border/50">
+                  <span className="text-red-500 font-bold text-lg leading-none">✕</span>
+                  <span className="text-muted-foreground">
+                    <strong>What this is NOT:</strong> Contract pipe pricing, spot OCTG prices, mill quotes, or transactional data
+                  </span>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
         </section>
 
         {/* Market Context Section */}
