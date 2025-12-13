@@ -206,8 +206,8 @@ const Index = () => {
       <main>
         {/* Hero Section - 50/50 Split Layout, Optimized for LCP */}
         <section className="relative overflow-hidden min-h-[400px] sm:h-[500px] lg:max-h-[600px] xl:max-h-[650px]">
-          {/* Left half gradient - solid dark coverage for text readability */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black from-0% via-black/60 via-30% to-transparent to-70% z-10" />
+          {/* Responsive gradient - vertical on mobile (dark bottom), horizontal on desktop (dark left) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black from-20% via-black/80 via-50% to-black/30 sm:bg-gradient-to-r sm:from-black sm:from-0% sm:via-black/60 sm:via-30% sm:to-transparent sm:to-70% z-10" />
           {/* Right half image - sharp and visible with focal point on people */}
           <img
             src={optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
