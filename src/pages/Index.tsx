@@ -205,7 +205,7 @@ const Index = () => {
       
       <main>
         {/* Hero Section - Optimized for LCP */}
-        <section className="relative overflow-hidden h-[400px] sm:h-[500px]">
+        <section className="relative overflow-hidden min-h-[400px] sm:h-[500px]">
           <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
           {/* Use img tag for LCP optimization instead of background-image */}
           <img
@@ -218,7 +218,7 @@ const Index = () => {
             decoding="sync"
             className="absolute inset-0 w-full h-full object-cover object-right opacity-60"
           />
-          <div className="container relative z-20 py-16 sm:py-24">
+          <div className="container relative z-20 py-10 sm:py-24">
             {isLoading ? (
               <div className="max-w-4xl space-y-4 min-h-[200px]">
                 <Skeleton className="h-8 w-32 bg-white/10" />
