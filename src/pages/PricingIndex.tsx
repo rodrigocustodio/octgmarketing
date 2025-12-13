@@ -189,48 +189,41 @@ export default function PricingIndex() {
               <BarChart3 className="h-8 w-8 text-accent" />
               <Badge variant="secondary" className="text-xs">MARKET INTELLIGENCE</Badge>
             </div>
-            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-4">
+            <h1 className="font-display text-4xl md:text-5xl font-bold tracking-tight mb-6">
               Market Prices – OCTG Cost Drivers, Benchmarks & Industry Indicators
             </h1>
-            <p className="text-lg text-muted-foreground max-w-3xl mb-6">
-              Track the raw material cost drivers, steel benchmarks, and industry indicators influencing OCTG pricing worldwide. 
-              Includes steel commodities, market sentiment, and energy-sector equity signals impacting casing and tubing markets.
-            </p>
-            {latestUpdate && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <Clock className="h-4 w-4" />
-                <span>Last updated: {format(new Date(latestUpdate), "MMM d, yyyy 'at' h:mm a")}</span>
+            
+            {/* 50/50 Grid: Subtitle + About Card */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {/* Left: Subtitle + last updated */}
+              <div>
+                <p className="text-lg text-muted-foreground mb-4">
+                  Track the raw material cost drivers, steel benchmarks, and industry indicators influencing OCTG pricing worldwide. 
+                  Includes steel commodities, market sentiment, and energy-sector equity signals impacting casing and tubing markets.
+                </p>
+                {latestUpdate && (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Clock className="h-4 w-4" />
+                    <span>Last updated: {format(new Date(latestUpdate), "MMM d, yyyy 'at' h:mm a")}</span>
+                  </div>
+                )}
               </div>
-            )}
-          </div>
-        </section>
-
-        {/* Editorial Explainer Block - MANDATORY */}
-        <section className="container py-8">
-          <Card className="border-accent/30 bg-accent/5">
-            <CardContent className="p-6">
-              <div className="flex items-start gap-3">
-                <AlertCircle className="h-5 w-5 text-accent mt-0.5 flex-shrink-0" />
-                <div>
-                  <h2 className="font-display text-lg font-semibold mb-3">About These Market Prices</h2>
-                  <div className="space-y-3 text-sm text-muted-foreground">
-                    <p>
-                      OCTG pricing is influenced by a combination of steel raw material costs, manufacturing capacity, 
-                      energy-sector investment cycles, and global market sentiment.
-                    </p>
-                    <p>
-                      This page tracks key input commodities (such as hot-rolled coil, billet, scrap, and iron ore) 
-                      alongside publicly traded energy and steel companies to provide directional insight into cost 
-                      pressure and market conditions impacting OCTG markets globally.
-                    </p>
-                    <p className="font-medium text-foreground">
-                      This data does not represent spot or contract OCTG pipe pricing.
+              
+              {/* Right: Compact "About" card - less prominent */}
+              <div className="bg-muted/30 rounded-lg p-4 border border-border/50">
+                <div className="flex items-start gap-2">
+                  <Info className="h-4 w-4 text-muted-foreground mt-0.5 flex-shrink-0" />
+                  <div>
+                    <h2 className="text-sm font-medium mb-2">About These Market Prices</h2>
+                    <p className="text-xs text-muted-foreground leading-relaxed">
+                      This data tracks input commodities and equity-based indicators influencing OCTG pricing — not direct pipe transactions. 
+                      <strong className="text-foreground"> Does not represent spot or contract OCTG pricing.</strong>
                     </p>
                   </div>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         </section>
 
         {/* OCTG Cost Pressure Index - Signature Feature */}

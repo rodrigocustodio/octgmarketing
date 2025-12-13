@@ -48,24 +48,45 @@ function calculatePressureLevel(
 
 const pressureConfig: Record<
   PressureLevel,
-  { label: string; color: string; bgColor: string; icon: typeof TrendingUp }
+  {
+    label: string;
+    cardBg: string;
+    textColor: string;
+    mutedText: string;
+    badgeBg: string;
+    indicatorBg: string;
+    indicatorColor: string;
+    icon: typeof TrendingUp;
+  }
 > = {
   rising: {
     label: "Tightening",
-    color: "text-red-500",
-    bgColor: "bg-red-500/10",
+    cardBg: "bg-red-500/15 dark:bg-red-500/25 border-red-500/40",
+    textColor: "text-red-900 dark:text-red-50",
+    mutedText: "text-red-800/80 dark:text-red-200/80",
+    badgeBg: "bg-red-500/20 text-red-900 dark:text-red-100",
+    indicatorBg: "bg-red-500/20 dark:bg-red-500/30",
+    indicatorColor: "text-red-600 dark:text-red-300",
     icon: TrendingUp,
   },
   stable: {
     label: "Neutral",
-    color: "text-yellow-500",
-    bgColor: "bg-yellow-500/10",
+    cardBg: "bg-yellow-400/15 dark:bg-yellow-500/20 border-yellow-500/40",
+    textColor: "text-yellow-900 dark:text-yellow-50",
+    mutedText: "text-yellow-800/80 dark:text-yellow-200/80",
+    badgeBg: "bg-yellow-500/20 text-yellow-900 dark:text-yellow-100",
+    indicatorBg: "bg-yellow-500/20 dark:bg-yellow-500/30",
+    indicatorColor: "text-yellow-600 dark:text-yellow-300",
     icon: Minus,
   },
   softening: {
     label: "Softening",
-    color: "text-green-500",
-    bgColor: "bg-green-500/10",
+    cardBg: "bg-green-500/15 dark:bg-green-500/20 border-green-500/40",
+    textColor: "text-green-900 dark:text-green-50",
+    mutedText: "text-green-800/80 dark:text-green-200/80",
+    badgeBg: "bg-green-500/20 text-green-900 dark:text-green-100",
+    indicatorBg: "bg-green-500/20 dark:bg-green-500/30",
+    indicatorColor: "text-green-600 dark:text-green-300",
     icon: TrendingDown,
   },
 };
@@ -79,18 +100,18 @@ export function CostPressureIndicator({
   const Icon = config.icon;
 
   return (
-    <Card className="border-accent/20 bg-gradient-to-br from-accent/5 to-primary/5">
+    <Card className={cn("border", config.cardBg)}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
             <div className="flex items-center gap-2 mb-2">
-              <h3 className="font-display text-lg font-semibold">
+              <h3 className={cn("font-display text-lg font-semibold", config.textColor)}>
                 OCTG Cost Pressure Index
               </h3>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <button className="text-muted-foreground hover:text-foreground transition-colors">
+                    <button className={cn("transition-colors", config.mutedText, "hover:opacity-80")}>
                       <Info className="h-4 w-4" />
                     </button>
                   </TooltipTrigger>
@@ -103,10 +124,10 @@ export function CostPressureIndicator({
                 </Tooltip>
               </TooltipProvider>
             </div>
-            <p className="text-sm text-muted-foreground mb-4">
+            <p className={cn("text-sm mb-4", config.mutedText)}>
               Based on steel commodity trends, scrap prices, and energy equity sentiment
             </p>
-            <span className="inline-block px-2 py-0.5 text-xs rounded bg-muted text-muted-foreground">
+            <span className={cn("inline-block px-2 py-0.5 text-xs rounded", config.badgeBg)}>
               Editorial Indicator
             </span>
           </div>
@@ -114,11 +135,11 @@ export function CostPressureIndicator({
           <div
             className={cn(
               "flex flex-col items-center justify-center rounded-xl p-4 min-w-[120px]",
-              config.bgColor
+              config.indicatorBg
             )}
           >
-            <Icon className={cn("h-8 w-8 mb-1", config.color)} />
-            <span className={cn("text-xl font-bold", config.color)}>
+            <Icon className={cn("h-8 w-8 mb-1", config.indicatorColor)} />
+            <span className={cn("text-xl font-bold", config.indicatorColor)}>
               {config.label}
             </span>
           </div>
