@@ -69,6 +69,9 @@ const TICKER_HEIGHT = "h-8"; // 32px to accommodate label
 
 export function PriceTicker() {
   const { data: prices, isLoading } = useSteelPrices();
+  
+  // Filter out anchors (state-owned entities with no public equity) and zero prices
+  const displayPrices = prices?.filter(p => p.price > 0 && p.category !== 'anchor') || [];
 
   // Always render with fixed height to prevent CLS
   if (isLoading) {
@@ -81,7 +84,7 @@ export function PriceTicker() {
     );
   }
 
-  if (!prices || prices.length === 0) {
+  if (displayPrices.length === 0) {
     return (
       <div className={`sticky top-16 z-40 w-full border-b border-border bg-muted/30 backdrop-blur supports-[backdrop-filter]:bg-muted/20 ${TICKER_HEIGHT}`}>
         <div className={`${TICKER_HEIGHT} flex items-center justify-center text-xs text-muted-foreground`}>
@@ -119,7 +122,7 @@ export function PriceTicker() {
         <div className="ticker-wrapper flex-1">
           <div className="ticker-content text-[11px] font-mono text-muted-foreground">
             {/* Double the content for seamless loop */}
-            {[...prices, ...prices].map((price, index) => (
+            {[...displayPrices, ...displayPrices].map((price, index) => (
               <PriceItem
                 key={`${price.symbol}-${index}`}
                 symbol={price.symbol}
