@@ -50,17 +50,21 @@ Deno.serve(async (req) => {
 
     console.log("Starting junk company cleanup...");
 
-    // First, count how many junk entries we have
-    // Junk patterns: starts with underscore, contains "/_", or is clearly a category tag
-    const { data: junkCompanies, error: selectError } = await supabase
+    // First, fetch ALL companies and filter in JS
+    // (PostgREST LIKE escaping for underscore is tricky)
+    const { data: allCompanies, error: selectError } = await supabase
       .from("companies")
-      .select("id, name")
-      .or("name.like._%, name.like.%/_%");
+      .select("id, name");
 
     if (selectError) {
-      console.error("Error fetching junk companies:", selectError);
+      console.error("Error fetching companies:", selectError);
       throw selectError;
     }
+
+    // Filter junk entries: starts with underscore OR contains "/_"
+    const junkCompanies = (allCompanies || []).filter(c => 
+      c.name.startsWith("_") || c.name.includes("/_")
+    );
 
     console.log(`Found ${junkCompanies?.length || 0} junk entries to delete`);
 
