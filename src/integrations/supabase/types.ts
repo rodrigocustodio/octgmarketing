@@ -449,6 +449,70 @@ export type Database = {
           },
         ]
       }
+      editorial_queue: {
+        Row: {
+          created_at: string
+          gap_reason: string | null
+          id: string
+          last_suggested_at: string | null
+          priority_score: number
+          product_id: string | null
+          region_id: string | null
+          research_data: Json | null
+          status: string
+          topic_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          gap_reason?: string | null
+          id?: string
+          last_suggested_at?: string | null
+          priority_score?: number
+          product_id?: string | null
+          region_id?: string | null
+          research_data?: Json | null
+          status?: string
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          gap_reason?: string | null
+          id?: string
+          last_suggested_at?: string | null
+          priority_score?: number
+          product_id?: string | null
+          region_id?: string | null
+          research_data?: Json | null
+          status?: string
+          topic_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "editorial_queue_product_id_fkey"
+            columns: ["product_id"]
+            isOneToOne: false
+            referencedRelation: "products"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_queue_region_id_fkey"
+            columns: ["region_id"]
+            isOneToOne: false
+            referencedRelation: "regions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "editorial_queue_topic_id_fkey"
+            columns: ["topic_id"]
+            isOneToOne: false
+            referencedRelation: "topics"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       editorial_suggestions: {
         Row: {
           business_score: number | null
