@@ -8,17 +8,18 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { 
   ListOrdered, 
   RefreshCw, 
-  Sparkles, 
   Globe, 
   Tag, 
   AlertCircle,
   Search,
-  Loader2 
+  CheckCircle2,
+  Loader2
 } from "lucide-react";
 import { toast } from "sonner";
 import OpportunityResearchDialog from "./OpportunityResearchDialog";
 
 interface QueueItem {
+  id: string;
   regionId: string;
   regionName: string;
   topicId: string;
@@ -26,6 +27,8 @@ interface QueueItem {
   articleCount: number;
   priorityScore: number;
   gapReason: string;
+  initialSequence: number;
+  lastPublishedAt: string | null;
 }
 
 export default function EditorialQueueTab() {
@@ -33,152 +36,101 @@ export default function EditorialQueueTab() {
   const [selectedItem, setSelectedItem] = useState<QueueItem | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // Fetch and calculate editorial queue
+  // Fetch queue from database with circular ordering
   const { data: queue, isLoading, refetch } = useQuery({
-    queryKey: ["editorial-queue-calculated"],
+    queryKey: ["editorial-queue-persistent"],
     queryFn: async () => {
-      const [regionsResult, topicsResult, articlesResult, articleTopicsResult] = await Promise.all([
-        supabase.from("regions").select("id, name").order("name"),
-        supabase.from("topics").select("id, name").order("name"),
-        supabase.from("articles").select("id, region_id, publish_date").in("status", ["published", "featured"]),
+      // Fetch queue items with region and topic names
+      const { data: queueData, error: queueError } = await supabase
+        .from("editorial_queue")
+        .select(`
+          id,
+          region_id,
+          topic_id,
+          priority_score,
+          gap_reason,
+          initial_sequence,
+          last_published_at,
+          regions!inner(id, name),
+          topics!inner(id, name)
+        `)
+        .order("last_published_at", { ascending: true, nullsFirst: true })
+        .order("initial_sequence", { ascending: true })
+        .limit(15);
+
+      if (queueError) throw queueError;
+
+      // Fetch article counts for each region×topic combination
+      const [articlesResult, articleTopicsResult] = await Promise.all([
+        supabase.from("articles").select("id, region_id").in("status", ["published", "featured"]),
         supabase.from("article_topics").select("article_id, topic_id"),
       ]);
 
-      const regions = regionsResult.data || [];
-      const topics = topicsResult.data || [];
       const articles = articlesResult.data || [];
       const articleTopics = articleTopicsResult.data || [];
 
-      const now = new Date();
-      const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      // Map queue items with article counts
+      const queueItems: QueueItem[] = (queueData || []).map((item: any) => {
+        const regionId = item.region_id;
+        const topicId = item.topic_id;
 
-      // Calculate coverage for each region × topic combination
-      const queueItems: QueueItem[] = [];
+        // Calculate article count for this region×topic
+        const articleIds = articles
+          .filter(a => a.region_id === regionId)
+          .map(a => a.id);
 
-      for (const region of regions) {
-        for (const topic of topics) {
-          const articleIds = articles
-            .filter(a => a.region_id === region.id)
-            .map(a => a.id);
+        const matchingArticles = articleTopics.filter(
+          at => articleIds.includes(at.article_id) && at.topic_id === topicId
+        );
 
-          const matchingArticles = articleTopics.filter(
-            at => articleIds.includes(at.article_id) && at.topic_id === topic.id
-          );
+        const count = matchingArticles.length;
 
-          const count = matchingArticles.length;
-
-          // Calculate priority score
-          let priorityScore = 0;
-          let gapReason = "";
-
-          if (count === 0) {
-            priorityScore = 100;
-            gapReason = "No coverage - high priority";
-          } else if (count < 3) {
-            priorityScore = 75;
-            gapReason = "Limited coverage";
-          } else if (count < 6) {
-            priorityScore = 50;
-            gapReason = "Moderate coverage";
-          } else {
-            priorityScore = 25;
-            gapReason = "Good coverage";
-          }
-
-          // Check if no recent articles (boost priority)
-          const regionArticles = articles.filter(a => a.region_id === region.id);
-          const hasRecentArticle = regionArticles.some(
-            a => a.publish_date && new Date(a.publish_date) > thirtyDaysAgo
-          );
-          if (!hasRecentArticle && count > 0) {
-            priorityScore += 25;
-            gapReason += " (stale - no recent articles)";
-          }
-
-          queueItems.push({
-            regionId: region.id,
-            regionName: region.name,
-            topicId: topic.id,
-            topicName: topic.name,
-            articleCount: count,
-            priorityScore,
-            gapReason,
-          });
+        // Calculate gap reason based on count
+        let gapReason = "";
+        if (count === 0) {
+          gapReason = "No coverage - high priority";
+        } else if (count < 3) {
+          gapReason = "Limited coverage";
+        } else if (count < 6) {
+          gapReason = "Moderate coverage";
+        } else {
+          gapReason = "Good coverage";
         }
-      }
 
-      // Round-robin algorithm: rotate through regions while varying topics
-      // This ensures balanced coverage across ALL 6 regions and topics
-      
-      // First, filter to high-priority items (0-2 articles = scores 75-100)
-      const highPriority = queueItems.filter(item => item.priorityScore >= 75);
-      
-      // Get unique regions in a fixed order
-      const regionOrder = regions.map(r => r.id);
-      const topicIds = topics.map(t => t.id);
-      
-      // Interleave function: rotates through regions, varies topics each cycle
-      function interleaveRoundRobin(items: QueueItem[]): QueueItem[] {
-        const result: QueueItem[] = [];
-        const usedCombinations = new Set<string>();
-        let topicOffset = 0; // Shifts topic selection each region cycle
-        
-        // Continue until we have enough items or exhausted all options
-        while (result.length < 10 && result.length < items.length) {
-          let addedThisCycle = false;
-          
-          // Cycle through each region in order
-          for (const regionId of regionOrder) {
-            if (result.length >= 10) break;
-            
-            // Find available items for this region, sorted by priority
-            const regionItems = items
-              .filter(item => 
-                item.regionId === regionId && 
-                !usedCombinations.has(`${item.regionId}-${item.topicId}`)
-              )
-              .sort((a, b) => {
-                // Sort by priority, then prefer topics we haven't used recently
-                if (b.priorityScore !== a.priorityScore) {
-                  return b.priorityScore - a.priorityScore;
-                }
-                return a.articleCount - b.articleCount;
-              });
-            
-            if (regionItems.length > 0) {
-              // Pick item with topic offset to vary topics across regions
-              const pickIndex = Math.min(topicOffset % regionItems.length, regionItems.length - 1);
-              const selected = regionItems[pickIndex];
-              
-              result.push(selected);
-              usedCombinations.add(`${selected.regionId}-${selected.topicId}`);
-              addedThisCycle = true;
-            }
-          }
-          
-          topicOffset++; // Next cycle picks different topics
-          
-          // Prevent infinite loop if no items were added
-          if (!addedThisCycle) break;
-        }
-        
-        return result;
-      }
-      
-      // Apply round-robin to high priority items
-      const interleaved = interleaveRoundRobin(highPriority);
-      
-      // If we need more items, add from medium priority with same logic
-      if (interleaved.length < 10) {
-        const mediumPriority = queueItems
-          .filter(item => item.priorityScore < 75 && item.priorityScore >= 50)
-          .filter(item => !interleaved.some(i => i.regionId === item.regionId && i.topicId === item.topicId));
-        
-        const additionalItems = interleaveRoundRobin(mediumPriority);
-        interleaved.push(...additionalItems.slice(0, 10 - interleaved.length));
-      }
+        return {
+          id: item.id,
+          regionId: regionId,
+          regionName: item.regions?.name || "Unknown",
+          topicId: topicId,
+          topicName: item.topics?.name || "Unknown",
+          articleCount: count,
+          priorityScore: item.priority_score || 100,
+          gapReason,
+          initialSequence: item.initial_sequence || 0,
+          lastPublishedAt: item.last_published_at,
+        };
+      });
 
-      return interleaved;
+      return queueItems;
+    },
+  });
+
+  // Mutation to mark item as published (sends to end of queue)
+  const markPublishedMutation = useMutation({
+    mutationFn: async (queueItemId: string) => {
+      const { error } = await supabase
+        .from("editorial_queue")
+        .update({ last_published_at: new Date().toISOString() })
+        .eq("id", queueItemId);
+
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["editorial-queue-persistent"] });
+      toast.success("Item moved to end of queue");
+    },
+    onError: (error) => {
+      toast.error("Failed to update queue: " + error.message);
     },
   });
 
@@ -187,12 +139,21 @@ export default function EditorialQueueTab() {
     setDialogOpen(true);
   };
 
-  const getPriorityColor = (score: number) => {
-    if (score >= 100) return "bg-destructive/20 text-destructive border-destructive/30";
-    if (score >= 75) return "bg-orange-500/20 text-orange-600 dark:text-orange-400 border-orange-500/30";
-    if (score >= 50) return "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30";
+  const handleMarkPublished = (e: React.MouseEvent, item: QueueItem) => {
+    e.stopPropagation();
+    markPublishedMutation.mutate(item.id);
+  };
+
+  const getPriorityColor = (count: number) => {
+    if (count === 0) return "bg-destructive/20 text-destructive border-destructive/30";
+    if (count < 3) return "bg-orange-500/20 text-orange-600 dark:text-orange-400 border-orange-500/30";
+    if (count < 6) return "bg-yellow-500/20 text-yellow-600 dark:text-yellow-400 border-yellow-500/30";
     return "bg-green-500/20 text-green-600 dark:text-green-400 border-green-500/30";
   };
+
+  // Calculate queue stats
+  const totalItems = 138; // 6 regions × 23 topics
+  const completedCount = queue?.filter(q => q.lastPublishedAt)?.length || 0;
 
   return (
     <div className="space-y-4">
@@ -203,20 +164,25 @@ export default function EditorialQueueTab() {
               <ListOrdered className="h-5 w-5 text-primary" />
               Smart Editorial Queue
             </div>
-            <Button
-              onClick={() => refetch()}
-              variant="outline"
-              size="sm"
-            >
-              <RefreshCw className="h-4 w-4 mr-2" />
-              Refresh
-            </Button>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="text-xs">
+                Queue: {totalItems} combinations
+              </Badge>
+              <Button
+                onClick={() => refetch()}
+                variant="outline"
+                size="sm"
+              >
+                <RefreshCw className="h-4 w-4 mr-2" />
+                Refresh
+              </Button>
+            </div>
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground mb-4">
-            AI-prioritized opportunities based on coverage gaps across 6 regions and {queue?.length ? Math.ceil((queue?.length || 0) / 6) : 0}+ topics.
-            Click any item to research and generate article ideas.
+            Circular queue rotating through 6 regions × 23 topics = {totalItems} combinations.
+            Completed items move to end of sequence automatically.
           </p>
 
           {isLoading ? (
@@ -227,9 +193,9 @@ export default function EditorialQueueTab() {
             </div>
           ) : queue && queue.length > 0 ? (
             <div className="space-y-3">
-              {queue.map((item, index) => (
+              {queue.slice(0, 10).map((item, index) => (
                 <div
-                  key={`${item.regionId}-${item.topicId}`}
+                  key={item.id}
                   className="p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => handleResearchClick(item)}
                 >
@@ -251,7 +217,7 @@ export default function EditorialQueueTab() {
                         </div>
                         <div className="flex items-center gap-2">
                           <Badge
-                            className={`text-xs border ${getPriorityColor(item.priorityScore)}`}
+                            className={`text-xs border ${getPriorityColor(item.articleCount)}`}
                           >
                             {item.articleCount} articles
                           </Badge>
@@ -261,10 +227,25 @@ export default function EditorialQueueTab() {
                         </div>
                       </div>
                     </div>
-                    <Button size="sm" variant="outline">
-                      <Search className="h-4 w-4 mr-2" />
-                      Research
-                    </Button>
+                    <div className="flex items-center gap-2">
+                      <Button 
+                        size="sm" 
+                        variant="ghost"
+                        onClick={(e) => handleMarkPublished(e, item)}
+                        disabled={markPublishedMutation.isPending}
+                        title="Mark as published (moves to end of queue)"
+                      >
+                        {markPublishedMutation.isPending ? (
+                          <Loader2 className="h-4 w-4 animate-spin" />
+                        ) : (
+                          <CheckCircle2 className="h-4 w-4 text-green-500" />
+                        )}
+                      </Button>
+                      <Button size="sm" variant="outline">
+                        <Search className="h-4 w-4 mr-2" />
+                        Research
+                      </Button>
+                    </div>
                   </div>
                 </div>
               ))}
