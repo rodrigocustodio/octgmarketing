@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useEnrichCompanyProfile, useFindCompanyWebsite, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
+import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useEnrichCompanyProfile, useFindCompanyWebsite, useScrapeAdipecExhibitors, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
 import { useRegions } from "@/hooks/useDirectory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -24,7 +24,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check, Square, Zap, Globe, Phone, Calendar, Briefcase, MapPin } from "lucide-react";
+import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check, Square, Zap, Globe, Phone, Calendar, Briefcase, MapPin, Download } from "lucide-react";
 import { INDUSTRY_ROLES } from "@/hooks/useDirectory";
 
 import { useToast } from "@/hooks/use-toast";
@@ -48,6 +48,7 @@ const Companies = () => {
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [isBulkEnriching, setIsBulkEnriching] = useState(false);
   const [isFindingWebsites, setIsFindingWebsites] = useState(false);
+  const [isFindingCompanies, setIsFindingCompanies] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({
     completed: 0,
     total: 0,
@@ -62,9 +63,43 @@ const Companies = () => {
   const generateDescription = useGenerateCompanyDescription();
   const enrichCompany = useEnrichCompanyProfile();
   const findWebsite = useFindCompanyWebsite();
+  const scrapeAdipec = useScrapeAdipecExhibitors();
   const updateCompany = useUpdateCompany();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Handle Find Companies from ADIPEC
+  const handleFindCompanies = async () => {
+    setIsFindingCompanies(true);
+    
+    try {
+      toast({ title: "Scraping ADIPEC exhibitor list...", description: "This may take a moment" });
+      
+      const result = await scrapeAdipec.mutateAsync();
+      
+      if (result.success) {
+        toast({ 
+          title: "Company discovery complete!", 
+          description: `Found ${result.totalFound} companies, skipped ${result.duplicatesSkipped} duplicates, added ${result.newCompaniesAdded} new companies` 
+        });
+      } else {
+        toast({ 
+          title: "Scrape failed", 
+          description: result.error || "Unknown error",
+          variant: "destructive" 
+        });
+      }
+    } catch (error) {
+      console.error('Error scraping ADIPEC:', error);
+      toast({ 
+        title: "Scrape failed", 
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive" 
+      });
+    } finally {
+      setIsFindingCompanies(false);
+    }
+  };
 
   // Count missing data
   const missingCount = companies?.filter(c => !c.description || c.description.length === 0).length || 0;
@@ -604,38 +639,59 @@ const Companies = () => {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {(isBulkGenerating || isBulkEnriching || isFindingWebsites) ? (
+            {(isBulkGenerating || isBulkEnriching || isFindingWebsites || isFindingCompanies) ? (
               <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  disabled
-                  className={`min-w-[320px] ${
-                    isFindingWebsites 
-                      ? "bg-blue-500/20 text-blue-500 border-blue-500/30"
-                      : isBulkEnriching 
-                        ? "bg-primary/20 text-primary border-primary/30"
-                        : "bg-accent/20 text-accent border-accent/30"
-                  }`}
-                >
-                  <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
-                  <span className="truncate max-w-[140px] inline-block">
-                    {bulkProgress.current || "Starting..."}
-                  </span>
-                  <span className="ml-2 text-xs opacity-80 flex-shrink-0">
-                    ({bulkProgress.batchCurrent}/{BATCH_SIZE} • Batch {bulkProgress.currentBatch}/{bulkProgress.totalBatches})
-                  </span>
-                </Button>
-                <Button
-                  variant="destructive"
-                  size="sm"
-                  onClick={handleStopBulk}
-                  aria-label="Stop bulk operation"
-                >
-                  <Square className="h-4 w-4" />
-                </Button>
+                {isFindingCompanies ? (
+                  <Button
+                    variant="outline"
+                    disabled
+                    className="min-w-[320px] bg-green-500/20 text-green-500 border-green-500/30"
+                  >
+                    <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                    <span>Scraping ADIPEC exhibitors...</span>
+                  </Button>
+                ) : (
+                  <>
+                    <Button
+                      variant="outline"
+                      disabled
+                      className={`min-w-[320px] ${
+                        isFindingWebsites 
+                          ? "bg-blue-500/20 text-blue-500 border-blue-500/30"
+                          : isBulkEnriching 
+                            ? "bg-primary/20 text-primary border-primary/30"
+                            : "bg-accent/20 text-accent border-accent/30"
+                      }`}
+                    >
+                      <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
+                      <span className="truncate max-w-[140px] inline-block">
+                        {bulkProgress.current || "Starting..."}
+                      </span>
+                      <span className="ml-2 text-xs opacity-80 flex-shrink-0">
+                        ({bulkProgress.batchCurrent}/{BATCH_SIZE} • Batch {bulkProgress.currentBatch}/{bulkProgress.totalBatches})
+                      </span>
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={handleStopBulk}
+                      aria-label="Stop bulk operation"
+                    >
+                      <Square className="h-4 w-4" />
+                    </Button>
+                  </>
+                )}
               </div>
             ) : (
               <>
+                <Button
+                  variant="outline"
+                  onClick={handleFindCompanies}
+                  className="bg-green-500/20 text-green-500 hover:bg-green-500/30 border-green-500/30"
+                >
+                  <Download className="h-4 w-4 mr-2" />
+                  Find Companies
+                </Button>
                 <Button
                   variant="outline"
                   onClick={handleBulkFindWebsites}

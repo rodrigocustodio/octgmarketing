@@ -157,3 +157,29 @@ export const useFindCompanyWebsite = () => {
     },
   });
 };
+
+export type ScrapeAdipecResult = {
+  success: boolean;
+  totalFound: number;
+  duplicatesSkipped: number;
+  newCompaniesAdded: number;
+  errors?: string[];
+  sampleCompanies?: Array<{ name: string; country: string }>;
+  error?: string;
+};
+
+export const useScrapeAdipecExhibitors = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async () => {
+      const { data, error } = await supabase.functions.invoke("scrape-adipec-exhibitors");
+
+      if (error) throw error;
+      return data as ScrapeAdipecResult;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+    },
+  });
+};

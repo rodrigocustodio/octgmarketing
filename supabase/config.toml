@@ -71,3 +71,6 @@ verify_jwt = false
 
 [functions.enrich-company-profile]
 verify_jwt = false
+
+[functions.scrape-adipec-exhibitors]
+verify_jwt = false
