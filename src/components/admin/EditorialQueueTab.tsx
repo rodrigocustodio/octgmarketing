@@ -139,6 +139,12 @@ export default function EditorialQueueTab() {
     setDialogOpen(true);
   };
 
+  const handleArticleGenerated = () => {
+    if (selectedItem) {
+      markPublishedMutation.mutate(selectedItem.id);
+    }
+  };
+
   const handleMarkPublished = (e: React.MouseEvent, item: QueueItem) => {
     e.stopPropagation();
     markPublishedMutation.mutate(item.id);
@@ -270,6 +276,7 @@ export default function EditorialQueueTab() {
           regionId={selectedItem.regionId}
           topicId={selectedItem.topicId}
           articleCount={selectedItem.articleCount}
+          onArticleGenerated={handleArticleGenerated}
         />
       )}
     </div>

@@ -28,6 +28,7 @@ interface OpportunityResearchDialogProps {
   regionId: string | null;
   topicId: string | null;
   articleCount: number;
+  onArticleGenerated?: () => void;
 }
 
 export default function OpportunityResearchDialog({
@@ -38,6 +39,7 @@ export default function OpportunityResearchDialog({
   regionId,
   topicId,
   articleCount,
+  onArticleGenerated,
 }: OpportunityResearchDialogProps) {
   const navigate = useNavigate();
   const [isResearching, setIsResearching] = useState(false);
@@ -88,6 +90,9 @@ export default function OpportunityResearchDialog({
         region_id: regionId,
         suggested_topic_ids: topicId ? [topicId] : [],
       }));
+      
+      // Mark the queue item as published
+      onArticleGenerated?.();
       
       onOpenChange(false);
       navigate("/admin/create?fromResearch=true");
