@@ -46,6 +46,7 @@ export const INDUSTRY_ROLES = [
   { value: "logistics", label: "Logistics & Transport", icon: "Truck" },
   { value: "software", label: "SCM & Software", icon: "Monitor" },
   { value: "trading", label: "Trading & Distribution", icon: "Package" },
+  { value: "consulting", label: "Consulting & Advisory", icon: "Briefcase" },
 ] as const;
 
 export function useAllCompanies() {
