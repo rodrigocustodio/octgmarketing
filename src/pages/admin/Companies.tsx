@@ -2,7 +2,7 @@ import { useState, useRef } from "react";
 import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
-import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useEnrichCompanyProfile, useFindCompanyWebsite, useScrapeAdipecExhibitors, useCleanupJunkCompanies, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
+import { useCompaniesAdmin, useGenerateCompanyDescription, useUpdateCompany, useDeleteCompany, useEnrichCompanyProfile, useFindCompanyWebsite, useScrapeAdipecExhibitors, useCleanupJunkCompanies, Company, EnrichedCompanyData } from "@/hooks/useCompanies";
 import { useRegions } from "@/hooks/useDirectory";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -57,6 +57,11 @@ const Companies = () => {
   const [showCleanupDialog, setShowCleanupDialog] = useState(false);
   const [isCleaningUp, setIsCleaningUp] = useState(false);
   
+  // Delete single company state
+  const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+  const [companyToDelete, setCompanyToDelete] = useState<Company | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  
   // Bulk generation state
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [isBulkEnriching, setIsBulkEnriching] = useState(false);
@@ -78,6 +83,7 @@ const Companies = () => {
   const findWebsite = useFindCompanyWebsite();
   const scrapeAdipec = useScrapeAdipecExhibitors();
   const cleanupJunk = useCleanupJunkCompanies();
+  const deleteCompany = useDeleteCompany();
   const updateCompany = useUpdateCompany();
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -147,6 +153,26 @@ const Companies = () => {
       });
     } finally {
       setIsCleaningUp(false);
+    }
+  };
+
+  // Handle single company delete
+  const handleDeleteCompany = async () => {
+    if (!companyToDelete) return;
+    setIsDeleting(true);
+    try {
+      await deleteCompany.mutateAsync(companyToDelete.id);
+      toast({ title: "Company deleted", description: `"${companyToDelete.name}" has been removed` });
+      setShowDeleteDialog(false);
+      setCompanyToDelete(null);
+    } catch (error) {
+      toast({ 
+        title: "Delete failed", 
+        description: error instanceof Error ? error.message : "Unknown error",
+        variant: "destructive" 
+      });
+    } finally {
+      setIsDeleting(false);
     }
   };
 
@@ -1104,6 +1130,18 @@ const Companies = () => {
                               <Edit className="h-4 w-4" />
                             </Link>
                           </Button>
+                          <Button
+                            variant="ghost"
+                            size="sm"
+                            className="h-7 px-2 text-destructive hover:bg-destructive/10"
+                            onClick={() => {
+                              setCompanyToDelete(company);
+                              setShowDeleteDialog(true);
+                            }}
+                            aria-label="Delete company"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
                         </div>
                       </TableCell>
                     </TableRow>
@@ -1147,6 +1185,38 @@ const Companies = () => {
                 <>
                   <Trash2 className="h-4 w-4 mr-2" />
                   Delete {junkCount} Entries
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Single Company Confirmation Dialog */}
+      <Dialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Delete Company?</DialogTitle>
+            <DialogDescription>
+              Permanently delete "{companyToDelete?.name}"?
+              <br /><br />
+              This action cannot be undone.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowDeleteDialog(false)} disabled={isDeleting}>
+              Cancel
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteCompany} disabled={isDeleting}>
+              {isDeleting ? (
+                <>
+                  <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                  Deleting...
+                </>
+              ) : (
+                <>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Delete
                 </>
               )}
             </Button>
