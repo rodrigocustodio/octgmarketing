@@ -1,3 +1,4 @@
+import { useState, useEffect, useRef } from "react";
 import { TrendingUp, TrendingDown, Minus, Info } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -56,6 +57,7 @@ const pressureConfig: Record<
     badgeBg: string;
     indicatorBg: string;
     indicatorColor: string;
+    pulseClass: string;
     icon: typeof TrendingUp;
   }
 > = {
@@ -67,6 +69,7 @@ const pressureConfig: Record<
     badgeBg: "bg-red-500/20 text-red-900 dark:text-red-100",
     indicatorBg: "bg-red-500/20 dark:bg-red-500/30",
     indicatorColor: "text-red-600 dark:text-red-300",
+    pulseClass: "animate-pulse-status-red",
     icon: TrendingUp,
   },
   stable: {
@@ -77,6 +80,7 @@ const pressureConfig: Record<
     badgeBg: "bg-yellow-500/20 text-yellow-900 dark:text-yellow-100",
     indicatorBg: "bg-yellow-500/20 dark:bg-yellow-500/30",
     indicatorColor: "text-yellow-600 dark:text-yellow-300",
+    pulseClass: "animate-pulse-status-yellow",
     icon: Minus,
   },
   softening: {
@@ -87,6 +91,7 @@ const pressureConfig: Record<
     badgeBg: "bg-green-500/20 text-green-900 dark:text-green-100",
     indicatorBg: "bg-green-500/20 dark:bg-green-500/30",
     indicatorColor: "text-green-600 dark:text-green-300",
+    pulseClass: "animate-pulse-status-green",
     icon: TrendingDown,
   },
 };
@@ -98,9 +103,21 @@ export function CostPressureIndicator({
   const level = calculatePressureLevel(commodities, stocks);
   const config = pressureConfig[level];
   const Icon = config.icon;
+  
+  const [isAnimating, setIsAnimating] = useState(false);
+  const prevLevelRef = useRef<PressureLevel | null>(null);
+  
+  useEffect(() => {
+    if (prevLevelRef.current !== null && prevLevelRef.current !== level) {
+      setIsAnimating(true);
+      const timer = setTimeout(() => setIsAnimating(false), 1000);
+      return () => clearTimeout(timer);
+    }
+    prevLevelRef.current = level;
+  }, [level]);
 
   return (
-    <Card className={cn("border", config.cardBg)}>
+    <Card className={cn("border transition-all duration-300", config.cardBg, isAnimating && config.pulseClass)}>
       <CardContent className="p-6">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1">
