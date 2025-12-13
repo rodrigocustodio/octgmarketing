@@ -211,8 +211,8 @@ const Article = () => {
         <main className="flex-1">
           {/* Hero Section - 50/50 Split Layout */}
           <section className="relative overflow-hidden min-h-[300px] sm:min-h-[400px]">
-            {/* Left half gradient - solid coverage for text readability */}
-            <div className="absolute inset-0 bg-gradient-to-r from-background from-0% via-background/60 via-30% to-transparent to-70% z-10" />
+          {/* Responsive gradient - vertical on mobile (dark bottom), horizontal on desktop (dark left) */}
+          <div className="absolute inset-0 bg-gradient-to-t from-black from-20% via-black/80 via-50% to-black/30 sm:bg-gradient-to-r sm:from-background sm:from-0% sm:via-background/60 sm:via-30% sm:to-transparent sm:to-70% z-10" />
             {/* Right half image - sharp and visible */}
             <img
               src={optimizeImageUrl(article.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
@@ -265,10 +265,12 @@ const Article = () => {
                 {article.title}
               </h1>
 
-              {/* Subtitle */}
+              {/* Subtitle - with background bars on mobile for readability */}
               {article.subtitle && (
                 <p className="text-lg sm:text-xl text-muted-foreground max-w-xl lg:max-w-[40%] mb-6">
-                  {article.subtitle}
+                  <span className="sm:bg-transparent bg-black/60 box-decoration-clone px-2 sm:px-0 leading-relaxed">
+                    {article.subtitle}
+                  </span>
                 </p>
               )}
 
