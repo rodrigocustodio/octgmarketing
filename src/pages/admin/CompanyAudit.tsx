@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { flushSync } from "react-dom";
 import { Link } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -26,6 +26,8 @@ import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Checkbox } from "@/components/ui/checkbox";
+import { Label } from "@/components/ui/label";
 import { 
   Search, 
   Play, 
@@ -38,11 +40,25 @@ import {
   Building2,
   ChevronLeft,
   Wrench,
-  RefreshCw
+  RefreshCw,
+  Trash2
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 import { cn } from "@/lib/utils";
+
+const STORAGE_KEY = "octg-company-audit-results";
+
+// Helper to check if a company is "complete" (all key fields populated)
+const isCompanyComplete = (company: Company): boolean => {
+  return !!(
+    company.website &&
+    company.industry_role &&
+    company.headquarters &&
+    company.year_founded &&
+    company.description
+  );
+};
 
 const BATCH_SIZE = 3;
 
@@ -59,6 +75,7 @@ const CompanyAudit = () => {
   const [regionFilter, setRegionFilter] = useState<string>("all");
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [showFilter, setShowFilter] = useState<string>("all"); // all, issues, perfect
+  const [excludeComplete, setExcludeComplete] = useState(true); // NEW: exclude complete companies
 
   // Audit state
   const [isAuditing, setIsAuditing] = useState(false);
@@ -68,12 +85,55 @@ const CompanyAudit = () => {
   const [fixingIds, setFixingIds] = useState<Set<string>>(new Set());
   const shouldStop = useRef(false);
 
+  // Load persisted results from localStorage on mount
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(STORAGE_KEY);
+      if (stored) {
+        const { results, summary } = JSON.parse(stored);
+        if (results?.length > 0) {
+          setAuditResults(results);
+          setAuditSummary(summary);
+        }
+      }
+    } catch (e) {
+      console.error("Failed to load persisted audit results:", e);
+    }
+  }, []);
+
+  // Persist results to localStorage when they change
+  useEffect(() => {
+    if (auditResults.length > 0) {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          results: auditResults,
+          summary: auditSummary,
+        }));
+      } catch (e) {
+        console.error("Failed to persist audit results:", e);
+      }
+    }
+  }, [auditResults, auditSummary]);
+
+  // Clear persisted results
+  const clearResults = () => {
+    setAuditResults([]);
+    setAuditSummary(null);
+    localStorage.removeItem(STORAGE_KEY);
+    toast({ title: "Results cleared" });
+  };
+
+  // Count complete companies
+  const completeCount = companies?.filter(isCompanyComplete).length || 0;
+  const incompleteCount = (companies?.length || 0) - completeCount;
+
   // Filter companies for audit
   const filteredCompanies = companies?.filter(c => {
     const matchesSearch = c.name.toLowerCase().includes(search.toLowerCase());
     const matchesRegion = regionFilter === "all" || c.region_id === regionFilter;
     const matchesRole = roleFilter === "all" || c.industry_role === roleFilter;
-    return matchesSearch && matchesRegion && matchesRole;
+    const matchesComplete = !excludeComplete || !isCompanyComplete(c);
+    return matchesSearch && matchesRegion && matchesRole && matchesComplete;
   }) || [];
 
   // Filter audit results for display
@@ -385,10 +445,16 @@ const CompanyAudit = () => {
           </div>
           <div className="flex items-center gap-2">
             {auditResults.length > 0 && (
-              <Button variant="outline" onClick={exportCSV}>
-                <Download className="h-4 w-4 mr-2" />
-                Export CSV
-              </Button>
+              <>
+                <Button variant="outline" onClick={clearResults}>
+                  <Trash2 className="h-4 w-4 mr-2" />
+                  Clear
+                </Button>
+                <Button variant="outline" onClick={exportCSV}>
+                  <Download className="h-4 w-4 mr-2" />
+                  Export CSV
+                </Button>
+              </>
             )}
             {isAuditing ? (
               <Button variant="destructive" onClick={stopAudit}>
@@ -441,6 +507,16 @@ const CompanyAudit = () => {
                   ))}
                 </SelectContent>
               </Select>
+              <div className="flex items-center gap-2 border rounded-md px-3 py-2 bg-muted/50">
+                <Checkbox 
+                  id="excludeComplete" 
+                  checked={excludeComplete} 
+                  onCheckedChange={(checked) => setExcludeComplete(!!checked)} 
+                />
+                <Label htmlFor="excludeComplete" className="text-sm cursor-pointer">
+                  Exclude complete ({completeCount} of {companies?.length || 0})
+                </Label>
+              </div>
               {auditResults.length > 0 && (
                 <Select value={showFilter} onValueChange={setShowFilter}>
                   <SelectTrigger className="w-[180px]">
