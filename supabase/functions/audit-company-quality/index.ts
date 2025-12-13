@@ -70,24 +70,27 @@ Current data we have:
 - Country: ${company.country || 'NOT SET'}
 - Year Founded: ${company.year_founded || 'NOT SET'}
 
-Valid industry roles are: mill, yard, inspection, drilling, logistics, software, trading
+Valid industry roles are EXACTLY: mill, yard, inspection, drilling, logistics, software, trading
+For industry_role_suggestion, you MUST use one of these exact values or null.
 
-Analyze and respond with ONLY a JSON object (no markdown, no explanation):
+CRITICAL: Respond with ONLY valid JSON. All numbers must be digits (not words like "sixty five").
+overall_score MUST be an integer between 0 and 100.
+
 {
-  "company_exists": true/false,
-  "is_octg_related": true/false,
-  "website_correct": true/false,
-  "website_suggestion": "correct-domain.com" or null,
-  "industry_role_correct": true/false,
-  "industry_role_suggestion": "mill|yard|inspection|drilling|logistics|software|trading" or null,
-  "headquarters_correct": true/false,
-  "headquarters_suggestion": "City, Country" or null,
-  "year_founded_correct": true/false,
-  "year_founded_suggestion": 1990 or null,
-  "description_quality": "excellent|good|fair|poor|missing",
-  "description_issues": ["issue1", "issue2"],
-  "overall_score": 0-100,
-  "recommendations": ["recommendation1", "recommendation2"]
+  "company_exists": true,
+  "is_octg_related": true,
+  "website_correct": true,
+  "website_suggestion": null,
+  "industry_role_correct": true,
+  "industry_role_suggestion": null,
+  "headquarters_correct": true,
+  "headquarters_suggestion": null,
+  "year_founded_correct": true,
+  "year_founded_suggestion": null,
+  "description_quality": "good",
+  "description_issues": [],
+  "overall_score": 85,
+  "recommendations": []
 }
 
 Scoring guide:
@@ -131,9 +134,61 @@ Scoring guide:
       jsonStr = jsonMatch[0];
     }
 
+    // Fix common JSON issues from AI
+    // Convert word numbers to digits (e.g., "sixty five" -> 65)
+    const wordToNumber: Record<string, number> = {
+      'zero': 0, 'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5,
+      'six': 6, 'seven': 7, 'eight': 8, 'nine': 9, 'ten': 10,
+      'twenty': 20, 'thirty': 30, 'forty': 40, 'fifty': 50,
+      'sixty': 60, 'seventy': 70, 'eighty': 80, 'ninety': 90, 'hundred': 100
+    };
+    
+    // Replace "overall_score": word_number patterns
+    jsonStr = jsonStr.replace(/"overall_score"\s*:\s*([a-z\s]+)(?=[,\}])/gi, (_match: string, words: string) => {
+      const cleaned = words.trim().toLowerCase();
+      // Try to parse compound numbers like "sixty five"
+      const parts = cleaned.split(/\s+/);
+      let total = 0;
+      for (const part of parts) {
+        if (wordToNumber[part] !== undefined) {
+          total += wordToNumber[part];
+        }
+      }
+      if (total > 0) {
+        return `"overall_score": ${total}`;
+      }
+      return `"overall_score": 50`; // Default fallback
+    });
+
     try {
       const parsed = JSON.parse(jsonStr);
       
+      // Ensure overall_score is a valid number
+      let score = parsed.overall_score;
+      if (typeof score !== 'number' || isNaN(score)) {
+        score = 50;
+      }
+      score = Math.max(0, Math.min(100, Math.round(score)));
+      
+      // Validate industry_role_suggestion against allowed values
+      const validRoles = ['mill', 'yard', 'inspection', 'drilling', 'logistics', 'software', 'trading'];
+      let industryRoleSuggestion = parsed.industry_role_suggestion || null;
+      if (industryRoleSuggestion && !validRoles.includes(industryRoleSuggestion.toLowerCase())) {
+        // Try to map common variations
+        const roleMap: Record<string, string> = {
+          'drilling services': 'drilling',
+          'oilfield services': 'drilling',
+          'pipe manufacturer': 'mill',
+          'steel manufacturer': 'mill',
+          'tube manufacturer': 'mill',
+          'pipe mill': 'mill',
+          'service provider': 'inspection',
+          'distributor': 'trading',
+          'trader': 'trading',
+        };
+        industryRoleSuggestion = roleMap[industryRoleSuggestion.toLowerCase()] || null;
+      }
+
       return {
         company_id: company.id,
         company_name: company.name,
@@ -141,14 +196,14 @@ Scoring guide:
         website_correct: parsed.website_correct ?? false,
         website_suggestion: parsed.website_suggestion || null,
         industry_role_correct: parsed.industry_role_correct ?? false,
-        industry_role_suggestion: parsed.industry_role_suggestion || null,
+        industry_role_suggestion: industryRoleSuggestion,
         headquarters_correct: parsed.headquarters_correct ?? false,
         headquarters_suggestion: parsed.headquarters_suggestion || null,
         year_founded_correct: parsed.year_founded_correct ?? false,
         year_founded_suggestion: parsed.year_founded_suggestion || null,
         description_quality: parsed.description_quality || 'missing',
         description_issues: parsed.description_issues || [],
-        overall_score: parsed.overall_score ?? 0,
+        overall_score: score,
         recommendations: parsed.recommendations || [],
       };
     } catch (parseError) {
