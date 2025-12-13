@@ -49,6 +49,7 @@ import ArticleEdit from "./pages/admin/ArticleEdit";
 import CreateArticle from "./pages/admin/CreateArticle";
 import Companies from "./pages/admin/Companies";
 import CompanyEdit from "./pages/admin/CompanyEdit";
+import CompanyAudit from "./pages/admin/CompanyAudit";
 import Executives from "./pages/admin/Executives";
 import ExecutiveEdit from "./pages/admin/ExecutiveEdit";
 import AdminProducts from "./pages/admin/Products";
@@ -112,6 +113,7 @@ const App = () => (
                 <Route path="/admin/executives/:id" element={<ProtectedRoute><ExecutiveEdit /></ProtectedRoute>} />
                 <Route path="/admin/companies" element={<ProtectedRoute><Companies /></ProtectedRoute>} />
                 <Route path="/admin/companies/:id" element={<ProtectedRoute><CompanyEdit /></ProtectedRoute>} />
+                <Route path="/admin/company-audit" element={<ProtectedRoute><CompanyAudit /></ProtectedRoute>} />
                 <Route path="/admin/products" element={<ProtectedRoute><AdminProducts /></ProtectedRoute>} />
                 <Route path="/admin/products/:id" element={<ProtectedRoute><ProductEdit /></ProtectedRoute>} />
                 <Route path="/admin/events" element={<ProtectedRoute><AdminEvents /></ProtectedRoute>} />
