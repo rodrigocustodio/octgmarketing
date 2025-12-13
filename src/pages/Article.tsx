@@ -211,13 +211,13 @@ const Article = () => {
         <main className="flex-1">
           {/* Hero Section */}
           <section className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-transparent z-10" />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 dark:via-background/85 to-transparent z-10" />
             <img
               src={optimizeImageUrl(article.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
               alt=""
               width={1200}
               height={600}
-              className="absolute inset-0 w-full h-full object-cover object-right opacity-40 dark:opacity-50"
+              className="absolute inset-0 w-full h-full object-cover object-right opacity-70 dark:opacity-50"
             />
             
             <div className="container relative z-20 py-12 sm:py-20">
