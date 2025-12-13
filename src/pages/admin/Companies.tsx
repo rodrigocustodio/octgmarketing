@@ -1071,7 +1071,7 @@ const Companies = () => {
                           <span className="text-muted-foreground">—</span>
                         )}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="whitespace-nowrap">
                         {company.regions?.name || <span className="text-muted-foreground">—</span>}
                       </TableCell>
                       <TableCell>
