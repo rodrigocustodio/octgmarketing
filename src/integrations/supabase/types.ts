@@ -454,6 +454,8 @@ export type Database = {
           created_at: string
           gap_reason: string | null
           id: string
+          initial_sequence: number | null
+          last_published_at: string | null
           last_suggested_at: string | null
           priority_score: number
           product_id: string | null
@@ -467,6 +469,8 @@ export type Database = {
           created_at?: string
           gap_reason?: string | null
           id?: string
+          initial_sequence?: number | null
+          last_published_at?: string | null
           last_suggested_at?: string | null
           priority_score?: number
           product_id?: string | null
@@ -480,6 +484,8 @@ export type Database = {
           created_at?: string
           gap_reason?: string | null
           id?: string
+          initial_sequence?: number | null
+          last_published_at?: string | null
           last_suggested_at?: string | null
           priority_score?: number
           product_id?: string | null
