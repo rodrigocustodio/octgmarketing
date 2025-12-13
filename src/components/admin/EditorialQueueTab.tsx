@@ -107,16 +107,78 @@ export default function EditorialQueueTab() {
         }
       }
 
-      // Sort by priority score (highest first), then by article count (lowest first)
-      queueItems.sort((a, b) => {
-        if (b.priorityScore !== a.priorityScore) {
-          return b.priorityScore - a.priorityScore;
+      // Round-robin algorithm: rotate through regions while varying topics
+      // This ensures balanced coverage across ALL 6 regions and topics
+      
+      // First, filter to high-priority items (0-2 articles = scores 75-100)
+      const highPriority = queueItems.filter(item => item.priorityScore >= 75);
+      
+      // Get unique regions in a fixed order
+      const regionOrder = regions.map(r => r.id);
+      const topicIds = topics.map(t => t.id);
+      
+      // Interleave function: rotates through regions, varies topics each cycle
+      function interleaveRoundRobin(items: QueueItem[]): QueueItem[] {
+        const result: QueueItem[] = [];
+        const usedCombinations = new Set<string>();
+        let topicOffset = 0; // Shifts topic selection each region cycle
+        
+        // Continue until we have enough items or exhausted all options
+        while (result.length < 10 && result.length < items.length) {
+          let addedThisCycle = false;
+          
+          // Cycle through each region in order
+          for (const regionId of regionOrder) {
+            if (result.length >= 10) break;
+            
+            // Find available items for this region, sorted by priority
+            const regionItems = items
+              .filter(item => 
+                item.regionId === regionId && 
+                !usedCombinations.has(`${item.regionId}-${item.topicId}`)
+              )
+              .sort((a, b) => {
+                // Sort by priority, then prefer topics we haven't used recently
+                if (b.priorityScore !== a.priorityScore) {
+                  return b.priorityScore - a.priorityScore;
+                }
+                return a.articleCount - b.articleCount;
+              });
+            
+            if (regionItems.length > 0) {
+              // Pick item with topic offset to vary topics across regions
+              const pickIndex = Math.min(topicOffset % regionItems.length, regionItems.length - 1);
+              const selected = regionItems[pickIndex];
+              
+              result.push(selected);
+              usedCombinations.add(`${selected.regionId}-${selected.topicId}`);
+              addedThisCycle = true;
+            }
+          }
+          
+          topicOffset++; // Next cycle picks different topics
+          
+          // Prevent infinite loop if no items were added
+          if (!addedThisCycle) break;
         }
-        return a.articleCount - b.articleCount;
-      });
+        
+        return result;
+      }
+      
+      // Apply round-robin to high priority items
+      const interleaved = interleaveRoundRobin(highPriority);
+      
+      // If we need more items, add from medium priority with same logic
+      if (interleaved.length < 10) {
+        const mediumPriority = queueItems
+          .filter(item => item.priorityScore < 75 && item.priorityScore >= 50)
+          .filter(item => !interleaved.some(i => i.regionId === item.regionId && i.topicId === item.topicId));
+        
+        const additionalItems = interleaveRoundRobin(mediumPriority);
+        interleaved.push(...additionalItems.slice(0, 10 - interleaved.length));
+      }
 
-      // Return top 10 opportunities
-      return queueItems.slice(0, 10);
+      return interleaved;
     },
   });
 
