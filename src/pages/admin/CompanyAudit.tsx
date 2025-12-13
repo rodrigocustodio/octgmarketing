@@ -182,6 +182,8 @@ const CompanyAudit = () => {
     setIsAuditing(false);
   };
 
+  const VALID_INDUSTRY_ROLES = ['mill', 'yard', 'inspection', 'drilling', 'logistics', 'software', 'trading'];
+
   const applyFix = async (result: AuditResult, field: 'website' | 'industry_role' | 'headquarters' | 'year_founded') => {
     const fixId = `${result.company_id}-${field}`;
     setFixingIds(prev => new Set(prev).add(fixId));
@@ -192,6 +194,15 @@ const CompanyAudit = () => {
       if (field === 'website' && result.website_suggestion) {
         updateData.website = result.website_suggestion;
       } else if (field === 'industry_role' && result.industry_role_suggestion) {
+        // Validate industry role before applying
+        if (!VALID_INDUSTRY_ROLES.includes(result.industry_role_suggestion)) {
+          toast({ 
+            title: "Invalid suggestion", 
+            description: `"${result.industry_role_suggestion}" is not a valid industry role. Valid: ${VALID_INDUSTRY_ROLES.join(', ')}`,
+            variant: "destructive" 
+          });
+          return;
+        }
         updateData.industry_role = result.industry_role_suggestion;
       } else if (field === 'headquarters' && result.headquarters_suggestion) {
         updateData.headquarters = result.headquarters_suggestion;
@@ -205,7 +216,7 @@ const CompanyAudit = () => {
           data: updateData,
         });
 
-        // Update local result to reflect fix
+        // Update local result to reflect fix - only after successful save
         setAuditResults(prev => prev.map(r => {
           if (r.company_id === result.company_id) {
             const updated = { ...r };
@@ -227,10 +238,10 @@ const CompanyAudit = () => {
           return r;
         }));
 
-        queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
         toast({ title: "Fixed", description: `Updated ${field} for ${result.company_name}` });
       }
     } catch (error) {
+      console.error("Fix failed:", error);
       toast({ 
         title: "Fix failed", 
         description: error instanceof Error ? error.message : "Unknown error",
@@ -253,7 +264,10 @@ const CompanyAudit = () => {
       const updateData: Record<string, any> = {};
       
       if (result.website_suggestion) updateData.website = result.website_suggestion;
-      if (result.industry_role_suggestion) updateData.industry_role = result.industry_role_suggestion;
+      // Validate industry role before including
+      if (result.industry_role_suggestion && VALID_INDUSTRY_ROLES.includes(result.industry_role_suggestion)) {
+        updateData.industry_role = result.industry_role_suggestion;
+      }
       if (result.headquarters_suggestion) updateData.headquarters = result.headquarters_suggestion;
       if (result.year_founded_suggestion) updateData.year_founded = result.year_founded_suggestion;
 
@@ -263,28 +277,35 @@ const CompanyAudit = () => {
           data: updateData,
         });
 
-        // Update local result
+        // Update local result - only after successful save
         setAuditResults(prev => prev.map(r => {
           if (r.company_id === result.company_id) {
-            return {
-              ...r,
-              website_correct: true,
-              website_suggestion: null,
-              industry_role_correct: true,
-              industry_role_suggestion: null,
-              headquarters_correct: true,
-              headquarters_suggestion: null,
-              year_founded_correct: true,
-              year_founded_suggestion: null,
-            };
+            const updated = { ...r };
+            if (updateData.website) {
+              updated.website_correct = true;
+              updated.website_suggestion = null;
+            }
+            if (updateData.industry_role) {
+              updated.industry_role_correct = true;
+              updated.industry_role_suggestion = null;
+            }
+            if (updateData.headquarters) {
+              updated.headquarters_correct = true;
+              updated.headquarters_suggestion = null;
+            }
+            if (updateData.year_founded) {
+              updated.year_founded_correct = true;
+              updated.year_founded_suggestion = null;
+            }
+            return updated;
           }
           return r;
         }));
 
-        queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
-        toast({ title: "All fixes applied", description: `Updated ${Object.keys(updateData).length} fields for ${result.company_name}` });
+        toast({ title: "Fixes applied", description: `Updated ${Object.keys(updateData).length} fields for ${result.company_name}` });
       }
     } catch (error) {
+      console.error("Fix all failed:", error);
       toast({ 
         title: "Fix failed", 
         description: error instanceof Error ? error.message : "Unknown error",
