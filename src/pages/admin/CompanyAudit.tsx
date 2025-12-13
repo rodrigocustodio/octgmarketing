@@ -60,6 +60,22 @@ const isCompanyComplete = (company: Company): boolean => {
   );
 };
 
+// Helper to count missing fields for a company
+const countMissingFields = (company: Company): number => {
+  let missing = 0;
+  if (!company.website) missing++;
+  if (!company.industry_role) missing++;
+  if (!company.headquarters) missing++;
+  if (!company.year_founded) missing++;
+  if (!company.description) missing++;
+  return missing;
+};
+
+// Check if company is missing exactly 1 field
+const isMissingExactlyOneField = (company: Company): boolean => {
+  return countMissingFields(company) === 1;
+};
+
 const BATCH_SIZE = 3;
 
 const CompanyAudit = () => {
@@ -123,9 +139,11 @@ const CompanyAudit = () => {
     toast({ title: "Results cleared" });
   };
 
-  // Count complete companies
+  // Count complete companies and those missing exactly 1 field
   const completeCount = companies?.filter(isCompanyComplete).length || 0;
   const incompleteCount = (companies?.length || 0) - completeCount;
+  const missingOneFieldCount = companies?.filter(isMissingExactlyOneField).length || 0;
+  const companiesMissingOneField = companies?.filter(isMissingExactlyOneField) || [];
 
   // Filter companies for audit
   const filteredCompanies = companies?.filter(c => {
@@ -233,6 +251,101 @@ const CompanyAudit = () => {
       toast({ 
         title: "Audit complete", 
         description: `Audited ${allResults.length} companies. Average score: ${summary.averageScore}%` 
+      });
+    }
+  };
+
+  // Run audit ONLY on companies missing exactly 1 field
+  const runAuditIncompleteOnly = async () => {
+    if (companiesMissingOneField.length === 0) {
+      toast({ title: "No incomplete companies to audit", description: "All companies are complete or missing 2+ fields", variant: "destructive" });
+      return;
+    }
+
+    setIsAuditing(true);
+    setAuditResults([]);
+    setAuditSummary(null);
+    shouldStop.current = false;
+
+    const allResults: AuditResult[] = [];
+    const companiesToAudit = companiesMissingOneField;
+    const total = companiesToAudit.length;
+
+    setProgress({ completed: 0, total, current: "" });
+
+    // Process in batches
+    for (let i = 0; i < companiesToAudit.length; i += BATCH_SIZE) {
+      if (shouldStop.current) break;
+
+      const batch = companiesToAudit.slice(i, i + BATCH_SIZE);
+      
+      flushSync(() => {
+        setProgress(prev => ({ ...prev, current: batch.map(c => c.name).join(", ") }));
+      });
+
+      try {
+        const { results } = await auditMutation.mutateAsync(
+          batch.map(c => ({
+            id: c.id,
+            name: c.name,
+            website: c.website,
+            description: c.description,
+            industry_role: c.industry_role,
+            headquarters: c.headquarters,
+            country: c.country,
+            year_founded: c.year_founded,
+            region: regions?.find(r => r.id === c.region_id)?.name,
+          }))
+        );
+
+        allResults.push(...results);
+        
+        flushSync(() => {
+          setAuditResults([...allResults]);
+          setProgress(prev => ({ ...prev, completed: prev.completed + batch.length }));
+        });
+
+        // Delay between batches
+        if (i + BATCH_SIZE < companiesToAudit.length) {
+          await new Promise(resolve => setTimeout(resolve, 2000));
+        }
+      } catch (error) {
+        console.error("Audit batch failed:", error);
+        toast({ 
+          title: "Batch failed", 
+          description: `Failed to audit: ${batch.map(c => c.name).join(", ")}`,
+          variant: "destructive" 
+        });
+      }
+    }
+
+    // Calculate summary
+    const summary: AuditSummary = {
+      total: allResults.length,
+      averageScore: allResults.length > 0 
+        ? Math.round(allResults.reduce((sum, r) => sum + r.overall_score, 0) / allResults.length) 
+        : 0,
+      companiesExist: allResults.filter(r => r.company_exists).length,
+      websitesCorrect: allResults.filter(r => r.website_correct).length,
+      websiteSuggestions: allResults.filter(r => r.website_suggestion).length,
+      industryRoleCorrect: allResults.filter(r => r.industry_role_correct).length,
+      headquartersCorrect: allResults.filter(r => r.headquarters_correct).length,
+      yearFoundedCorrect: allResults.filter(r => r.year_founded_correct).length,
+      excellentDescriptions: allResults.filter(r => r.description_quality === "excellent").length,
+      goodDescriptions: allResults.filter(r => r.description_quality === "good").length,
+      fairDescriptions: allResults.filter(r => r.description_quality === "fair").length,
+      poorDescriptions: allResults.filter(r => r.description_quality === "poor").length,
+      missingDescriptions: allResults.filter(r => r.description_quality === "missing").length,
+      errors: allResults.filter(r => r.error).length,
+    };
+
+    setAuditSummary(summary);
+    setIsAuditing(false);
+
+    if (!shouldStop.current) {
+      toast({ 
+        title: "Incomplete audit complete", 
+        description: `Audited ${allResults.length} companies missing 1 field. Average score: ${summary.averageScore}%` 
       });
     }
   };
@@ -462,10 +575,18 @@ const CompanyAudit = () => {
                 Stop Audit
               </Button>
             ) : (
-              <Button onClick={runAudit} disabled={filteredCompanies.length === 0}>
-                <Play className="h-4 w-4 mr-2" />
-                Run Audit ({Math.min(filteredCompanies.length, 100)} companies)
-              </Button>
+              <>
+                {missingOneFieldCount > 0 && (
+                  <Button variant="secondary" onClick={runAuditIncompleteOnly}>
+                    <AlertCircle className="h-4 w-4 mr-2" />
+                    Audit Incomplete Only ({missingOneFieldCount})
+                  </Button>
+                )}
+                <Button onClick={runAudit} disabled={filteredCompanies.length === 0}>
+                  <Play className="h-4 w-4 mr-2" />
+                  Run Audit ({Math.min(filteredCompanies.length, 100)} companies)
+                </Button>
+              </>
             )}
           </div>
         </div>
