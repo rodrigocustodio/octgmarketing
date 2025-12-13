@@ -209,15 +209,17 @@ const Article = () => {
         <Header />
 
         <main className="flex-1">
-          {/* Hero Section */}
-          <section className="relative overflow-hidden">
-            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/70 dark:via-background/85 to-transparent z-10" />
+          {/* Hero Section - 50/50 Split Layout */}
+          <section className="relative overflow-hidden min-h-[300px] sm:min-h-[400px]">
+            {/* Left half gradient - solid coverage for text readability */}
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background to-background/80 lg:to-transparent lg:via-50% z-10" />
+            {/* Right half image - sharp and visible */}
             <img
               src={optimizeImageUrl(article.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
               alt=""
               width={1200}
               height={600}
-              className="absolute inset-0 w-full h-full object-cover object-right opacity-70 dark:opacity-50"
+              className="absolute right-0 top-0 w-full lg:w-[55%] h-full object-cover object-left"
             />
             
             <div className="container relative z-20 py-12 sm:py-20">
@@ -259,13 +261,13 @@ const Article = () => {
               </div>
 
               {/* Title */}
-              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight mb-4 max-w-4xl">
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight mb-4 max-w-2xl lg:max-w-[45%]">
                 {article.title}
               </h1>
 
               {/* Subtitle */}
               {article.subtitle && (
-                <p className="text-lg sm:text-xl text-muted-foreground max-w-3xl mb-6">
+                <p className="text-lg sm:text-xl text-muted-foreground max-w-xl lg:max-w-[40%] mb-6">
                   {article.subtitle}
                 </p>
               )}

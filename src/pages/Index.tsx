@@ -204,10 +204,11 @@ const Index = () => {
         <Header />
       
       <main>
-        {/* Hero Section - Optimized for LCP */}
+        {/* Hero Section - 50/50 Split Layout, Optimized for LCP */}
         <section className="relative overflow-hidden min-h-[400px] sm:h-[500px]">
-          <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/50 to-transparent z-10" />
-          {/* Use img tag for LCP optimization instead of background-image */}
+          {/* Left half gradient - solid dark coverage for text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-black via-black/90 to-black/60 lg:via-50% lg:to-transparent z-10" />
+          {/* Right half image - sharp and visible */}
           <img
             src={optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
             alt=""
@@ -216,7 +217,7 @@ const Index = () => {
             fetchPriority="high"
             loading="eager"
             decoding="sync"
-            className="absolute inset-0 w-full h-full object-cover object-right opacity-60"
+            className="absolute right-0 top-0 w-full lg:w-[55%] h-full object-cover object-left"
           />
           <div className="container relative z-20 py-10 sm:py-24">
             {isLoading ? (
@@ -227,12 +228,12 @@ const Index = () => {
                 <Skeleton className="h-10 w-40 bg-white/10" />
               </div>
             ) : featuredArticle ? (
-              <div className="max-w-4xl animate-fade-in-up">
+              <div className="max-w-2xl lg:max-w-[45%] animate-fade-in-up">
                 <Badge variant="featured" className="mb-4">Featured Story</Badge>
                 <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-white">
                   {featuredArticle.title}
                 </h1>
-                <p className="text-xl text-white/80 mb-6 max-w-2xl">
+                <p className="text-xl text-white/80 mb-6">
                   {featuredArticle.subtitle}
                 </p>
                 <div className="flex flex-wrap gap-3">
@@ -249,12 +250,12 @@ const Index = () => {
                 </div>
               </div>
             ) : (
-              <div className="max-w-4xl">
+              <div className="max-w-2xl lg:max-w-[45%]">
                 <Badge variant="featured" className="mb-4">Coming Soon</Badge>
                 <h1 className="font-display text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight mb-4 text-white">
                   OCTG Index Intelligence
                 </h1>
-                <p className="text-xl text-white/80 mb-6 max-w-2xl">
+                <p className="text-xl text-white/80 mb-6">
                   Your source for Oil Country Tubular Goods industry news and analysis
                 </p>
                 <Link to="/directory">
