@@ -17,7 +17,13 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { TrendingUp, TrendingDown, Minus, Clock, BarChart3, Globe, Newspaper, Info, AlertCircle } from "lucide-react";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
+import { TrendingUp, TrendingDown, Minus, Clock, BarChart3, Globe, Newspaper, Info, AlertCircle, Building2 } from "lucide-react";
 import { format } from "date-fns";
 import { CostPressureIndicator } from "@/components/market/CostPressureIndicator";
 
@@ -58,13 +64,31 @@ function formatPrice(price: number, currency: string = "USD") {
   return `${price.toFixed(2)} ${currency}`;
 }
 
+function InfoTooltip({ content }: { content: string }) {
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <button className="text-muted-foreground hover:text-foreground transition-colors ml-1">
+            <Info className="h-3.5 w-3.5" />
+          </button>
+        </TooltipTrigger>
+        <TooltipContent className="max-w-xs">
+          <p className="text-xs">{content}</p>
+        </TooltipContent>
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
 export default function PricingIndex() {
   const { data: prices, isLoading: pricesLoading } = useSteelPrices();
   const { data: articles } = usePublishedArticles(4);
 
-  // Separate commodities from stocks
+  // Separate commodities, stocks, and anchors
   const commodities = prices?.filter((p) => p.category === "commodity") || [];
   const stocks = prices?.filter((p) => p.category === "stock") || [];
+  const anchors = prices?.filter((p) => p.category === "anchor") || [];
 
   // Group stocks by region
   const stocksByRegion = stocks.reduce((acc, stock) => {
@@ -73,6 +97,14 @@ export default function PricingIndex() {
     acc[region].push(stock);
     return acc;
   }, {} as Record<string, typeof stocks>);
+
+  // Group anchors by region
+  const anchorsByRegion = anchors.reduce((acc, anchor) => {
+    const region = anchor.region || "Global";
+    if (!acc[region]) acc[region] = [];
+    acc[region].push(anchor);
+    return acc;
+  }, {} as Record<string, typeof anchors>);
 
   const regions = Object.keys(stocksByRegion).sort();
 
@@ -208,12 +240,15 @@ export default function PricingIndex() {
           </section>
         )}
 
-        {/* Commodities Section - Renamed */}
+        {/* Commodities Section */}
         <section className="container py-10">
           <div className="mb-6">
-            <h2 className="font-display text-2xl font-bold tracking-tight mb-2">
-              Steel & Raw Material Cost Drivers
-            </h2>
+            <div className="flex items-center gap-2 mb-2">
+              <h2 className="font-display text-2xl font-bold tracking-tight">
+                Steel & Raw Material Cost Drivers
+              </h2>
+              <InfoTooltip content="These materials directly influence casing and tubing production costs. Data is editorial and directional—not transactional." />
+            </div>
             <p className="text-sm text-muted-foreground">
               These materials directly influence casing and tubing production costs and mill pricing behavior.
             </p>
@@ -232,20 +267,24 @@ export default function PricingIndex() {
                   <Card key={commodity.id} className="bg-card hover:bg-card/80 transition-colors">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="text-sm font-medium text-muted-foreground">{commodity.symbol}</span>
+                        <div className="flex items-center gap-1">
+                          <span className="text-sm font-medium text-muted-foreground">{commodity.symbol}</span>
+                          <InfoTooltip content="Input commodity used as cost-pressure proxy. Not transactional." />
+                        </div>
                         <PriceChangeIndicator change={commodity.change} changePercent={commodity.change_percent} />
                       </div>
                       <p className="font-display text-2xl font-bold tracking-tight">
                         {formatPrice(commodity.price, commodity.currency)}
                       </p>
                       <p className="text-sm text-muted-foreground mt-1">{commodity.name}</p>
+                      <Badge variant="outline" className="mt-2 text-[10px]">Cost Driver</Badge>
                     </CardContent>
                   </Card>
                 ))}
               </div>
               {/* Data Source Attribution */}
               <p className="text-xs text-muted-foreground mt-4 italic">
-                Source: Exchange data, public market feeds, editorial aggregation
+                Source: Exchange data, public market feeds, editorial aggregation. Editorial indicator—not transactional.
               </p>
             </>
           ) : (
@@ -257,7 +296,7 @@ export default function PricingIndex() {
           )}
         </section>
 
-        {/* Stocks by Region Section - Renamed */}
+        {/* Stocks by Region Section */}
         <section className="container py-10">
           <div className="mb-6">
             <div className="flex items-center gap-3 mb-2">
@@ -265,6 +304,7 @@ export default function PricingIndex() {
               <h2 className="font-display text-2xl font-bold tracking-tight">
                 Energy & Steel Equities – Market Sentiment Indicators
               </h2>
+              <InfoTooltip content="Equity performance reflects capital investment cycles and market sentiment, not direct OCTG pipe pricing." />
             </div>
             <p className="text-sm text-muted-foreground">
               Equity performance reflects capital investment cycles and market sentiment, not direct OCTG pipe pricing.
@@ -286,6 +326,26 @@ export default function PricingIndex() {
 
                 {regions.map((region) => (
                   <TabsContent key={region} value={region}>
+                    {/* Regional Industry Anchors Section */}
+                    {anchorsByRegion[region] && anchorsByRegion[region].length > 0 && (
+                      <div className="mb-6">
+                        <div className="flex items-center gap-2 mb-3">
+                          <Building2 className="h-4 w-4 text-accent" />
+                          <h3 className="text-sm font-semibold text-muted-foreground">
+                            Regional Industry Anchors — Strategic NOCs & EPCs
+                          </h3>
+                          <InfoTooltip content="Non-equity entities included for regional authority and industry context. No live pricing." />
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {anchorsByRegion[region].map((anchor) => (
+                            <Badge key={anchor.id} variant="secondary" className="px-3 py-1.5">
+                              {anchor.name}
+                            </Badge>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
                     <div className="rounded-lg border border-border overflow-hidden">
                       <table className="w-full">
                         <thead className="bg-muted/50">
@@ -323,10 +383,13 @@ export default function PricingIndex() {
                   </TabsContent>
                 ))}
               </Tabs>
-              {/* Data Source Attribution */}
-              <p className="text-xs text-muted-foreground mt-4 italic">
-                Source: Public stock exchange feeds, company filings
-              </p>
+              {/* Equity-based indicator label */}
+              <div className="mt-4 flex items-center gap-2">
+                <Badge variant="outline" className="text-[10px]">Market Sentiment Proxy</Badge>
+                <p className="text-xs text-muted-foreground italic">
+                  Equity-based indicator — delayed market data. Source: Public stock exchange feeds, company filings.
+                </p>
+              </div>
             </>
           ) : (
             <Card className="bg-muted/50">
@@ -337,7 +400,7 @@ export default function PricingIndex() {
           )}
         </section>
 
-        {/* Market Context Section - Renamed */}
+        {/* Market Context Section */}
         <section className="container py-10">
           <Card className="bg-gradient-to-br from-primary/5 to-accent/5 border-accent/20">
             <CardHeader>

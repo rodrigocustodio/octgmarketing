@@ -976,11 +976,15 @@ export type Database = {
           change_percent: number | null
           created_at: string
           currency: string | null
+          data_role: string | null
           id: string
           name: string
           price: number
+          pricing_type: string | null
           region: string | null
+          source_class: string | null
           symbol: string
+          transactional: boolean | null
           updated_at: string
         }
         Insert: {
@@ -989,11 +993,15 @@ export type Database = {
           change_percent?: number | null
           created_at?: string
           currency?: string | null
+          data_role?: string | null
           id?: string
           name: string
           price: number
+          pricing_type?: string | null
           region?: string | null
+          source_class?: string | null
           symbol: string
+          transactional?: boolean | null
           updated_at?: string
         }
         Update: {
@@ -1002,11 +1010,15 @@ export type Database = {
           change_percent?: number | null
           created_at?: string
           currency?: string | null
+          data_role?: string | null
           id?: string
           name?: string
           price?: number
+          pricing_type?: string | null
           region?: string | null
+          source_class?: string | null
           symbol?: string
+          transactional?: boolean | null
           updated_at?: string
         }
         Relationships: []

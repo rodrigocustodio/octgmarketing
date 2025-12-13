@@ -51,13 +51,13 @@ const pressureConfig: Record<
   { label: string; color: string; bgColor: string; icon: typeof TrendingUp }
 > = {
   rising: {
-    label: "Rising",
+    label: "Tightening",
     color: "text-red-500",
     bgColor: "bg-red-500/10",
     icon: TrendingUp,
   },
   stable: {
-    label: "Stable",
+    label: "Neutral",
     color: "text-yellow-500",
     bgColor: "bg-yellow-500/10",
     icon: Minus,
