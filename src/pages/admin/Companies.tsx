@@ -26,6 +26,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Search, Plus, Building2, Edit, AlertCircle, CheckCircle2, Sparkles, Loader2, Check, Square, Zap, Globe, Phone, Calendar, Briefcase, MapPin } from "lucide-react";
 import { INDUSTRY_ROLES } from "@/hooks/useDirectory";
+import { CompanyAuditReport } from "@/components/admin/CompanyAuditReport";
 import { useToast } from "@/hooks/use-toast";
 import { useQueryClient } from "@tanstack/react-query";
 
@@ -662,6 +663,9 @@ const Companies = () => {
                   <Sparkles className="h-4 w-4 mr-2" />
                   Generate Descriptions ({missingCount})
                 </Button>
+                {companies && companies.length > 0 && (
+                  <CompanyAuditReport companies={companies} />
+                )}
               </>
             )}
             <Button asChild>
