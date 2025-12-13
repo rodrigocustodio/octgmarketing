@@ -45,6 +45,7 @@ const Companies = () => {
   const BATCH_SIZE = 3; // Smaller batch for enrichment (more API calls per company)
   const [isBulkGenerating, setIsBulkGenerating] = useState(false);
   const [isBulkEnriching, setIsBulkEnriching] = useState(false);
+  const [isFindingWebsites, setIsFindingWebsites] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({
     completed: 0,
     total: 0,
@@ -443,6 +444,114 @@ const Companies = () => {
     shouldStopBulk.current = true;
   };
 
+  // Bulk find missing websites only
+  const handleBulkFindWebsites = async () => {
+    const companiesWithoutWebsite = companies?.filter(c => !c.website) || [];
+    
+    if (companiesWithoutWebsite.length === 0) {
+      toast({ title: "All companies have websites", description: "No companies are missing website data" });
+      return;
+    }
+    
+    const totalBatches = Math.ceil(companiesWithoutWebsite.length / BATCH_SIZE);
+    
+    setIsFindingWebsites(true);
+    setBulkProgress({
+      completed: 0,
+      total: companiesWithoutWebsite.length,
+      current: "",
+      batchCurrent: 0,
+      currentBatch: 1,
+      totalBatches,
+      fieldsUpdated: 0,
+    });
+    shouldStopBulk.current = false;
+    
+    let foundCount = 0;
+    let notFoundCount = 0;
+    let batchNumber = 1;
+    
+    for (let i = 0; i < companiesWithoutWebsite.length; i += BATCH_SIZE) {
+      if (shouldStopBulk.current) break;
+      
+      const batch = companiesWithoutWebsite.slice(i, i + BATCH_SIZE);
+      flushSync(() => {
+        setBulkProgress(prev => ({ ...prev, currentBatch: batchNumber }));
+      });
+      
+      for (let j = 0; j < batch.length; j++) {
+        if (shouldStopBulk.current) {
+          toast({ title: "Website search stopped", description: `Found ${foundCount} websites, ${notFoundCount} not found` });
+          break;
+        }
+        
+        const company = batch[j];
+        flushSync(() => {
+          setBulkProgress(prev => ({
+            ...prev,
+            current: company.name,
+            batchCurrent: j + 1,
+          }));
+        });
+        
+        try {
+          const result = await enrichCompany.mutateAsync({
+            companyName: company.name,
+            existingData: {
+              website: null, // Force website search
+              description: company.description,
+              industry_role: company.industry_role,
+              headquarters: company.headquarters,
+              country: company.country,
+            },
+          });
+          
+          // Only save the website field
+          if (result.website) {
+            await updateCompany.mutateAsync({
+              id: company.id,
+              data: { website: result.website },
+            });
+            foundCount++;
+          } else {
+            notFoundCount++;
+          }
+        } catch (error) {
+          console.error(`Failed to find website for ${company.name}:`, error);
+          notFoundCount++;
+        }
+        
+        flushSync(() => {
+          setBulkProgress(prev => ({ 
+            ...prev, 
+            completed: prev.completed + 1,
+            fieldsUpdated: foundCount,
+          }));
+        });
+        
+        // Delay between requests
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+      
+      queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+      batchNumber++;
+      
+      if (!shouldStopBulk.current && i + BATCH_SIZE < companiesWithoutWebsite.length) {
+        await new Promise(resolve => setTimeout(resolve, 2000));
+      }
+    }
+    
+    queryClient.invalidateQueries({ queryKey: ["companies-admin"] });
+    setIsFindingWebsites(false);
+    
+    if (!shouldStopBulk.current) {
+      toast({ 
+        title: "Website search complete", 
+        description: `Found ${foundCount} websites, ${notFoundCount} could not be determined` 
+      });
+    }
+  };
+
   const filteredCompanies = companies?.filter((company) => {
     const matchesSearch = company.name.toLowerCase().includes(search.toLowerCase());
     const matchesRegion = regionFilter === "all" || company.region_id === regionFilter;
@@ -493,12 +602,18 @@ const Companies = () => {
             </p>
           </div>
           <div className="flex items-center gap-2 flex-wrap">
-            {(isBulkGenerating || isBulkEnriching) ? (
+            {(isBulkGenerating || isBulkEnriching || isFindingWebsites) ? (
               <div className="flex items-center gap-2">
                 <Button
                   variant="outline"
                   disabled
-                  className="bg-accent/20 text-accent border-accent/30 min-w-[320px]"
+                  className={`min-w-[320px] ${
+                    isFindingWebsites 
+                      ? "bg-blue-500/20 text-blue-500 border-blue-500/30"
+                      : isBulkEnriching 
+                        ? "bg-primary/20 text-primary border-primary/30"
+                        : "bg-accent/20 text-accent border-accent/30"
+                  }`}
                 >
                   <Loader2 className="h-4 w-4 mr-2 animate-spin flex-shrink-0" />
                   <span className="truncate max-w-[140px] inline-block">
@@ -519,6 +634,15 @@ const Companies = () => {
               </div>
             ) : (
               <>
+                <Button
+                  variant="outline"
+                  onClick={handleBulkFindWebsites}
+                  disabled={missingWebsite === 0}
+                  className="bg-blue-500/20 text-blue-500 hover:bg-blue-500/30 border-blue-500/30"
+                >
+                  <Globe className="h-4 w-4 mr-2" />
+                  Find Missing Websites ({missingWebsite})
+                </Button>
                 <Button
                   variant="outline"
                   onClick={handleBulkEnrich}
@@ -549,28 +673,58 @@ const Companies = () => {
         </div>
 
         {/* Bulk Progress Panel */}
-        {(isBulkGenerating || isBulkEnriching) && (
-          <div className={`bg-card border rounded-lg p-4 ${isBulkEnriching ? 'border-primary/30' : 'border-accent/30'}`}>
+        {(isBulkGenerating || isBulkEnriching || isFindingWebsites) && (
+          <div className={`bg-card border rounded-lg p-4 ${
+            isFindingWebsites 
+              ? 'border-blue-500/30' 
+              : isBulkEnriching 
+                ? 'border-primary/30' 
+                : 'border-accent/30'
+          }`}>
             <div className="flex items-center justify-between mb-3">
               <div className="flex items-center gap-3">
-                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${isBulkEnriching ? 'bg-primary/20' : 'bg-accent/20'}`}>
-                  <Loader2 className={`h-5 w-5 animate-spin ${isBulkEnriching ? 'text-primary' : 'text-accent'}`} />
+                <div className={`h-10 w-10 rounded-full flex items-center justify-center ${
+                  isFindingWebsites 
+                    ? 'bg-blue-500/20' 
+                    : isBulkEnriching 
+                      ? 'bg-primary/20' 
+                      : 'bg-accent/20'
+                }`}>
+                  <Loader2 className={`h-5 w-5 animate-spin ${
+                    isFindingWebsites 
+                      ? 'text-blue-500' 
+                      : isBulkEnriching 
+                        ? 'text-primary' 
+                        : 'text-accent'
+                  }`} />
                 </div>
                 <div>
                   <p className="font-medium text-foreground">
-                    {isBulkEnriching ? 'Enriching' : 'Generating'}: <span className={isBulkEnriching ? 'text-primary' : 'text-accent'}>{bulkProgress.current}</span>
+                    {isFindingWebsites ? 'Finding Website' : isBulkEnriching ? 'Enriching' : 'Generating'}: <span className={
+                      isFindingWebsites 
+                        ? 'text-blue-500' 
+                        : isBulkEnriching 
+                          ? 'text-primary' 
+                          : 'text-accent'
+                    }>{bulkProgress.current}</span>
                   </p>
                   <p className="text-xs text-muted-foreground">
                     Batch {bulkProgress.currentBatch} of {bulkProgress.totalBatches} • 
                     Item {bulkProgress.batchCurrent} of {Math.min(BATCH_SIZE, bulkProgress.total - (bulkProgress.currentBatch - 1) * BATCH_SIZE)}
-                    {isBulkEnriching && bulkProgress.fieldsUpdated > 0 && (
-                      <span className="ml-2">• {bulkProgress.fieldsUpdated} fields updated</span>
+                    {(isBulkEnriching || isFindingWebsites) && bulkProgress.fieldsUpdated > 0 && (
+                      <span className="ml-2">• {bulkProgress.fieldsUpdated} {isFindingWebsites ? 'websites found' : 'fields updated'}</span>
                     )}
                   </p>
                 </div>
               </div>
               <div className="text-right">
-                <p className={`text-lg font-bold ${isBulkEnriching ? 'text-primary' : 'text-accent'}`}>
+                <p className={`text-lg font-bold ${
+                  isFindingWebsites 
+                    ? 'text-blue-500' 
+                    : isBulkEnriching 
+                      ? 'text-primary' 
+                      : 'text-accent'
+                }`}>
                   {bulkProgress.completed} / {bulkProgress.total}
                 </p>
                 <p className="text-xs text-muted-foreground">
