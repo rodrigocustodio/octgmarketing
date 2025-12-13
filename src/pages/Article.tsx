@@ -261,7 +261,7 @@ const Article = () => {
               </div>
 
               {/* Title */}
-              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight mb-4 max-w-2xl lg:max-w-[45%]">
+              <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight mb-4 max-w-2xl lg:max-w-[45%] text-white sm:text-foreground">
                 {article.title}
               </h1>
 
@@ -275,7 +275,7 @@ const Article = () => {
               )}
 
               {/* Meta */}
-              <div className="flex items-center gap-4 text-sm text-muted-foreground">
+              <div className="flex items-center gap-4 text-sm text-gray-300 sm:text-muted-foreground">
                 <div className="flex items-center gap-1">
                   <Calendar className="h-4 w-4" />
                   <span>{formatArticleDate(article.publish_date)}</span>
