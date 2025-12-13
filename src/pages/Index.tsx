@@ -185,7 +185,7 @@ const Index = () => {
   return (
     <>
       <SEOHead
-        title="OCTG Index | Energy Industry News & Market Intelligence"
+        title="OCTG Index - Oil & Gas Industry News, Events & Market Data"
         description="OCTG Index is a global energy industry news platform covering OCTG markets, supply chains, pricing intelligence, and major energy events worldwide."
         canonical="https://octgindex.com"
       />
