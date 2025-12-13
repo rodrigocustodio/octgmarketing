@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -19,7 +19,8 @@ import {
 } from "@/components/ui/select";
 import { ImageUpload } from "@/components/admin/ImageUpload";
 import { CompanyTagSelector } from "@/components/admin/CompanyTagSelector";
-import { Loader2, Sparkles, Save, Send, Eye } from "lucide-react";
+import EditorialQueueTab from "@/components/admin/EditorialQueueTab";
+import { Loader2, Sparkles, Save, Send, Eye, ListOrdered, FileText } from "lucide-react";
 import { marked } from "marked";
 
 interface GeneratedArticle {
@@ -52,8 +53,13 @@ const getAuthorIdByRegion = (regionId: string | null, regions: { id: string; slu
 
 export default function CreateArticle() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const { toast } = useToast();
   const queryClient = useQueryClient();
+
+  // Check if coming from research
+  const fromResearch = searchParams.get('fromResearch') === 'true';
+  const [activeTab, setActiveTab] = useState(fromResearch ? "write" : "queue");
 
   // Form state
   const [rawContent, setRawContent] = useState("");
@@ -71,6 +77,29 @@ export default function CreateArticle() {
   const [selectedCompanyIds, setSelectedCompanyIds] = useState<string[]>([]);
   const [heroImageUrl, setHeroImageUrl] = useState<string | undefined>();
   const [isUploading, setIsUploading] = useState(false);
+
+  // Check sessionStorage for pre-filled data from research
+  useEffect(() => {
+    if (fromResearch) {
+      const stored = sessionStorage.getItem('generatedArticle');
+      if (stored) {
+        try {
+          const data = JSON.parse(stored) as GeneratedArticle;
+          setGeneratedArticle(data);
+          setTitle(data.title);
+          setExcerpt(data.excerpt);
+          setBodyMarkdown(data.body_markdown);
+          setSlug(data.slug);
+          setRegionId(data.region_id);
+          setSelectedTopicIds(data.suggested_topic_ids || []);
+          setSelectedCompanyIds(data.suggested_company_ids || []);
+          sessionStorage.removeItem('generatedArticle');
+        } catch (e) {
+          console.error('Failed to parse stored article:', e);
+        }
+      }
+    }
+  }, [fromResearch]);
 
   // Fetch regions
   const { data: regions = [] } = useQuery({
@@ -244,7 +273,7 @@ export default function CreateArticle() {
 
 
   const renderMarkdown = (markdown: string) => {
-    return { __html: marked(markdown) };
+    return { __html: marked.parse(markdown, { async: false }) as string };
   };
 
   return (
@@ -253,58 +282,76 @@ export default function CreateArticle() {
         <div>
           <h1 className="text-2xl font-bold">Create Article</h1>
           <p className="text-muted-foreground">
-            Paste content and let AI generate a polished article
+            Use the Editorial Queue for AI-guided opportunities or paste content directly
           </p>
         </div>
 
         {!generatedArticle ? (
-          // Step 1: Input content
-          <Card>
-            <CardHeader>
-              <CardTitle>Source Content</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <Label htmlFor="source-name">Source Name (optional)</Label>
-                <Input
-                  id="source-name"
-                  placeholder="e.g., Press Release from Tenaris"
-                  value={sourceName}
-                  onChange={(e) => setSourceName(e.target.value)}
-                />
-              </div>
-              <div>
-                <Label htmlFor="raw-content">Content *</Label>
-                <Textarea
-                  id="raw-content"
-                  placeholder="Paste your source content here (minimum 100 characters)..."
-                  value={rawContent}
-                  onChange={(e) => setRawContent(e.target.value)}
-                  className="min-h-[300px] font-mono text-sm"
-                />
-                <p className="text-xs text-muted-foreground mt-1">
-                  {rawContent.length} characters
-                </p>
-              </div>
-              <Button
-                onClick={() => generateMutation.mutate()}
-                disabled={rawContent.length < 100 || generateMutation.isPending}
-                className="w-full"
-              >
-                {generateMutation.isPending ? (
-                  <>
-                    <Loader2 className="h-4 w-4 mr-2 animate-spin" />
-                    Generating Article...
-                  </>
-                ) : (
-                  <>
-                    <Sparkles className="h-4 w-4 mr-2" />
-                    Generate Article with AI
-                  </>
-                )}
-              </Button>
-            </CardContent>
-          </Card>
+          <Tabs value={activeTab} onValueChange={setActiveTab}>
+            <TabsList>
+              <TabsTrigger value="queue" className="flex items-center gap-2">
+                <ListOrdered className="h-4 w-4" />
+                Editorial Queue
+              </TabsTrigger>
+              <TabsTrigger value="write" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                Write Manually
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="queue" className="mt-4">
+              <EditorialQueueTab />
+            </TabsContent>
+
+            <TabsContent value="write" className="mt-4">
+              <Card>
+                <CardHeader>
+                  <CardTitle>Source Content</CardTitle>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <Label htmlFor="source-name">Source Name (optional)</Label>
+                    <Input
+                      id="source-name"
+                      placeholder="e.g., Press Release from Tenaris"
+                      value={sourceName}
+                      onChange={(e) => setSourceName(e.target.value)}
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="raw-content">Content *</Label>
+                    <Textarea
+                      id="raw-content"
+                      placeholder="Paste your source content here (minimum 100 characters)..."
+                      value={rawContent}
+                      onChange={(e) => setRawContent(e.target.value)}
+                      className="min-h-[300px] font-mono text-sm"
+                    />
+                    <p className="text-xs text-muted-foreground mt-1">
+                      {rawContent.length} characters
+                    </p>
+                  </div>
+                  <Button
+                    onClick={() => generateMutation.mutate()}
+                    disabled={rawContent.length < 100 || generateMutation.isPending}
+                    className="w-full"
+                  >
+                    {generateMutation.isPending ? (
+                      <>
+                        <Loader2 className="h-4 w-4 mr-2 animate-spin" />
+                        Generating Article...
+                      </>
+                    ) : (
+                      <>
+                        <Sparkles className="h-4 w-4 mr-2" />
+                        Generate Article with AI
+                      </>
+                    )}
+                  </Button>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         ) : (
           // Step 2: Edit and publish
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

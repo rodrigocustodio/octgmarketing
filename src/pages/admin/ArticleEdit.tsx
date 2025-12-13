@@ -592,7 +592,7 @@ const ArticleEdit = () => {
                     <div
                       className="prose prose-invert max-w-none min-h-[400px] p-4 border rounded-md bg-muted/30"
                       dangerouslySetInnerHTML={{
-                        __html: marked(formData.body || "*No content yet*"),
+                        __html: marked.parse(formData.body || "*No content yet*", { async: false }) as string,
                       }}
                     />
                   </TabsContent>

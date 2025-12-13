@@ -2,6 +2,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { useEditorialStats } from "@/hooks/useEditorialStats";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { 
   Newspaper, 
   Globe, 
@@ -10,11 +11,13 @@ import {
   TrendingUp,
   TrendingDown,
   Minus,
-  BarChart3
+  BarChart3,
+  Package
 } from "lucide-react";
 import CoverageHeatmap from "@/components/admin/CoverageHeatmap";
 import CompanyMentions from "@/components/admin/CompanyMentions";
 import TopicSuggestions from "@/components/admin/TopicSuggestions";
+import ProductCoverageMatrix from "@/components/admin/ProductCoverageMatrix";
 
 function StatCard({ 
   title, 
@@ -132,8 +135,25 @@ export default function EditorialRoom() {
           )}
         </div>
 
-        {/* Coverage Heatmap */}
-        <CoverageHeatmap />
+        {/* Coverage Tabs */}
+        <Tabs defaultValue="topics" className="w-full">
+          <TabsList>
+            <TabsTrigger value="topics" className="flex items-center gap-2">
+              <Globe className="h-4 w-4" />
+              Region × Topic
+            </TabsTrigger>
+            <TabsTrigger value="products" className="flex items-center gap-2">
+              <Package className="h-4 w-4" />
+              OCTG Products
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="topics" className="mt-4">
+            <CoverageHeatmap />
+          </TabsContent>
+          <TabsContent value="products" className="mt-4">
+            <ProductCoverageMatrix />
+          </TabsContent>
+        </Tabs>
 
         {/* Two Column Layout */}
         <div className="grid gap-6 lg:grid-cols-2">
