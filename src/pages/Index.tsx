@@ -205,19 +205,25 @@ const Index = () => {
       
       <main>
         {/* Hero Section - 50/50 Split Layout, Optimized for LCP */}
-        <section className="relative overflow-hidden min-h-[400px] sm:h-[500px]">
+        <section className="relative overflow-hidden min-h-[400px] sm:h-[500px] lg:max-h-[600px] xl:max-h-[650px]">
           {/* Left half gradient - solid dark coverage for text readability */}
           <div className="absolute inset-0 bg-gradient-to-r from-black from-0% via-black/60 via-30% to-transparent to-70% z-10" />
-          {/* Right half image - sharp and visible */}
+          {/* Right half image - sharp and visible with focal point on people */}
           <img
             src={optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
-            alt=""
+            srcSet={`
+              ${optimizeImageUrl(featuredArticle?.hero_image_url, { width: 768, quality: 80 }) || heroImage} 768w,
+              ${optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 85 }) || heroImage} 1200w,
+              ${optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1920, quality: 85 }) || heroImage} 1920w
+            `}
+            sizes="100vw"
+            alt={featuredArticle?.title || "OCTG Index - Global Energy Industry News"}
             width={1920}
             height={1080}
             fetchPriority="high"
             loading="eager"
             decoding="sync"
-            className="absolute inset-0 w-full h-full object-cover object-center"
+            className="absolute inset-0 w-full h-full object-cover object-[60%_35%]"
           />
           <div className="container relative z-20 py-10 sm:py-24">
             {isLoading ? (
