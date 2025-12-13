@@ -1,18 +1,29 @@
-import { useState } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useSteelPrices, SteelPrice } from "@/hooks/useSteelPrices";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { RefreshCw, TrendingUp, TrendingDown, Minus, Clock, AlertCircle, CheckCircle2, Database } from "lucide-react";
+import { RefreshCw, TrendingUp, TrendingDown, Minus, Clock, AlertCircle, CheckCircle2, Database, Timer } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
+
+const REFRESH_INTERVAL_SECONDS = 25 * 60; // 25 minutes
 
 export function PriceTickerManager() {
   const { data: prices, isLoading, refetch } = useSteelPrices();
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [secondsRemaining, setSecondsRemaining] = useState(REFRESH_INTERVAL_SECONDS);
   const { toast } = useToast();
+  const isRefreshingRef = useRef(false);
+
+  // Format countdown as MM:SS
+  const formatCountdown = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+  };
 
   // Get freshness status based on most recent update
   const getMostRecentUpdate = () => {
@@ -45,8 +56,13 @@ export function PriceTickerManager() {
   const commodityCount = prices?.filter(p => p.category === "commodity").length ?? 0;
 
   // Refresh prices from API
-  const handleRefreshPrices = async () => {
+  const handleRefreshPrices = useCallback(async () => {
+    if (isRefreshingRef.current) return; // Prevent concurrent refreshes
+    
+    isRefreshingRef.current = true;
     setIsRefreshing(true);
+    setSecondsRemaining(REFRESH_INTERVAL_SECONDS); // Reset countdown
+    
     try {
       const { data, error } = await supabase.functions.invoke("fetch-steel-prices");
       
@@ -68,8 +84,25 @@ export function PriceTickerManager() {
       });
     } finally {
       setIsRefreshing(false);
+      isRefreshingRef.current = false;
     }
-  };
+  }, [refetch, toast]);
+
+  // Countdown timer with auto-refresh
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setSecondsRemaining(prev => {
+        if (prev <= 1) {
+          // Auto-trigger refresh when countdown ends
+          handleRefreshPrices();
+          return REFRESH_INTERVAL_SECONDS;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+    
+    return () => clearInterval(interval);
+  }, [handleRefreshPrices]);
 
   // Format price with currency
   const formatPrice = (price: number, currency: string) => {
@@ -99,7 +132,7 @@ export function PriceTickerManager() {
   return (
     <Card>
       <CardHeader>
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between gap-4">
           <div>
             <CardTitle className="flex items-center gap-2">
               <Database className="h-5 w-5" />
@@ -109,14 +142,22 @@ export function PriceTickerManager() {
               Manage and refresh steel & OCTG price data
             </CardDescription>
           </div>
-          <Button 
-            onClick={handleRefreshPrices} 
-            disabled={isRefreshing}
-            size="sm"
-          >
-            <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
-            {isRefreshing ? "Refreshing..." : "Refresh Prices"}
-          </Button>
+          <div className="flex items-center gap-3">
+            {/* Countdown Timer */}
+            <div className="flex items-center gap-2 text-sm font-mono bg-muted/80 px-3 py-1.5 rounded-md border">
+              <Timer className="h-4 w-4 text-accent" />
+              <span className="tabular-nums font-semibold">{formatCountdown(secondsRemaining)}</span>
+              <span className="text-xs text-muted-foreground hidden sm:inline">until refresh</span>
+            </div>
+            <Button 
+              onClick={handleRefreshPrices} 
+              disabled={isRefreshing}
+              size="sm"
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+              {isRefreshing ? "Refreshing..." : "Refresh Prices"}
+            </Button>
+          </div>
         </div>
       </CardHeader>
       <CardContent className="space-y-6">
