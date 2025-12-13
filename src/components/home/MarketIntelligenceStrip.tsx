@@ -104,7 +104,7 @@ export function MarketIntelligenceStrip() {
         </div>
 
         {/* Content Grid - Commodities + Cost Pressure Index */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_200px] gap-3">
+        <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-3">
           {/* Commodities Grid */}
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
             {commodities.slice(0, 5).map((commodity) => {
@@ -114,22 +114,22 @@ export function MarketIntelligenceStrip() {
               return (
                 <div
                   key={commodity.id}
-                  className="bg-background border border-border/50 rounded-lg p-3 border-l-2 border-l-amber-500/70"
+                  className="bg-background border border-border/50 rounded-lg p-4 border-l-2 border-l-amber-500/70"
                 >
                   <div className="flex items-center justify-between mb-1">
-                    <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide truncate">
+                    <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide truncate">
                       {commodity.symbol}
                     </span>
-                    <span className="text-[9px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium">
+                    <span className="text-[10px] px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-600 dark:text-amber-400 font-medium">
                       INPUT
                     </span>
                   </div>
-                  <div className="text-lg font-bold text-foreground">
+                  <div className="text-xl font-bold text-foreground">
                     ${commodity.price.toFixed(0)}
-                    <span className="text-[10px] font-normal text-muted-foreground">/ton</span>
+                    <span className="text-xs font-normal text-muted-foreground">/ton</span>
                   </div>
                   <div className={cn(
-                    "text-xs font-medium",
+                    "text-sm font-medium",
                     isPositive && "text-red-500",
                     isNegative && "text-green-500",
                     !isPositive && !isNegative && "text-muted-foreground"
@@ -142,16 +142,16 @@ export function MarketIntelligenceStrip() {
           </div>
 
           {/* Compact Cost Pressure Index */}
-          <div className={cn("rounded-lg p-3 flex flex-col justify-center items-center", config.bg)}>
+          <div className={cn("rounded-lg p-4 flex flex-col justify-center items-center", config.bg)}>
             <div className="flex items-center gap-1 mb-1">
-              <span className="text-[10px] font-medium text-muted-foreground uppercase tracking-wide">
+              <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
                 Cost Pressure
               </span>
               <TooltipProvider>
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <button className="text-muted-foreground hover:text-foreground transition-colors">
-                      <Info className="h-3 w-3" />
+                      <Info className="h-3.5 w-3.5" />
                     </button>
                   </TooltipTrigger>
                   <TooltipContent className="max-w-xs">
@@ -161,12 +161,12 @@ export function MarketIntelligenceStrip() {
               </TooltipProvider>
             </div>
             <div className="flex items-center gap-2">
-              <Icon className={cn("h-5 w-5", config.text)} />
-              <span className={cn("text-lg font-bold", config.text)}>
+              <Icon className={cn("h-6 w-6", config.text)} />
+              <span className={cn("text-xl font-bold", config.text)}>
                 {config.label}
               </span>
             </div>
-            <span className="text-[9px] text-muted-foreground mt-1">Editorial Indicator</span>
+            <span className="text-[10px] text-muted-foreground mt-1">Editorial Indicator</span>
           </div>
         </div>
 
