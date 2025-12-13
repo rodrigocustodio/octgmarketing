@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { CompanyTagSelector } from "@/components/admin/CompanyTagSelector";
 import {
   Select,
   SelectContent,
@@ -392,14 +393,6 @@ const ArticleEdit = () => {
     );
   };
 
-  // Toggle company
-  const toggleCompany = (companyId: string) => {
-    setSelectedCompanies((prev) =>
-      prev.includes(companyId)
-        ? prev.filter((id) => id !== companyId)
-        : [...prev, companyId]
-    );
-  };
 
   // Handle drop on textarea
   const handleContentDrop = (e: React.DragEvent<HTMLTextAreaElement>) => {
@@ -832,23 +825,11 @@ const ArticleEdit = () => {
                 <CardTitle>Companies</CardTitle>
               </CardHeader>
               <CardContent>
-                <div className="space-y-2 max-h-48 overflow-y-auto">
-                  {companies?.map((company) => (
-                    <div key={company.id} className="flex items-center gap-2">
-                      <Checkbox
-                        id={`company-${company.id}`}
-                        checked={selectedCompanies.includes(company.id)}
-                        onCheckedChange={() => toggleCompany(company.id)}
-                      />
-                      <label
-                        htmlFor={`company-${company.id}`}
-                        className="text-sm cursor-pointer"
-                      >
-                        {company.name}
-                      </label>
-                    </div>
-                  ))}
-                </div>
+                <CompanyTagSelector
+                  companies={companies || []}
+                  selectedIds={selectedCompanies}
+                  onChange={setSelectedCompanies}
+                />
               </CardContent>
             </Card>
           </div>
