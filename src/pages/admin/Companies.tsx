@@ -37,6 +37,7 @@ const Companies = () => {
   const [roleFilter, setRoleFilter] = useState<string>("all");
   const [descFilter, setDescFilter] = useState<string>("all");
   const [enrichFilter, setEnrichFilter] = useState<string>("all");
+  const [websiteFilter, setWebsiteFilter] = useState<string>("all");
   const [generatingIds, setGeneratingIds] = useState<Set<string>>(new Set());
   const [enrichingIds, setEnrichingIds] = useState<Set<string>>(new Set());
   const [completedIds, setCompletedIds] = useState<Set<string>>(new Set());
@@ -566,7 +567,12 @@ const Companies = () => {
       matchesEnrich = !!(company.description && company.website && company.industry_role && company.region_id);
     }
     
-    return matchesSearch && matchesRegion && matchesRole && matchesDesc && matchesEnrich;
+    // Website filter
+    let matchesWebsite = true;
+    if (websiteFilter === "missing") matchesWebsite = !company.website;
+    else if (websiteFilter === "has") matchesWebsite = !!company.website;
+    
+    return matchesSearch && matchesRegion && matchesRole && matchesDesc && matchesEnrich && matchesWebsite;
   });
 
   const getDescriptionStatus = (description: string | null) => {
@@ -836,6 +842,18 @@ const Companies = () => {
               <SelectItem value="all">All Profiles</SelectItem>
               <SelectItem value="incomplete">Incomplete</SelectItem>
               <SelectItem value="complete">Complete</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={websiteFilter} onValueChange={setWebsiteFilter}>
+            <SelectTrigger className="w-[160px]">
+              <Globe className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Website" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Websites</SelectItem>
+              <SelectItem value="missing">No Website</SelectItem>
+              <SelectItem value="has">Has Website</SelectItem>
             </SelectContent>
           </Select>
         </div>
