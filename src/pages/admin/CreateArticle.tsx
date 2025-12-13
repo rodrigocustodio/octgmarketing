@@ -17,8 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { ImageUpload } from "@/components/admin/ImageUpload";
+import { CompanyTagSelector } from "@/components/admin/CompanyTagSelector";
 import { Loader2, Sparkles, Save, Send, Eye } from "lucide-react";
 import { marked } from "marked";
 
@@ -242,13 +242,6 @@ export default function CreateArticle() {
     );
   };
 
-  const handleCompanyToggle = (companyId: string) => {
-    setSelectedCompanyIds((prev) =>
-      prev.includes(companyId)
-        ? prev.filter((id) => id !== companyId)
-        : [...prev, companyId]
-    );
-  };
 
   const renderMarkdown = (markdown: string) => {
     return { __html: marked(markdown) };
@@ -451,10 +444,12 @@ export default function CreateArticle() {
                   <div className="space-y-2 max-h-48 overflow-y-auto">
                     {topics.map((topic) => (
                       <div key={topic.id} className="flex items-center space-x-2">
-                        <Checkbox
+                        <input
+                          type="checkbox"
                           id={`topic-${topic.id}`}
                           checked={selectedTopicIds.includes(topic.id)}
-                          onCheckedChange={() => handleTopicToggle(topic.id)}
+                          onChange={() => handleTopicToggle(topic.id)}
+                          className="h-4 w-4 rounded border-border"
                         />
                         <label
                           htmlFor={`topic-${topic.id}`}
@@ -471,31 +466,22 @@ export default function CreateArticle() {
               {/* Companies */}
               <Card>
                 <CardHeader>
-                  <CardTitle>Companies</CardTitle>
+                  <CardTitle className="flex items-center gap-2">
+                    Companies
+                    {generatedArticle?.suggested_company_ids?.length > 0 && (
+                      <span className="text-xs font-normal text-muted-foreground">
+                        (AI detected)
+                      </span>
+                    )}
+                  </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {companies.slice(0, 50).map((company) => (
-                      <div key={company.id} className="flex items-center space-x-2">
-                        <Checkbox
-                          id={`company-${company.id}`}
-                          checked={selectedCompanyIds.includes(company.id)}
-                          onCheckedChange={() => handleCompanyToggle(company.id)}
-                        />
-                        <label
-                          htmlFor={`company-${company.id}`}
-                          className="text-sm cursor-pointer"
-                        >
-                          {company.name}
-                        </label>
-                      </div>
-                    ))}
-                    {companies.length > 50 && (
-                      <p className="text-xs text-muted-foreground">
-                        Showing first 50 companies
-                      </p>
-                    )}
-                  </div>
+                  <CompanyTagSelector
+                    companies={companies}
+                    selectedIds={selectedCompanyIds}
+                    aiDetectedIds={generatedArticle?.suggested_company_ids || []}
+                    onChange={setSelectedCompanyIds}
+                  />
                 </CardContent>
               </Card>
 
