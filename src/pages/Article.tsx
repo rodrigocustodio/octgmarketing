@@ -10,6 +10,7 @@ import { OctgMarketingPromo } from "@/components/articles/OctgMarketingPromo";
 import { UpcomingEventCard } from "@/components/articles/UpcomingEventCard";
 import { ArticleAuthorBox } from "@/components/articles/ArticleAuthorBox";
 import { CompanySpotlightCard } from "@/components/articles/CompanySpotlightCard";
+import { ArticleBody, ContentSlot } from "@/components/articles/ArticleBody";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { 
@@ -288,24 +289,30 @@ const Article = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 lg:gap-12">
               {/* Article Body */}
               <div className="lg:col-span-2">
-                {/* If we have a company and enough content to split, render split content with card */}
+                {/* Content rendered with isolated slots for components */}
                 {primaryCompany && secondHalfHtml ? (
-                  <article className="article-content max-w-none">
-                    <div dangerouslySetInnerHTML={{ __html: firstHalfHtml }} />
-                    
-                    <CompanySpotlightCard
-                      name={primaryCompany.name}
-                      slug={primaryCompany.slug}
-                      headquarters={primaryCompany.headquarters}
-                      website={primaryCompany.website}
-                    />
-                    
-                    <div dangerouslySetInnerHTML={{ __html: secondHalfHtml }} />
-                  </article>
+                  <ArticleBody 
+                    slots={[
+                      { type: 'prose', content: firstHalfHtml },
+                      { 
+                        type: 'component', 
+                        component: (
+                          <CompanySpotlightCard
+                            name={primaryCompany.name}
+                            slug={primaryCompany.slug}
+                            headquarters={primaryCompany.headquarters}
+                            website={primaryCompany.website}
+                          />
+                        )
+                      },
+                      { type: 'prose', content: secondHalfHtml },
+                    ]}
+                  />
                 ) : (
-                  <article 
-                    className="article-content max-w-none"
-                    dangerouslySetInnerHTML={{ __html: fullBodyHtml }}
+                  <ArticleBody 
+                    slots={[
+                      { type: 'prose', content: fullBodyHtml }
+                    ]}
                   />
                 )}
 

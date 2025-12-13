@@ -13,14 +13,14 @@ export function CompanySpotlightCard({
   headquarters 
 }: CompanySpotlightCardProps) {
   return (
-    <div className="my-6 pl-4 border-l-2 border-accent/60 not-prose space-y-0.5">
-      <p className="font-semibold text-foreground text-lg leading-tight m-0">{name}</p>
+    <div className="pl-3 border-l-2 border-accent/60 space-y-0.5">
+      <p className="font-semibold text-foreground text-base leading-snug">{name}</p>
       {headquarters && (
-        <p className="text-sm text-muted-foreground leading-tight m-0">{headquarters}</p>
+        <p className="text-sm text-muted-foreground leading-snug">{headquarters}</p>
       )}
       <Link 
         to={`/directory/company/${slug}`} 
-        className="text-sm text-accent hover:underline inline-flex items-center gap-1 leading-tight"
+        className="text-sm text-accent hover:underline inline-flex items-center gap-1"
       >
         View company profile →
       </Link>
