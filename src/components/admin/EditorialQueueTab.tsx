@@ -199,34 +199,35 @@ export default function EditorialQueueTab() {
                   className="p-4 border rounded-lg bg-card hover:bg-muted/50 transition-colors cursor-pointer"
                   onClick={() => handleResearchClick(item)}
                 >
-                  <div className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <span className="text-2xl font-bold text-muted-foreground w-8">
-                        #{index + 1}
-                      </span>
-                      <div>
-                        <div className="flex items-center gap-2 mb-1">
-                          <Badge variant="outline" className="text-xs">
-                            <Globe className="h-3 w-3 mr-1" />
-                            {item.regionName}
-                          </Badge>
-                          <Badge variant="outline" className="text-xs">
-                            <Tag className="h-3 w-3 mr-1" />
-                            {item.topicName}
-                          </Badge>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge
-                            className={`text-xs border ${getPriorityColor(item.articleCount)}`}
-                          >
-                            {item.articleCount} articles
-                          </Badge>
-                          <span className="text-xs text-muted-foreground">
-                            {item.gapReason}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
+                  <div className="grid grid-cols-[50px_1fr_1.5fr_auto_1fr_auto] items-center gap-4">
+                    {/* Column 1: Position */}
+                    <span className="text-2xl font-bold text-muted-foreground">
+                      #{index + 1}
+                    </span>
+                    
+                    {/* Column 2: Region */}
+                    <Badge variant="outline" className="text-xs w-fit">
+                      <Globe className="h-3 w-3 mr-1" />
+                      {item.regionName}
+                    </Badge>
+                    
+                    {/* Column 3: Topic */}
+                    <Badge variant="outline" className="text-xs w-fit">
+                      <Tag className="h-3 w-3 mr-1" />
+                      {item.topicName}
+                    </Badge>
+                    
+                    {/* Column 4: Article count */}
+                    <Badge className={`text-xs border ${getPriorityColor(item.articleCount)}`}>
+                      {item.articleCount} articles
+                    </Badge>
+                    
+                    {/* Column 5: Gap reason */}
+                    <span className="text-xs text-muted-foreground">
+                      {item.gapReason}
+                    </span>
+                    
+                    {/* Column 6: Actions */}
                     <div className="flex items-center gap-2">
                       <Button 
                         size="sm" 
