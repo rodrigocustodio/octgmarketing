@@ -1,4 +1,5 @@
 import { marked } from 'marked';
+import DOMPurify from 'dompurify';
 
 // Configure marked for safe rendering
 marked.setOptions({
@@ -6,9 +7,20 @@ marked.setOptions({
   breaks: true,
 });
 
+/**
+ * Convert markdown to sanitized HTML to prevent XSS attacks
+ */
 export function markdownToHtml(markdown: string): string {
   if (!markdown) return '';
-  return marked.parse(markdown) as string;
+  const rawHtml = marked.parse(markdown) as string;
+  // Sanitize HTML to prevent XSS - allow safe tags for article content
+  return DOMPurify.sanitize(rawHtml, {
+    ALLOWED_TAGS: ['h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'p', 'br', 'hr', 'ul', 'ol', 'li', 
+                   'strong', 'em', 'b', 'i', 'u', 'a', 'blockquote', 'code', 'pre', 
+                   'table', 'thead', 'tbody', 'tr', 'th', 'td', 'img', 'figure', 'figcaption'],
+    ALLOWED_ATTR: ['href', 'src', 'alt', 'title', 'class', 'id', 'target', 'rel'],
+    ALLOW_DATA_ATTR: false,
+  });
 }
 
 /**
