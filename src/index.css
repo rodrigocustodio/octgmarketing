@@ -518,6 +518,33 @@
   animation: confetti-fall 2.5s ease-out forwards;
 }
 
+/* Cost Pressure Index Pulse Animations */
+@keyframes pulse-status {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  50% {
+    transform: scale(1.015);
+    opacity: 0.95;
+  }
+}
+
+.animate-pulse-status-red {
+  animation: pulse-status 0.5s ease-in-out 2;
+  box-shadow: 0 0 30px rgba(239, 68, 68, 0.4);
+}
+
+.animate-pulse-status-yellow {
+  animation: pulse-status 0.5s ease-in-out 2;
+  box-shadow: 0 0 30px rgba(234, 179, 8, 0.4);
+}
+
+.animate-pulse-status-green {
+  animation: pulse-status 0.5s ease-in-out 2;
+  box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+}
+
 /* Responsive ticker speed adjustments - slower on smaller screens for readability */
 @media (max-width: 768px) {
   .ticker-content {
