@@ -380,9 +380,19 @@ const DraftDetail = () => {
         }
       }
 
+      // Delete the draft after successful publish
+      const { error: deleteError } = await supabase
+        .from("draft_articles")
+        .delete()
+        .eq("id", draft.id);
+
+      if (deleteError) {
+        console.error("Error deleting draft:", deleteError);
+      }
+
       toast({
-        title: "Article Approved",
-        description: "The draft has been approved and published with metadata.",
+        title: "Article Published",
+        description: "The article is now live and the draft has been removed.",
       });
 
       navigate("/admin/drafts");
@@ -403,27 +413,25 @@ const DraftDetail = () => {
     
     setSubmitting(true);
     try {
+      // Delete the draft instead of just updating status
       const { error } = await supabase
         .from("draft_articles")
-        .update({
-          status: "rejected",
-          editor_notes: editorNotes || null,
-        })
+        .delete()
         .eq("id", draft.id);
 
       if (error) throw error;
 
       toast({
-        title: "Article Rejected",
-        description: "The draft has been rejected.",
+        title: "Draft Deleted",
+        description: "The draft has been removed.",
       });
 
       navigate("/admin/drafts");
     } catch (error) {
-      console.error("Error rejecting draft:", error);
+      console.error("Error deleting draft:", error);
       toast({
         title: "Error",
-        description: "Failed to reject draft",
+        description: "Failed to delete draft",
         variant: "destructive",
       });
     } finally {
