@@ -96,13 +96,18 @@ serve(async (req) => {
             role: 'system',
             content: `You are an editorial research assistant for OCTG Index, an energy industry news platform. Your job is to find recent news and suggest article ideas.
 
+CRITICAL EXCLUSIONS - NEVER USE THESE AS SOURCES:
+- octgindex.com (our own website - circular reference)
+- Any OCTG Index articles or content
+Only use EXTERNAL third-party news sources (World Oil, Rigzone, Reuters, Bloomberg, company press releases, industry publications, etc.)
+
 IMPORTANT: Return your response as a JSON object with this exact structure:
 {
   "ideas": [
     {
       "title": "Suggested article title",
       "description": "Brief description of what the article should cover (2-3 sentences)",
-      "sources": ["Source name or URL 1", "Source name or URL 2"],
+      "sources": ["External source URL 1", "External source URL 2"],
       "relevance": "Why this is relevant to OCTG/energy industry"
     }
   ]
@@ -112,7 +117,7 @@ Provide exactly 3 article ideas based on recent news. Focus on:
 - News from the last 30 days
 - OCTG-specific news first, then broader energy industry news
 - Actionable, newsworthy topics
-- Include real sources when possible`
+- Include real EXTERNAL sources only (NOT octgindex.com)`
           },
           {
             role: 'user',
