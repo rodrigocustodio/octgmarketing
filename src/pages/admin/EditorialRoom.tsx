@@ -1,8 +1,13 @@
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useEditorialStats } from "@/hooks/useEditorialStats";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
 import { 
   Newspaper, 
   Globe, 
@@ -12,12 +17,30 @@ import {
   TrendingDown,
   Minus,
   BarChart3,
-  Package
+  Package,
+  Tags,
+  Loader2,
+  CheckCircle2,
+  XCircle,
+  ArrowRight
 } from "lucide-react";
+import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
+import { toast } from "@/hooks/use-toast";
 import CoverageHeatmap from "@/components/admin/CoverageHeatmap";
 import CompanyMentions from "@/components/admin/CompanyMentions";
 import TopicSuggestions from "@/components/admin/TopicSuggestions";
 import ProductCoverageMatrix from "@/components/admin/ProductCoverageMatrix";
+
+interface RecategorizationResult {
+  article_id: string;
+  title: string;
+  old_category: string | null;
+  new_category: string;
+  confidence: number;
+  success: boolean;
+  error?: string;
+}
 
 function StatCard({ 
   title, 
@@ -59,6 +82,10 @@ function StatCard({
 
 export default function EditorialRoom() {
   const { data: stats, isLoading } = useEditorialStats();
+  const [isRecategorizing, setIsRecategorizing] = useState(false);
+  const [progress, setProgress] = useState({ current: 0, total: 0 });
+  const [results, setResults] = useState<RecategorizationResult[]>([]);
+  const [showResults, setShowResults] = useState(false);
 
   const getTrend = () => {
     if (!stats) return "neutral";
@@ -75,6 +102,68 @@ export default function EditorialRoom() {
     return "Same as last week";
   };
 
+  const handleRecategorizeAll = async () => {
+    setIsRecategorizing(true);
+    setResults([]);
+    
+    // Get total article count
+    const { count } = await supabase
+      .from('articles')
+      .select('*', { count: 'exact', head: true })
+      .in('status', ['published', 'featured']);
+    
+    const totalArticles = count || 0;
+    setProgress({ current: 0, total: totalArticles });
+    
+    let allResults: RecategorizationResult[] = [];
+    let offset = 0;
+    const batchSize = 10;
+    
+    try {
+      while (offset < totalArticles) {
+        const { data, error } = await supabase.functions.invoke('recategorize-articles', {
+          body: { batch_size: batchSize, offset }
+        });
+        
+        if (error) throw error;
+        
+        const batchResults = data?.results || [];
+        allResults = [...allResults, ...batchResults];
+        
+        const newCurrent = Math.min(offset + batchSize, totalArticles);
+        setProgress({ current: newCurrent, total: totalArticles });
+        
+        toast({
+          title: `Processing ${newCurrent}/${totalArticles}`,
+          description: `${batchResults.filter((r: RecategorizationResult) => r.success).length} articles updated in this batch`,
+        });
+        
+        offset += batchSize;
+      }
+      
+      setResults(allResults);
+      setShowResults(true);
+      
+      const successCount = allResults.filter(r => r.success).length;
+      toast({
+        title: "Recategorization Complete",
+        description: `${successCount}/${allResults.length} articles successfully recategorized`,
+      });
+    } catch (error) {
+      console.error('Recategorization error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to complete recategorization",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRecategorizing(false);
+    }
+  };
+
+  const successCount = results.filter(r => r.success).length;
+  const errorCount = results.filter(r => !r.success).length;
+
   return (
     <AdminLayout>
       <div className="space-y-6">
@@ -88,6 +177,53 @@ export default function EditorialRoom() {
             Content planning hub with analytics, gap analysis, and AI-powered topic suggestions
           </p>
         </div>
+
+        {/* AI Recategorization Card */}
+        <Card>
+          <CardHeader className="pb-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Tags className="h-5 w-5 text-primary" />
+                <CardTitle className="text-lg">AI Category Assignment</CardTitle>
+              </div>
+              {results.length > 0 && !isRecategorizing && (
+                <Button variant="outline" size="sm" onClick={() => setShowResults(true)}>
+                  View Last Results
+                </Button>
+              )}
+            </div>
+            <CardDescription>
+              Use Perplexity AI to analyze all articles and assign the best-matching category from the official 30-category list.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {isRecategorizing && (
+              <div className="space-y-2">
+                <Progress value={(progress.current / progress.total) * 100} />
+                <p className="text-sm text-muted-foreground text-center">
+                  Processing {progress.current}/{progress.total} articles...
+                </p>
+              </div>
+            )}
+            <Button 
+              onClick={handleRecategorizeAll} 
+              disabled={isRecategorizing}
+              className="w-full"
+            >
+              {isRecategorizing ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Recategorizing...
+                </>
+              ) : (
+                <>
+                  <Tags className="mr-2 h-4 w-4" />
+                  Recategorize All Articles
+                </>
+              )}
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Stats Grid */}
         <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -163,6 +299,66 @@ export default function EditorialRoom() {
           {/* AI Topic Suggestions */}
           <TopicSuggestions />
         </div>
+
+        {/* Results Dialog */}
+        <Dialog open={showResults} onOpenChange={setShowResults}>
+          <DialogContent className="max-w-2xl">
+            <DialogHeader>
+              <DialogTitle>Recategorization Results</DialogTitle>
+              <DialogDescription>
+                Summary of AI category assignments for all articles
+              </DialogDescription>
+            </DialogHeader>
+            
+            <div className="flex gap-4 mb-4">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 className="h-5 w-5 text-green-500" />
+                <span className="font-medium">{successCount} Success</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <XCircle className="h-5 w-5 text-red-500" />
+                <span className="font-medium">{errorCount} Errors</span>
+              </div>
+            </div>
+            
+            <ScrollArea className="h-[400px] rounded-md border">
+              <div className="p-4 space-y-2">
+                {results.map((result, index) => (
+                  <div 
+                    key={result.article_id || index}
+                    className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium truncate">{result.title}</p>
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <span>{result.old_category || 'None'}</span>
+                        <ArrowRight className="h-3 w-3" />
+                        <span className="text-foreground font-medium">{result.new_category}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 ml-4">
+                      <Badge 
+                        variant={result.confidence > 0.8 ? "default" : result.confidence > 0.5 ? "secondary" : "outline"}
+                        className="text-xs"
+                      >
+                        {Math.round(result.confidence * 100)}%
+                      </Badge>
+                      {result.success ? (
+                        <CheckCircle2 className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <XCircle className="h-4 w-4 text-red-500" />
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+            
+            <div className="flex justify-end">
+              <Button onClick={() => setShowResults(false)}>Close</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
     </AdminLayout>
   );
