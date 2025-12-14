@@ -77,3 +77,12 @@ verify_jwt = false
 
 [functions.cleanup-junk-companies]
 verify_jwt = false
+
+[functions.recategorize-articles]
+verify_jwt = false
+
+[functions.research-editorial-opportunity]
+verify_jwt = false
+
+[functions.audit-company-quality]
+verify_jwt = false

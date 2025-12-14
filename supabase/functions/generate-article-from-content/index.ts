@@ -22,18 +22,38 @@ const REGION_KEYWORDS: Record<string, string[]> = {
   'global': ['global', 'worldwide', 'international', 'multiple regions', 'cross-border']
 };
 
-// Topic detection keywords
+// Official 30-category topic detection keywords
 const TOPIC_KEYWORDS: Record<string, string[]> = {
+  'breaking-news': ['breaking', 'urgent', 'just in', 'developing', 'alert', 'flash'],
+  'ceo-news': ['ceo', 'chief executive', 'executive appointment', 'ceo interview', 'ceo statement', 'leadership change'],
   'mills-manufacturing': ['mill', 'manufacturing', 'production', 'capacity', 'steel', 'seamless', 'welded', 'pipe plant', 'factory', 'output', 'rolling', 'forge', 'threading', 'heat treatment', 'casing', 'tubing'],
   'yards-supply-chain': ['yard', 'stockyard', 'inventory', 'supply chain', 'logistics', 'distribution', 'warehouse', 'storage', 'distributor', 'supplier', 'delivery', 'procurement'],
-  'pricing-market': ['price', 'pricing', 'market', 'tariff', 'import', 'export', 'trade', 'duty', 'cost', 'demand', 'forecast', 'analysis', 'revenue', 'margin', 'profit', 'premium'],
-  'projects-contracts': ['project', 'contract', 'tender', 'award', 'development', 'exploration', 'field', 'greenfield', 'brownfield', 'fid', 'final investment', 'epc'],
-  'rigs-wellsite': ['rig', 'well', 'drilling', 'completion', 'workover', 'offshore', 'onshore', 'derrick', 'blowout', 'spud', 'perforation', 'jackup', 'drillship', 'semisubmersible'],
-  'careers-people': ['ceo', 'appointed', 'hire', 'executive', 'leadership', 'president', 'director', 'retirement', 'succession', 'board', 'management', 'chief'],
-  'companies-strategy': ['merger', 'acquisition', 'joint venture', 'partnership', 'investment', 'expansion', 'strategy', 'restructuring', 'divestment', 'ipo', 'buyout'],
-  'hse-regulations': ['safety', 'environment', 'regulation', 'compliance', 'emission', 'incident', 'inspection', 'audit', 'epa', 'api', 'standard', 'certification', 'carbon'],
+  'pricing-market': ['price', 'pricing', 'market', 'tariff', 'import', 'export', 'trade', 'duty', 'cost', 'demand', 'forecast', 'revenue', 'margin', 'profit', 'premium'],
+  'projects-contracts': ['project', 'contract', 'tender', 'award', 'development', 'field', 'greenfield', 'brownfield', 'fid', 'final investment', 'epc'],
+  'rigs-wellsite': ['rig', 'well', 'drilling', 'completion', 'workover', 'derrick', 'blowout', 'spud', 'perforation', 'jackup', 'drillship', 'semisubmersible', 'rig count'],
+  'careers-people': ['appointed', 'hire', 'hiring', 'workforce', 'career', 'job', 'employment', 'talent', 'professional development'],
+  'companies-strategy': ['company', 'corporate', 'strategy', 'expansion', 'restructuring', 'business', 'growth'],
+  'hse-regulations': ['safety', 'environment', 'regulation', 'compliance', 'emission', 'incident', 'audit', 'epa', 'api', 'standard', 'certification'],
   'ports-terminals': ['port', 'terminal', 'harbor', 'berth', 'loading', 'unloading', 'freight', 'shipping', 'vessel', 'cargo', 'maritime'],
-  'technology-digitalization': ['digital', 'technology', 'automation', 'ai', 'artificial intelligence', 'iot', 'sensor', 'software', 'data', 'analytics', 'machine learning', 'innovation']
+  'technology-digitalization': ['digital', 'technology', 'automation', 'ai', 'artificial intelligence', 'iot', 'sensor', 'software', 'data', 'analytics', 'machine learning', 'innovation'],
+  'offshore-subsea': ['offshore', 'subsea', 'deepwater', 'platform', 'fpso', 'floating', 'semi-submersible', 'jack-up', 'ultra-deepwater'],
+  'onshore-operations': ['onshore', 'shale', 'unconventional', 'land-based', 'fracking', 'hydraulic fracturing', 'tight oil', 'tight gas'],
+  'mergers-acquisitions': ['merger', 'acquisition', 'acquire', 'takeover', 'buyout', 'divestment', 'divest', 'sell', 'purchase', 'm&a'],
+  'earnings-financials': ['earnings', 'revenue', 'profit', 'loss', 'quarterly', 'annual report', 'financial results', 'ebitda', 'dividend', 'stock', 'share'],
+  'energy-transition': ['renewable', 'decarbonization', 'hydrogen', 'carbon capture', 'ccs', 'green energy', 'sustainability', 'net zero', 'clean energy'],
+  'pipeline-infrastructure': ['pipeline', 'midstream', 'lng terminal', 'gas transmission', 'trunk line', 'gathering', 'transport'],
+  'inspection-quality': ['inspection', 'qa', 'qc', 'quality assurance', 'quality control', 'ndt', 'non-destructive', 'testing', 'certification', 'api certified'],
+  'gas-lng': ['gas', 'lng', 'natural gas', 'liquefied', 'regasification', 'liquefaction', 'gas field', 'gas production'],
+  'oil': ['oil', 'crude', 'petroleum', 'oil field', 'oil production', 'barrel', 'bpd', 'oil reserves'],
+  'energy-events': ['conference', 'exhibition', 'trade show', 'summit', 'forum', 'event', 'adipec', 'ote', 'offshore technology'],
+  'geopolitical': ['geopolitical', 'sanctions', 'opec', 'policy', 'government', 'legislation', 'political'],
+  'logistics': ['transport', 'shipping', 'freight', 'delivery', 'logistics', 'fleet'],
+  'scm-solutions': ['scm', 'supply chain management', 'erp', 'tracking', 'visibility', 'procurement software'],
+  'product-news': ['product launch', 'new product', 'innovation', 'equipment', 'tool'],
+  'regional-coverage': ['regional', 'local', 'domestic', 'country focus'],
+  'ai-energy': ['ai', 'machine learning', 'artificial intelligence', 'predictive', 'automation', 'digital twin'],
+  'educational': ['guide', 'how to', 'explained', 'what is', 'introduction', 'basics'],
+  'safety': ['safety', 'accident', 'hazard', 'ppe', 'safety record', 'injury', 'fatality']
 };
 
 const SYSTEM_PROMPT = `You are a senior energy industry editor for OCTG Index, a leading corporate OCTG (Oil Country Tubular Goods) news portal. Your task is to rewrite source content into professional, authoritative ORIGINAL editorial content optimized for SEO and AI search engines.
@@ -189,7 +209,12 @@ REQUIRED CREATIVE CLOSING HEADERS:
 ENTITY EXTRACTION:
 - Identify and list any OCTG manufacturers, operators, or service companies mentioned
 - List countries specifically mentioned in the article
-- Suggest relevant topic categories from: mills-manufacturing, yards-supply-chain, pricing-market, projects-contracts, rigs-wellsite, careers-people, companies-strategy, hse-regulations, ports-terminals, technology-digitalization
+- Suggest relevant topic categories from this OFFICIAL 30-CATEGORY LIST:
+  breaking-news, ceo-news, mills-manufacturing, yards-supply-chain, pricing-market, projects-contracts,
+  rigs-wellsite, careers-people, companies-strategy, hse-regulations, ports-terminals, technology-digitalization,
+  offshore-subsea, onshore-operations, mergers-acquisitions, earnings-financials, energy-transition,
+  pipeline-infrastructure, inspection-quality, gas-lng, oil, energy-events, geopolitical, logistics,
+  scm-solutions, product-news, regional-coverage, ai-energy, educational, safety
 
 GEOGRAPHIC REGION IDENTIFICATION - CRITICAL:
 - Carefully identify the PRIMARY geographic region of the news
