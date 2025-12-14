@@ -124,6 +124,7 @@ Provide exactly 3 article ideas based on recent news. Focus on:
             content: searchQuery
           }
         ],
+        search_recency_filter: 'month',
       }),
     });
 

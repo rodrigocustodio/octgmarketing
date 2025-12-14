@@ -179,10 +179,21 @@ export default function OpportunityResearchDialog({
                   {idea.sources?.length > 0 && (
                     <div className="flex flex-wrap gap-1 mb-3">
                       {idea.sources.slice(0, 3).map((source, idx) => (
-                        <Badge key={idx} variant="secondary" className="text-xs">
-                          <ExternalLink className="h-3 w-3 mr-1" />
-                          {source.length > 30 ? source.slice(0, 30) + "..." : source}
-                        </Badge>
+                        <a
+                          key={idx}
+                          href={source.startsWith('http') ? source : `https://${source}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex"
+                        >
+                          <Badge 
+                            variant="secondary" 
+                            className="text-xs cursor-pointer hover:bg-secondary/80 transition-colors"
+                          >
+                            <ExternalLink className="h-3 w-3 mr-1" />
+                            {source.replace(/^https?:\/\//, '').slice(0, 35)}...
+                          </Badge>
+                        </a>
                       ))}
                     </div>
                   )}
