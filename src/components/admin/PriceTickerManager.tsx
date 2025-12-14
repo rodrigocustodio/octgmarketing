@@ -10,11 +10,44 @@ import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 
 const REFRESH_INTERVAL_SECONDS = 25 * 60; // 25 minutes
+const STORAGE_KEY = "priceTickerNextRefresh";
+
+// Helper functions for localStorage persistence
+const getStoredNextRefresh = (): number | null => {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    return stored ? parseInt(stored, 10) : null;
+  } catch {
+    return null;
+  }
+};
+
+const setStoredNextRefresh = (timestamp: number) => {
+  try {
+    localStorage.setItem(STORAGE_KEY, timestamp.toString());
+  } catch {
+    // localStorage not available
+  }
+};
+
+const getInitialSeconds = (): number => {
+  const storedTimestamp = getStoredNextRefresh();
+  if (storedTimestamp) {
+    const remaining = Math.floor((storedTimestamp - Date.now()) / 1000);
+    if (remaining > 0 && remaining <= REFRESH_INTERVAL_SECONDS) {
+      return remaining;
+    }
+  }
+  // No valid stored time - set new one
+  const newTimestamp = Date.now() + REFRESH_INTERVAL_SECONDS * 1000;
+  setStoredNextRefresh(newTimestamp);
+  return REFRESH_INTERVAL_SECONDS;
+};
 
 export function PriceTickerManager() {
   const { data: prices, isLoading, refetch } = useSteelPrices();
   const [isRefreshing, setIsRefreshing] = useState(false);
-  const [secondsRemaining, setSecondsRemaining] = useState(REFRESH_INTERVAL_SECONDS);
+  const [secondsRemaining, setSecondsRemaining] = useState(getInitialSeconds);
   const { toast } = useToast();
   const isRefreshingRef = useRef(false);
 
@@ -61,7 +94,11 @@ export function PriceTickerManager() {
     
     isRefreshingRef.current = true;
     setIsRefreshing(true);
-    setSecondsRemaining(REFRESH_INTERVAL_SECONDS); // Reset countdown
+    
+    // Reset countdown and store new timestamp
+    const newTimestamp = Date.now() + REFRESH_INTERVAL_SECONDS * 1000;
+    setStoredNextRefresh(newTimestamp);
+    setSecondsRemaining(REFRESH_INTERVAL_SECONDS);
     
     try {
       const { data, error } = await supabase.functions.invoke("fetch-steel-prices");
@@ -95,6 +132,8 @@ export function PriceTickerManager() {
         if (prev <= 1) {
           // Auto-trigger refresh when countdown ends
           handleRefreshPrices();
+          const newTimestamp = Date.now() + REFRESH_INTERVAL_SECONDS * 1000;
+          setStoredNextRefresh(newTimestamp);
           return REFRESH_INTERVAL_SECONDS;
         }
         return prev - 1;
