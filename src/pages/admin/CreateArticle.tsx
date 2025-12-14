@@ -92,7 +92,7 @@ export default function CreateArticle() {
           setSlug(data.slug);
           setRegionId(data.region_id);
           setSelectedTopicIds(data.suggested_topic_ids || []);
-          setSelectedCompanyIds(data.suggested_company_ids || []);
+          setSelectedCompanyIds([]); // Manual selection only
           sessionStorage.removeItem('generatedArticle');
         } catch (e) {
           console.error('Failed to parse stored article:', e);
@@ -162,7 +162,7 @@ export default function CreateArticle() {
       setSlug(data.slug);
       setRegionId(data.region_id);
       setSelectedTopicIds(data.suggested_topic_ids || []);
-      setSelectedCompanyIds(data.suggested_company_ids || []);
+      setSelectedCompanyIds([]); // Manual selection only
       toast({
         title: "Article Generated",
         description: "Review and edit the generated content before publishing.",
@@ -513,20 +513,12 @@ export default function CreateArticle() {
               {/* Companies */}
               <Card>
                 <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    Companies
-                    {generatedArticle?.suggested_company_ids?.length > 0 && (
-                      <span className="text-xs font-normal text-muted-foreground">
-                        (AI detected)
-                      </span>
-                    )}
-                  </CardTitle>
+                  <CardTitle>Companies</CardTitle>
                 </CardHeader>
                 <CardContent>
                   <CompanyTagSelector
                     companies={companies}
                     selectedIds={selectedCompanyIds}
-                    aiDetectedIds={generatedArticle?.suggested_company_ids || []}
                     onChange={setSelectedCompanyIds}
                   />
                 </CardContent>
