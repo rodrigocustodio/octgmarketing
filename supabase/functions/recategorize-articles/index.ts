@@ -91,7 +91,8 @@ serve(async (req) => {
       );
     }
 
-    const { article_id, batch_size = 10 } = await req.json();
+    const body = await req.json();
+    const { article_id, batch_size = 10, offset = 0 } = body;
 
     // Fetch topics from database to get IDs
     const { data: dbTopics, error: topicsError } = await supabase
@@ -120,8 +121,8 @@ serve(async (req) => {
       // Single article mode
       articlesQuery = articlesQuery.eq('id', article_id);
     } else {
-      // Batch mode
-      articlesQuery = articlesQuery.limit(batch_size);
+      // Batch mode with offset for pagination
+      articlesQuery = articlesQuery.range(offset, offset + batch_size - 1);
     }
 
     const { data: articles, error: articlesError } = await articlesQuery;
@@ -287,7 +288,15 @@ Body excerpt: ${contentSample}`
         processed: articles.length,
         successful: successCount,
         errors: errorCount,
-        results
+        results: results.map(r => ({
+          article_id: r.articleId,
+          title: r.title,
+          old_category: r.oldCategories[0] || null,
+          new_category: r.newCategory,
+          confidence: r.confidence,
+          success: r.status === 'success',
+          error: r.error
+        }))
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
