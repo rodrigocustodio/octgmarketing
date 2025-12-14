@@ -166,7 +166,7 @@ export default function EditorialRoom() {
 
   return (
     <AdminLayout>
-      <div className="space-y-6">
+      <div className="space-y-6 max-w-full overflow-hidden">
         {/* Header */}
         <div>
           <h1 className="text-3xl font-bold flex items-center gap-3">

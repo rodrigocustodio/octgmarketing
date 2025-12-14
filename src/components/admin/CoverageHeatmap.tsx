@@ -65,43 +65,41 @@ export default function CoverageHeatmap() {
 
   return (
     <>
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center justify-between">
-            <span>Region × Topic Coverage</span>
-            <div className="flex items-center gap-4 text-xs font-normal">
-              <span className="text-muted-foreground">Click any cell to research</span>
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded bg-destructive/20" />
-                <span>0</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded bg-yellow-500/20" />
-                <span>1-2</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded bg-blue-500/20" />
-                <span>3-5</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <span className="w-3 h-3 rounded bg-green-500/20" />
-                <span>6+</span>
-              </div>
+      <Card className="max-w-full overflow-hidden">
+        <CardHeader className="pb-3">
+          <CardTitle className="text-lg">Region × Topic Coverage</CardTitle>
+          <div className="flex flex-wrap items-center gap-3 text-xs">
+            <span className="text-muted-foreground">Click cell to research</span>
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded bg-destructive/20" />
+              <span>0</span>
             </div>
-          </CardTitle>
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded bg-yellow-500/20" />
+              <span>1-2</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded bg-blue-500/20" />
+              <span>3-5</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <span className="w-3 h-3 rounded bg-green-500/20" />
+              <span>6+</span>
+            </div>
+          </div>
         </CardHeader>
-        <CardContent>
+        <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="w-full text-sm">
+            <table className="min-w-[700px] w-full text-sm">
               <thead>
                 <tr>
-                  <th className="text-left p-2 font-medium text-muted-foreground">Region</th>
+                  <th className="text-left p-2 font-medium text-muted-foreground sticky left-0 bg-card z-10">Region</th>
                   {topics.map(topic => (
                     <th
                       key={topic.id}
-                      className="p-2 font-medium text-muted-foreground text-center min-w-[80px]"
+                      className="p-1 font-medium text-muted-foreground text-center"
                     >
-                      <span className="text-xs">{topic.name}</span>
+                      <span className="text-[10px] whitespace-nowrap">{topic.name}</span>
                     </th>
                   ))}
                 </tr>
