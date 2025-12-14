@@ -65,9 +65,9 @@ export default function CoverageHeatmap() {
 
   return (
     <>
-      <Card className="max-w-full overflow-hidden">
+      <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-lg">Region × Topic Coverage</CardTitle>
+          <CardTitle className="text-lg">Topic × Region Coverage</CardTitle>
           <div className="flex flex-wrap items-center gap-3 text-xs">
             <span className="text-muted-foreground">Click cell to research</span>
             <div className="flex items-center gap-1">
@@ -90,28 +90,25 @@ export default function CoverageHeatmap() {
         </CardHeader>
         <CardContent className="p-0">
           <div className="overflow-x-auto">
-            <table className="min-w-[700px] w-full text-sm">
+            <table className="w-full text-sm">
               <thead>
                 <tr>
-                  <th className="text-left p-2 font-medium text-muted-foreground sticky left-0 bg-card z-10">Region</th>
-                  {topics.map(topic => (
-                    <th
-                      key={topic.id}
-                      className="p-1 font-medium text-muted-foreground text-center"
-                    >
-                      <span className="text-[10px] whitespace-nowrap">{topic.name}</span>
+                  <th className="text-left p-2 font-medium text-muted-foreground sticky left-0 bg-card z-10">Topic</th>
+                  {regions.map(region => (
+                    <th key={region.id} className="p-2 font-medium text-muted-foreground text-center">
+                      {region.name}
                     </th>
                   ))}
                 </tr>
               </thead>
               <tbody>
-                {regions.map(region => (
-                  <tr key={region.id} className="border-t border-border">
-                    <td className="p-2 font-medium">{region.name}</td>
-                    {topics.map(topic => {
+                {topics.map(topic => (
+                  <tr key={topic.id} className="border-t border-border">
+                    <td className="p-2 font-medium sticky left-0 bg-card">{topic.name}</td>
+                    {regions.map(region => {
                       const cellData = getCellData(region.id, topic.id);
                       return (
-                        <td key={topic.id} className="p-1 text-center">
+                        <td key={region.id} className="p-1 text-center">
                           <button
                             onClick={() => handleCellClick(region.id, topic.id)}
                             className={cn(
