@@ -18,7 +18,7 @@ const AdminLayout = ({ children }: AdminLayoutProps) => {
         </header>
 
         {/* Main content */}
-        <main className="flex-1 p-6">
+        <main className="flex-1 p-6 overflow-x-hidden min-w-0">
           {children}
         </main>
       </div>
