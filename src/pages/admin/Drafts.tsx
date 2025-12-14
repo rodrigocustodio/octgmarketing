@@ -25,22 +25,9 @@ interface DraftArticle {
   title: string;
   slug: string;
   excerpt: string | null;
-  status: "pending_review" | "approved" | "rejected";
   created_at: string;
   region?: { name: string } | null;
 }
-
-const statusColors = {
-  pending_review: "bg-amber-500/20 text-amber-500 border-amber-500/30",
-  approved: "bg-green-500/20 text-green-500 border-green-500/30",
-  rejected: "bg-red-500/20 text-red-500 border-red-500/30",
-};
-
-const statusLabels = {
-  pending_review: "Pending Review",
-  approved: "Approved",
-  rejected: "Rejected",
-};
 
 const Drafts = () => {
   const [drafts, setDrafts] = useState<DraftArticle[]>([]);
@@ -55,6 +42,7 @@ const Drafts = () => {
           *,
           region:regions(name)
         `)
+        .eq("status", "pending_review")
         .order("created_at", { ascending: false })
         .limit(100);
 
@@ -72,7 +60,6 @@ const Drafts = () => {
     fetchDrafts();
   }, []);
 
-  const pendingCount = drafts.filter(d => d.status === "pending_review").length;
   const seoOptimizedCount = drafts.filter(d => 
     isTitleValid(d.title) && isDescriptionValid(d.excerpt)
   ).length;
@@ -108,13 +95,8 @@ const Drafts = () => {
         {/* Stats */}
         <div className="flex flex-wrap items-center gap-3">
           <Badge variant="outline" className="text-base py-1 px-3">
-            {drafts.length} total
+            {drafts.length} pending
           </Badge>
-          {pendingCount > 0 && (
-            <Badge className="bg-amber-500/20 text-amber-500 border-amber-500/30 text-base py-1 px-3">
-              {pendingCount} pending
-            </Badge>
-          )}
           <Badge className="bg-green-500/20 text-green-500 border-green-500/30 text-base py-1 px-3">
             <CheckCircle className="h-3.5 w-3.5 mr-1.5" />
             {seoOptimizedCount} SEO optimized
@@ -155,7 +137,6 @@ const Drafts = () => {
                     <TableHead className="text-center w-16">T</TableHead>
                     <TableHead className="text-center w-16">D</TableHead>
                     <TableHead>Created</TableHead>
-                    <TableHead>Status</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -188,14 +169,6 @@ const Drafts = () => {
                       </TableCell>
                       <TableCell className="text-muted-foreground text-sm">
                         {format(new Date(draft.created_at), "MMM d, HH:mm")}
-                      </TableCell>
-                      <TableCell>
-                        <Badge 
-                          variant="outline" 
-                          className={statusColors[draft.status]}
-                        >
-                          {statusLabels[draft.status]}
-                        </Badge>
                       </TableCell>
                       <TableCell className="text-right">
                         <Link to={`/admin/drafts/${draft.id}`}>
