@@ -1,7 +1,6 @@
 import { useState, useMemo } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import {
   Command,
   CommandEmpty,
@@ -15,7 +14,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover";
-import { X, Plus, Sparkles, Building2 } from "lucide-react";
+import { X, Plus, Building2 } from "lucide-react";
 
 interface Company {
   id: string;
@@ -25,7 +24,6 @@ interface Company {
 interface CompanyTagSelectorProps {
   companies: Company[];
   selectedIds: string[];
-  aiDetectedIds?: string[];
   onChange: (ids: string[]) => void;
   maxCompanies?: number;
 }
@@ -33,7 +31,6 @@ interface CompanyTagSelectorProps {
 export function CompanyTagSelector({
   companies,
   selectedIds,
-  aiDetectedIds = [],
   onChange,
   maxCompanies = 15,
 }: CompanyTagSelectorProps) {
@@ -66,10 +63,6 @@ export function CompanyTagSelector({
     setSearchValue("");
   };
 
-  const isAiDetected = (companyId: string) => {
-    return aiDetectedIds.includes(companyId);
-  };
-
   return (
     <div className="space-y-3">
       {/* Selected companies as tags */}
@@ -80,12 +73,9 @@ export function CompanyTagSelector({
           selectedCompanies.map((company) => (
             <Badge
               key={company.id}
-              variant={isAiDetected(company.id) ? "default" : "secondary"}
+              variant="secondary"
               className="flex items-center gap-1 pr-1"
             >
-              {isAiDetected(company.id) && (
-                <Sparkles className="h-3 w-3 mr-0.5" />
-              )}
               <span className="max-w-[150px] truncate">{company.name}</span>
               <button
                 onClick={() => handleRemove(company.id)}
