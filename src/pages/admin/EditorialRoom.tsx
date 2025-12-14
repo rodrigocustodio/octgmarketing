@@ -196,32 +196,38 @@ export default function EditorialRoom() {
               Use Perplexity AI to analyze all articles and assign the best-matching category from the official 30-category list.
             </CardDescription>
           </CardHeader>
-          <CardContent className="space-y-4">
-            {isRecategorizing && (
-              <div className="space-y-2">
-                <Progress value={(progress.current / progress.total) * 100} />
-                <p className="text-sm text-muted-foreground text-center">
-                  Processing {progress.current}/{progress.total} articles...
-                </p>
-              </div>
-            )}
-            <Button 
-              onClick={handleRecategorizeAll} 
-              disabled={isRecategorizing}
-              className="w-full"
-            >
+          <CardContent>
+            <div className="flex items-center justify-between gap-4 flex-wrap">
               {isRecategorizing ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  Recategorizing...
-                </>
+                <div className="flex-1 min-w-[200px] space-y-1">
+                  <Progress value={(progress.current / progress.total) * 100} className="h-2" />
+                  <p className="text-xs text-muted-foreground">
+                    Processing {progress.current}/{progress.total} articles...
+                  </p>
+                </div>
               ) : (
-                <>
-                  <Tags className="mr-2 h-4 w-4" />
-                  Recategorize All Articles
-                </>
+                <span className="text-sm text-muted-foreground">
+                  {results.length > 0 ? `Last run: ${results.length} articles processed` : 'Ready to process'}
+                </span>
               )}
-            </Button>
+              <Button 
+                onClick={handleRecategorizeAll} 
+                disabled={isRecategorizing}
+                size="sm"
+              >
+                {isRecategorizing ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <Tags className="mr-2 h-4 w-4" />
+                    Recategorize All
+                  </>
+                )}
+              </Button>
+            </div>
           </CardContent>
         </Card>
 
