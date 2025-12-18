@@ -78,12 +78,13 @@ Deno.serve(async (req) => {
     if (type === "index") {
       const sitemaps = [
         { loc: `${BASE_URL}/sitemap-news.xml`, lastmod: today },
+        { loc: `${BASE_URL}/sitemap-google-news.xml`, lastmod: today },
         { loc: `${BASE_URL}/sitemap-events.xml`, lastmod: today },
         { loc: `${BASE_URL}/sitemap-directory.xml`, lastmod: today },
         { loc: `${BASE_URL}/sitemap-pages.xml`, lastmod: today },
       ];
       xmlContent = generateSitemapIndex(sitemaps);
-      console.log("Generated sitemap index with 4 sitemaps");
+      console.log("Generated sitemap index with 5 sitemaps");
     }
 
     // ============================================
@@ -347,10 +348,56 @@ Deno.serve(async (req) => {
       console.log(`Generated pages sitemap with ${urls.length} URLs`);
     }
 
+    // ============================================
+    // GOOGLE NEWS SITEMAP - Articles from last 48 hours (for Google News)
+    // ============================================
+    else if (type === "google-news") {
+      // Google News requires special namespace and only articles from last 48 hours
+      const twoDaysAgo = new Date();
+      twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+      const cutoffDate = twoDaysAgo.toISOString();
+
+      const { data: recentArticles } = await supabase
+        .from("articles")
+        .select("slug, title, publish_date")
+        .in("status", ["published", "featured"])
+        .gte("publish_date", cutoffDate)
+        .order("publish_date", { ascending: false });
+
+      console.log(`Found ${recentArticles?.length || 0} articles from last 48 hours for Google News sitemap`);
+
+      // Generate Google News specific XML
+      const newsEntries = (recentArticles || []).map(article => {
+        const pubDate = article.publish_date 
+          ? new Date(article.publish_date).toISOString()
+          : new Date().toISOString();
+        
+        return `  <url>
+    <loc>${escapeXml(`${BASE_URL}/article/${article.slug}`)}</loc>
+    <news:news>
+      <news:publication>
+        <news:name>OCTG Index</news:name>
+        <news:language>en</news:language>
+      </news:publication>
+      <news:publication_date>${pubDate}</news:publication_date>
+      <news:title>${escapeXml(article.title)}</news:title>
+    </news:news>
+  </url>`;
+      }).join("\n");
+
+      xmlContent = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:news="http://www.google.com/schemas/sitemap-news/0.9">
+${newsEntries}
+</urlset>`;
+      console.log(`Generated Google News sitemap with ${recentArticles?.length || 0} URLs`);
+    }
+
     // Default fallback - return sitemap index
     else {
       const sitemaps = [
         { loc: `${BASE_URL}/sitemap-news.xml`, lastmod: today },
+        { loc: `${BASE_URL}/sitemap-google-news.xml`, lastmod: today },
         { loc: `${BASE_URL}/sitemap-events.xml`, lastmod: today },
         { loc: `${BASE_URL}/sitemap-directory.xml`, lastmod: today },
         { loc: `${BASE_URL}/sitemap-pages.xml`, lastmod: today },
