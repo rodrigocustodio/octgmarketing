@@ -244,7 +244,7 @@ export default function CreateArticle() {
 
       return article;
     },
-    onSuccess: (_, status) => {
+    onSuccess: (article, status) => {
       queryClient.invalidateQueries({ queryKey: ["articles"] });
       toast({
         title: status === "published" ? "Article Published" : "Draft Saved",
@@ -252,6 +252,14 @@ export default function CreateArticle() {
           ? "Your article is now live on the site." 
           : "Your article has been saved as a draft.",
       });
+      
+      // Ping IndexNow for faster Google indexation (non-blocking, only for published)
+      if (status === "published") {
+        supabase.functions.invoke("index-now", {
+          body: { articleSlug: slug }
+        }).catch(err => console.error("[IndexNow] Failed:", err));
+      }
+      
       navigate("/admin/articles");
     },
     onError: (error) => {
