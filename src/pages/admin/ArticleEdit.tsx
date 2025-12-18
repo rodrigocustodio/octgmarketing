@@ -293,6 +293,14 @@ const ArticleEdit = () => {
     onSuccess: (articleId) => {
       toast.success("Article saved");
       queryClient.invalidateQueries({ queryKey: ["admin-articles"] });
+      
+      // Ping IndexNow for faster Google indexation (non-blocking, only for published)
+      if (formData.status === "published") {
+        supabase.functions.invoke("index-now", {
+          body: { articleSlug: formData.slug }
+        }).catch(err => console.error("[IndexNow] Failed:", err));
+      }
+      
       if (isNew) {
         navigate(`/admin/articles/${articleId}`);
       }

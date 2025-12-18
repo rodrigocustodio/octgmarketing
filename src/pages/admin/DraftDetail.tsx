@@ -395,6 +395,17 @@ const DraftDetail = () => {
         description: "The article is now live and the draft has been removed.",
       });
 
+      // Ping IndexNow for faster Google indexation (non-blocking)
+      supabase.functions.invoke("index-now", {
+        body: { articleSlug: draft.slug }
+      }).then(res => {
+        if (res.data?.success) {
+          console.log("[IndexNow] Submitted:", draft.slug);
+        }
+      }).catch(err => {
+        console.error("[IndexNow] Failed:", err);
+      });
+
       navigate("/admin/drafts");
     } catch (error) {
       console.error("Error approving draft:", error);
