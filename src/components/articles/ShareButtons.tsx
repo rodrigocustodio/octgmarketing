@@ -1,6 +1,5 @@
 import { Linkedin, Twitter, Facebook, Mail, Link2, Check } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Separator } from "@/components/ui/separator";
 import { toast } from "@/hooks/use-toast";
 import { useState } from "react";
 
@@ -14,8 +13,6 @@ interface ShareButtonsProps {
 const ShareButtons = ({ url, title, subtitle, slug }: ShareButtonsProps) => {
   const [copied, setCopied] = useState(false);
   
-  // Use direct article URL for social sharing - React Helmet sets OG meta tags
-  // and crawlers can fetch them. The /og/ proxy path was causing issues.
   const shareUrl = slug 
     ? `https://octgindex.com/article/${slug}`
     : url;
@@ -40,7 +37,7 @@ const ShareButtons = ({ url, title, subtitle, slug }: ShareButtonsProps) => {
         description: "Article link copied to clipboard",
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (err) {
+    } catch {
       toast({
         title: "Failed to copy",
         description: "Please copy the URL manually",
@@ -53,68 +50,54 @@ const ShareButtons = ({ url, title, subtitle, slug }: ShareButtonsProps) => {
     window.open(shareUrl, '_blank', 'width=600,height=400,scrollbars=yes');
   };
 
+  const iconButtonClass = "w-7 h-7 rounded-full border border-border/50 bg-transparent hover:bg-secondary flex items-center justify-center transition-colors cursor-pointer";
+
   return (
-    <Card variant="elevated" className="sticky top-24">
-      <CardHeader className="pb-3">
-        <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">
-          Share Article
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2">
-        {/* LinkedIn - Primary emphasis */}
-        <Button
+    <div>
+      <Separator className="mb-3" />
+      <div className="flex items-center gap-2">
+        <span className="text-xs text-muted-foreground">Share:</span>
+        <button
           onClick={() => openShareWindow(shareLinks.linkedin)}
-          className="w-full justify-start gap-3 bg-[#0077b5] hover:bg-[#005885] text-white"
+          className={iconButtonClass}
+          aria-label="Share on LinkedIn"
         >
-          <Linkedin className="h-4 w-4" />
-          <span>Share on LinkedIn</span>
-        </Button>
-
-        {/* Twitter/X */}
-        <Button
-          variant="outline"
+          <Linkedin className="h-3.5 w-3.5 text-foreground" />
+        </button>
+        <button
           onClick={() => openShareWindow(shareLinks.twitter)}
-          className="w-full justify-start gap-3"
+          className={iconButtonClass}
+          aria-label="Share on X"
         >
-          <Twitter className="h-4 w-4" />
-          <span>Share on X</span>
-        </Button>
-
-        {/* Facebook */}
-        <Button
-          variant="outline"
+          <Twitter className="h-3.5 w-3.5 text-foreground" />
+        </button>
+        <button
           onClick={() => openShareWindow(shareLinks.facebook)}
-          className="w-full justify-start gap-3"
+          className={iconButtonClass}
+          aria-label="Share on Facebook"
         >
-          <Facebook className="h-4 w-4" />
-          <span>Share on Facebook</span>
-        </Button>
-
-        {/* Copy Link */}
-        <Button
-          variant="outline"
+          <Facebook className="h-3.5 w-3.5 text-foreground" />
+        </button>
+        <button
           onClick={handleCopyLink}
-          className="w-full justify-start gap-3"
+          className={iconButtonClass}
+          aria-label="Copy link"
         >
           {copied ? (
-            <Check className="h-4 w-4 text-green-500" />
+            <Check className="h-3.5 w-3.5 text-green-500" />
           ) : (
-            <Link2 className="h-4 w-4" />
+            <Link2 className="h-3.5 w-3.5 text-foreground" />
           )}
-          <span>{copied ? "Copied!" : "Copy Link"}</span>
-        </Button>
-
-        {/* Email */}
-        <Button
-          variant="outline"
+        </button>
+        <button
           onClick={() => window.location.href = shareLinks.email}
-          className="w-full justify-start gap-3"
+          className={iconButtonClass}
+          aria-label="Share via email"
         >
-          <Mail className="h-4 w-4" />
-          <span>Share via Email</span>
-        </Button>
-      </CardContent>
-    </Card>
+          <Mail className="h-3.5 w-3.5 text-foreground" />
+        </button>
+      </div>
+    </div>
   );
 };
 
