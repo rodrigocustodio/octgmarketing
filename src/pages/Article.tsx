@@ -356,30 +356,6 @@ const Article = () => {
             </div>
           </section>
 
-          {/* More from Region */}
-          {relatedArticles && relatedArticles.length > 0 && article.region && (
-            <section className="border-t border-border">
-              <div className="container py-12">
-                <h2 className="font-display text-xl sm:text-2xl font-bold tracking-tight mb-8">
-                  More from {article.region.name}
-                </h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {relatedArticles.map((relatedArticle) => (
-                    <ArticleCard 
-                      key={relatedArticle.id}
-                      title={relatedArticle.title}
-                      subtitle={relatedArticle.subtitle || undefined}
-                      imageUrl={relatedArticle.hero_image_url || undefined}
-                      region={relatedArticle.region?.name}
-                      date={formatArticleDate(relatedArticle.publish_date)}
-                      slug={relatedArticle.slug}
-                    />
-                  ))}
-                </div>
-              </div>
-            </section>
-          )}
-
           {/* Newsletter CTA with Background Image */}
           <section className="relative overflow-hidden border-t border-border">
             <div 
