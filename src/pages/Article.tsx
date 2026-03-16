@@ -76,9 +76,9 @@ const Article = () => {
         <main className="flex-1">
           <section className="container pt-8 sm:pt-12">
             <Skeleton className="h-5 w-48 mb-4" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
-              <Skeleton className="aspect-[4/3] w-full rounded-lg" />
-              <div className="space-y-3">
+            <div className="flex flex-col md:flex-row gap-6 lg:gap-8 md:min-h-[320px] md:max-h-[520px]">
+              <Skeleton className="w-full md:w-[45%] lg:w-1/2 rounded-lg min-h-[260px]" />
+              <div className="flex-1 space-y-3">
                 <Skeleton className="h-6 w-20" />
                 <Skeleton className="h-10 w-full" />
                 <Skeleton className="h-6 w-3/4" />
@@ -88,10 +88,16 @@ const Article = () => {
             <Separator className="mt-6" />
           </section>
           <section className="container py-8">
-            <div className="space-y-4">
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-full" />
-              <Skeleton className="h-6 w-3/4" />
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] gap-8">
+              <div className="space-y-4">
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-full" />
+                <Skeleton className="h-6 w-3/4" />
+              </div>
+              <div className="space-y-4">
+                <Skeleton className="h-48 w-full rounded-lg" />
+                <Skeleton className="h-32 w-full rounded-lg" />
+              </div>
             </div>
           </section>
         </main>
@@ -237,21 +243,21 @@ const Article = () => {
               </BreadcrumbList>
             </Breadcrumb>
 
-            {/* Hero Section — 50/50 image left, text right */}
-            <div className={`grid gap-6 lg:gap-8 ${hasHeroImage ? 'grid-cols-1 md:grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
+            {/* Hero Section — flex row, image left, text right */}
+            <div className={`flex gap-6 lg:gap-8 ${hasHeroImage ? 'flex-col md:flex-row md:items-stretch md:min-h-[320px] md:max-h-[520px]' : 'flex-col'}`}>
               {/* Left: Hero Image */}
               {hasHeroImage && (
-                <div className="order-1">
+                <div className="w-full md:w-[45%] lg:w-1/2 overflow-hidden rounded-lg shrink-0">
                   <img
                     src={optimizeImageUrl(article.hero_image_url, { width: 960, quality: 85 })}
                     alt={article.title}
-                    className="w-full h-full max-h-[280px] md:max-h-[320px] lg:max-h-none object-cover rounded-lg"
+                    className="w-full h-full max-h-[260px] md:max-h-none object-cover object-center"
                   />
                 </div>
               )}
 
               {/* Right: Article Header Text */}
-              <div className={`flex flex-col justify-center gap-4 ${hasHeroImage ? 'order-2' : ''}`}>
+              <div className={`flex flex-col justify-center gap-4 ${hasHeroImage ? 'md:w-[55%] lg:w-1/2' : 'w-full'}`}>
                 {article.region && (
                   <div className="flex gap-2">
                     <Badge variant="default" className="bg-accent text-accent-foreground">
@@ -293,47 +299,45 @@ const Article = () => {
             <Separator className="mt-8" />
           </section>
 
-          {/* Body Section — full width, single column */}
+          {/* Body Section with Sidebar */}
           <section className="container py-8 sm:py-12">
-            <div className="max-w-4xl">
-              {primaryCompany && secondHalfHtml ? (
-                <ArticleBody 
-                  slots={[
-                    { type: 'prose', content: firstHalfHtml },
-                    { 
-                      type: 'component', 
-                      component: (
-                        <CompanySpotlightCard
-                          name={primaryCompany.name}
-                          slug={primaryCompany.slug}
-                          headquarters={primaryCompany.headquarters}
-                          website={primaryCompany.website}
-                        />
-                      )
-                    },
-                    { type: 'prose', content: secondHalfHtml },
-                  ]}
-                />
-              ) : (
-                <ArticleBody 
-                  slots={[
-                    { type: 'prose', content: fullBodyHtml }
-                  ]}
-                />
-              )}
+            <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_380px] gap-8">
+              {/* Left: Article Body */}
+              <div>
+                {primaryCompany && secondHalfHtml ? (
+                  <ArticleBody 
+                    slots={[
+                      { type: 'prose', content: firstHalfHtml },
+                      { 
+                        type: 'component', 
+                        component: (
+                          <CompanySpotlightCard
+                            name={primaryCompany.name}
+                            slug={primaryCompany.slug}
+                            headquarters={primaryCompany.headquarters}
+                            website={primaryCompany.website}
+                          />
+                        )
+                      },
+                      { type: 'prose', content: secondHalfHtml },
+                    ]}
+                  />
+                ) : (
+                  <ArticleBody 
+                    slots={[
+                      { type: 'prose', content: fullBodyHtml }
+                    ]}
+                  />
+                )}
 
-              {article.author && (
-                <ArticleAuthorBox author={article.author} />
-              )}
-            </div>
-          </section>
+                {article.author && (
+                  <ArticleAuthorBox author={article.author} />
+                )}
+              </div>
 
-          {/* Post-Body Widgets — two-column grid */}
-          <section className="border-t border-border">
-            <div className="container py-12">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Left: Related Articles */}
-                <div>
+              {/* Right: Sidebar */}
+              <aside className="space-y-6">
+                <div className="sticky top-24 space-y-6">
                   {relatedArticles && relatedArticles.length > 0 && (
                     <RelatedArticles 
                       articles={relatedArticles.map((a) => ({
@@ -345,15 +349,11 @@ const Article = () => {
                       currentRegion={article.region?.name}
                     />
                   )}
-                </div>
-
-                {/* Right: Spotlight, Event, Newsletter */}
-                <div className="space-y-6">
                   <UpcomingEventCard />
                   <OctgMarketingPromo />
                   <NewsletterSignup variant="compact" />
                 </div>
-              </div>
+              </aside>
             </div>
           </section>
 
