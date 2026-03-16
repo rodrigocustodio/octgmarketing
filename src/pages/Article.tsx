@@ -351,7 +351,6 @@ const Article = () => {
                   )}
                   <UpcomingEventCard />
                   <OctgMarketingPromo />
-                  <NewsletterSignup variant="compact" />
                 </div>
               </aside>
             </div>
