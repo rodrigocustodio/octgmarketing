@@ -295,7 +295,7 @@ serve(async (req) => {
           { role: 'system', content: SYSTEM_PROMPT },
           { 
             role: 'user', 
-            content: `Rewrite this as original OCTG Index editorial content (1,200-1,500 words with proper H2/H3 hierarchy and 3 FAQ questions). Do NOT reference or credit any external source:\n\n${source_name ? `Source: ${source_name}\n\n` : ''}Content:\n${content}` 
+            content: `Rewrite this as original OCTG Index editorial content with proper H2/H3 hierarchy. Do NOT reference or credit any external source:\n\n${source_name ? `Source: ${source_name}\n\n` : ''}Content:\n${content}\n\nWrite this article for OCTG Index. The reader is a senior professional in the energy industry. Do not explain what OCTG is. Do not write a conclusion section. Do not use the phrases listed as forbidden. Start with a specific tension or data point, not a general overview.` 
           }
         ],
         temperature: 0.7,
