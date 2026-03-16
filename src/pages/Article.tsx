@@ -243,20 +243,9 @@ const Article = () => {
               </BreadcrumbList>
             </Breadcrumb>
 
-            {/* Hero Section — flex row, image left, text right */}
+            {/* Hero Section — flex row, text left, image right */}
             <div className={`flex gap-6 lg:gap-8 ${hasHeroImage ? 'flex-col md:flex-row md:items-stretch md:min-h-[320px] md:max-h-[520px]' : 'flex-col'}`}>
-              {/* Left: Hero Image */}
-              {hasHeroImage && (
-                <div className="w-full md:w-[45%] lg:w-1/2 overflow-hidden rounded-lg shrink-0">
-                  <img
-                    src={optimizeImageUrl(article.hero_image_url, { width: 960, quality: 85 })}
-                    alt={article.title}
-                    className="w-full h-full max-h-[260px] md:max-h-none object-cover object-center"
-                  />
-                </div>
-              )}
-
-              {/* Right: Article Header Text */}
+              {/* Left: Article Header Text */}
               <div className={`flex flex-col justify-center gap-4 ${hasHeroImage ? 'md:w-[55%] lg:w-1/2' : 'w-full'}`}>
                 {article.region && (
                   <div className="flex gap-2">
@@ -294,6 +283,17 @@ const Article = () => {
                   slug={article.slug}
                 />
               </div>
+
+              {/* Right: Hero Image */}
+              {hasHeroImage && (
+                <div className="w-full md:w-[45%] lg:w-1/2 overflow-hidden rounded-lg shrink-0 order-first md:order-last">
+                  <img
+                    src={optimizeImageUrl(article.hero_image_url, { width: 960, quality: 85 })}
+                    alt={article.title}
+                    className="w-full h-full max-h-[260px] md:max-h-none object-cover object-center"
+                  />
+                </div>
+              )}
             </div>
 
             <Separator className="mt-8" />
