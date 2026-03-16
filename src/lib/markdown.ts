@@ -12,6 +12,8 @@ marked.setOptions({
  */
 export function markdownToHtml(markdown: string): string {
   if (!markdown) return '';
+  // Remove "Last Updated" lines from legacy article content
+  markdown = markdown.replace(/\*?\*?Last Updated:?\*?\*?:?\s*.+/gi, '');
   const rawHtml = marked.parse(markdown) as string;
   // Sanitize HTML to prevent XSS - allow safe tags for article content
   return DOMPurify.sanitize(rawHtml, {
