@@ -41,6 +41,17 @@
   ],
   "rewrites": [
     {
+      "source": "/article/:slug*",
+      "has": [
+        {
+          "type": "header",
+          "key": "user-agent",
+          "value": "(?i).*(facebookexternalhit|facebot|linkedinbot|twitterbot|whatsapp|telegrambot|slackbot|discordbot|pinterest|redditbot|googlebot|baiduspider|yandex|embedly).*"
+        }
+      ],
+      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/article/:slug*"
+    },
+    {
       "source": "/sitemap.xml",
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=index"
     },
