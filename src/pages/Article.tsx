@@ -76,22 +76,22 @@ const Article = () => {
         <main className="flex-1">
           <section className="container pt-8 sm:pt-12">
             <Skeleton className="h-5 w-48 mb-4" />
-            <Skeleton className="h-6 w-20 mb-4" />
-            <Skeleton className="h-10 w-3/4 mb-3" />
-            <Skeleton className="h-6 w-1/2 mb-4" />
-            <Skeleton className="h-4 w-64 mb-6" />
-            <Separator />
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 lg:gap-8">
+              <Skeleton className="aspect-[4/3] w-full rounded-lg" />
+              <div className="space-y-3">
+                <Skeleton className="h-6 w-20" />
+                <Skeleton className="h-10 w-full" />
+                <Skeleton className="h-6 w-3/4" />
+                <Skeleton className="h-4 w-48" />
+              </div>
+            </div>
+            <Separator className="mt-6" />
           </section>
           <section className="container py-8">
-            <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_380px] gap-8 lg:gap-12">
-              <div className="space-y-4">
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-full" />
-                <Skeleton className="h-6 w-3/4" />
-              </div>
-              <div className="space-y-4">
-                <Skeleton className="aspect-[4/3] w-full rounded-lg" />
-              </div>
+            <div className="space-y-4">
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-full" />
+              <Skeleton className="h-6 w-3/4" />
             </div>
           </section>
         </main>
@@ -183,40 +183,6 @@ const Article = () => {
     ]
   };
 
-  /* Sidebar widgets — shared between two-column and single-column layouts */
-  const sidebarWidgets = (
-    <>
-      {relatedArticles && relatedArticles.length > 0 && (
-        <RelatedArticles 
-          articles={relatedArticles.map((a) => ({
-            title: a.title,
-            region: a.region?.name || "",
-            date: formatArticleDate(a.publish_date),
-            slug: a.slug,
-          }))}
-          currentRegion={article.region?.name}
-        />
-      )}
-      <div className="hidden lg:block">
-        <UpcomingEventCard />
-      </div>
-      <div className="hidden lg:block">
-        <OctgMarketingPromo />
-      </div>
-      <div className="hidden lg:block">
-        <NewsletterSignup variant="compact" />
-      </div>
-      <div className="sticky top-24">
-        <ShareButtons 
-          url={canonicalUrl}
-          title={article.title}
-          subtitle={article.subtitle || ""}
-          slug={article.slug}
-        />
-      </div>
-    </>
-  );
-
   return (
     <>
       <SEOHead
@@ -242,9 +208,8 @@ const Article = () => {
         <Header />
 
         <main className="flex-1">
-          {/* Editorial Header */}
+          {/* Breadcrumbs */}
           <section className="container pt-8 sm:pt-12">
-            {/* Breadcrumbs */}
             <Breadcrumb className="mb-6">
               <BreadcrumbList>
                 <BreadcrumbItem>
@@ -272,151 +237,124 @@ const Article = () => {
               </BreadcrumbList>
             </Breadcrumb>
 
-            {/* Badge */}
-            <div className="flex gap-2 mb-4">
-              {article.region && (
-                <Badge variant="default" className="bg-accent text-accent-foreground">
-                  {article.region.name}
-                </Badge>
+            {/* Hero Section — 50/50 image left, text right */}
+            <div className={`grid gap-6 lg:gap-8 ${hasHeroImage ? 'grid-cols-1 md:grid-cols-2 items-stretch' : 'grid-cols-1'}`}>
+              {/* Left: Hero Image */}
+              {hasHeroImage && (
+                <div className="order-1">
+                  <img
+                    src={optimizeImageUrl(article.hero_image_url, { width: 960, quality: 85 })}
+                    alt={article.title}
+                    className="w-full h-full max-h-[280px] md:max-h-[320px] lg:max-h-none object-cover rounded-lg"
+                  />
+                </div>
               )}
+
+              {/* Right: Article Header Text */}
+              <div className={`flex flex-col justify-center gap-4 ${hasHeroImage ? 'order-2' : ''}`}>
+                {article.region && (
+                  <div className="flex gap-2">
+                    <Badge variant="default" className="bg-accent text-accent-foreground">
+                      {article.region.name}
+                    </Badge>
+                  </div>
+                )}
+
+                <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight text-foreground">
+                  {article.title}
+                </h1>
+
+                {article.subtitle && (
+                  <p className="text-lg sm:text-xl text-muted-foreground">
+                    {article.subtitle}
+                  </p>
+                )}
+
+                <div className="flex items-center gap-4 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1">
+                    <Calendar className="h-4 w-4" />
+                    <span>{formatArticleDate(article.publish_date)}</span>
+                  </div>
+                  <div className="flex items-center gap-1">
+                    <Clock className="h-4 w-4" />
+                    <span>{readingTime}</span>
+                  </div>
+                </div>
+
+                <ShareButtons 
+                  url={canonicalUrl}
+                  title={article.title}
+                  subtitle={article.subtitle || ""}
+                  slug={article.slug}
+                />
+              </div>
             </div>
 
-            {/* Title */}
-            <h1 className="font-display text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight mb-4 max-w-3xl text-foreground">
-              {article.title}
-            </h1>
-
-            {/* Subtitle */}
-            {article.subtitle && (
-              <p className="text-lg sm:text-xl text-muted-foreground max-w-2xl mb-6">
-                {article.subtitle}
-              </p>
-            )}
-
-            {/* Meta */}
-            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-              <div className="flex items-center gap-1">
-                <Calendar className="h-4 w-4" />
-                <span>{formatArticleDate(article.publish_date)}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Clock className="h-4 w-4" />
-                <span>{readingTime}</span>
-              </div>
-            </div>
-
-            <Separator className="mt-6" />
+            <Separator className="mt-8" />
           </section>
 
-          {/* Mobile hero image (above body, only on small screens) */}
-          {hasHeroImage && (
-            <div className="container pt-6 md:hidden">
-              <img
-                src={optimizeImageUrl(article.hero_image_url, { width: 800, quality: 85 })}
-                alt={article.title}
-                className="w-full max-h-[240px] object-cover rounded-lg"
-              />
-            </div>
-          )}
-
-          {/* Main Content */}
+          {/* Body Section — full width, single column */}
           <section className="container py-8 sm:py-12">
-            {hasHeroImage ? (
-              /* Two-column layout when hero image exists */
-              <div className="grid grid-cols-1 md:grid-cols-[1fr_320px] lg:grid-cols-[1fr_380px] gap-8 lg:gap-12">
-                {/* Article Body — left column */}
+            <div className="max-w-4xl">
+              {primaryCompany && secondHalfHtml ? (
+                <ArticleBody 
+                  slots={[
+                    { type: 'prose', content: firstHalfHtml },
+                    { 
+                      type: 'component', 
+                      component: (
+                        <CompanySpotlightCard
+                          name={primaryCompany.name}
+                          slug={primaryCompany.slug}
+                          headquarters={primaryCompany.headquarters}
+                          website={primaryCompany.website}
+                        />
+                      )
+                    },
+                    { type: 'prose', content: secondHalfHtml },
+                  ]}
+                />
+              ) : (
+                <ArticleBody 
+                  slots={[
+                    { type: 'prose', content: fullBodyHtml }
+                  ]}
+                />
+              )}
+
+              {article.author && (
+                <ArticleAuthorBox author={article.author} />
+              )}
+            </div>
+          </section>
+
+          {/* Post-Body Widgets — two-column grid */}
+          <section className="border-t border-border">
+            <div className="container py-12">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                {/* Left: Related Articles */}
                 <div>
-                  {primaryCompany && secondHalfHtml ? (
-                    <ArticleBody 
-                      slots={[
-                        { type: 'prose', content: firstHalfHtml },
-                        { 
-                          type: 'component', 
-                          component: (
-                            <CompanySpotlightCard
-                              name={primaryCompany.name}
-                              slug={primaryCompany.slug}
-                              headquarters={primaryCompany.headquarters}
-                              website={primaryCompany.website}
-                            />
-                          )
-                        },
-                        { type: 'prose', content: secondHalfHtml },
-                      ]}
+                  {relatedArticles && relatedArticles.length > 0 && (
+                    <RelatedArticles 
+                      articles={relatedArticles.map((a) => ({
+                        title: a.title,
+                        region: a.region?.name || "",
+                        date: formatArticleDate(a.publish_date),
+                        slug: a.slug,
+                      }))}
+                      currentRegion={article.region?.name}
                     />
-                  ) : (
-                    <ArticleBody 
-                      slots={[
-                        { type: 'prose', content: fullBodyHtml }
-                      ]}
-                    />
-                  )}
-
-                  {article.author && (
-                    <ArticleAuthorBox author={article.author} />
                   )}
                 </div>
 
-                {/* Sidebar — right column */}
-                <aside className="space-y-6">
-                  {/* Desktop/tablet hero image */}
-                  <div className="hidden md:block">
-                    <img
-                      src={optimizeImageUrl(article.hero_image_url, { width: 760, quality: 85 })}
-                      alt={article.title}
-                      width={760}
-                      height={570}
-                      className="w-full rounded-lg object-cover aspect-[4/3]"
-                    />
-                    <p className="text-xs text-muted-foreground mt-1.5">
-                      {article.title}
-                    </p>
-                  </div>
-
-                  {sidebarWidgets}
-                </aside>
-              </div>
-            ) : (
-              /* Single-column layout when no hero image */
-              <div>
-                <div className="max-w-3xl">
-                  {primaryCompany && secondHalfHtml ? (
-                    <ArticleBody 
-                      slots={[
-                        { type: 'prose', content: firstHalfHtml },
-                        { 
-                          type: 'component', 
-                          component: (
-                            <CompanySpotlightCard
-                              name={primaryCompany.name}
-                              slug={primaryCompany.slug}
-                              headquarters={primaryCompany.headquarters}
-                              website={primaryCompany.website}
-                            />
-                          )
-                        },
-                        { type: 'prose', content: secondHalfHtml },
-                      ]}
-                    />
-                  ) : (
-                    <ArticleBody 
-                      slots={[
-                        { type: 'prose', content: fullBodyHtml }
-                      ]}
-                    />
-                  )}
-
-                  {article.author && (
-                    <ArticleAuthorBox author={article.author} />
-                  )}
-                </div>
-
-                {/* Sidebar widgets stacked below content */}
-                <div className="mt-12 max-w-md space-y-6">
-                  {sidebarWidgets}
+                {/* Right: Spotlight, Event, Newsletter */}
+                <div className="space-y-6">
+                  <UpcomingEventCard />
+                  <OctgMarketingPromo />
+                  <NewsletterSignup variant="compact" />
                 </div>
               </div>
-            )}
+            </div>
           </section>
 
           {/* More from Region */}
