@@ -91,6 +91,7 @@ function generateOgHtml(article: {
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@OCTGMarketing">
   <meta name="twitter:url" content="${canonicalUrl}">
   <meta name="twitter:title" content="${article.title}">
   <meta name="twitter:description" content="${description}">
@@ -98,8 +99,14 @@ function generateOgHtml(article: {
   
   <!-- LinkedIn specific -->
   <meta property="og:image:alt" content="${article.title}${regionText}">
-  <meta name="author" content="${siteName}">
+  <meta name="author" content="${article.author_name || siteName}">
   
+  <!-- Article metadata -->
+  ${article.publish_date ? `<meta property="article:published_time" content="${article.publish_date}">` : ''}
+  ${article.author_name ? `<meta property="article:author" content="${article.author_name}">` : ''}
+  
+  <!-- TODO: Add fb:app_id once Facebook App is created -->
+  <!-- <meta property="fb:app_id" content="YOUR_FACEBOOK_APP_ID" /> -->
   <!-- Canonical URL -->
   <link rel="canonical" href="${canonicalUrl}">
   
