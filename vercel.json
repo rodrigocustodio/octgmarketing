@@ -64,10 +64,6 @@
       "source": "/sitemap-pages.xml",
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=pages"
     },
-    {
-      "source": "/og/:path*",
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/:path*"
-    }
   ],
   "headers": [
     {
