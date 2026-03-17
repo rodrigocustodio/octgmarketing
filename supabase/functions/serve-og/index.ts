@@ -39,6 +39,8 @@ function generateOgHtml(article: {
   subtitle: string | null;
   hero_image_url: string | null;
   slug: string;
+  publish_date: string | null;
+  author_name: string | null;
   region?: { name: string } | null;
 }, isCrawlerRequest: boolean): string {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
@@ -89,6 +91,7 @@ function generateOgHtml(article: {
   
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:site" content="@OCTGMarketing">
   <meta name="twitter:url" content="${canonicalUrl}">
   <meta name="twitter:title" content="${article.title}">
   <meta name="twitter:description" content="${description}">
@@ -96,8 +99,14 @@ function generateOgHtml(article: {
   
   <!-- LinkedIn specific -->
   <meta property="og:image:alt" content="${article.title}${regionText}">
-  <meta name="author" content="${siteName}">
+  <meta name="author" content="${article.author_name || siteName}">
   
+  <!-- Article metadata -->
+  ${article.publish_date ? `<meta property="article:published_time" content="${article.publish_date}">` : ''}
+  ${article.author_name ? `<meta property="article:author" content="${article.author_name}">` : ''}
+  
+  <!-- TODO: Add fb:app_id once Facebook App is created -->
+  <!-- <meta property="fb:app_id" content="YOUR_FACEBOOK_APP_ID" /> -->
   <!-- Canonical URL -->
   <link rel="canonical" href="${canonicalUrl}">
   
@@ -183,19 +192,24 @@ serve(async (req: Request): Promise<Response> => {
         subtitle,
         hero_image_url,
         slug,
+        publish_date,
+        authors(name),
         regions(name)
       `)
       .eq("slug", slug)
       .in("status", ["published", "featured"])
       .maybeSingle();
 
-    // Transform region data (regions comes as array from join, take first)
+    // Transform region and author data
     const regionsData = article?.regions as unknown as { name: string }[] | null;
+    const authorsData = article?.authors as unknown as { name: string } | null;
     const articleWithRegion = article ? {
       title: article.title,
       subtitle: article.subtitle,
       hero_image_url: article.hero_image_url,
       slug: article.slug,
+      publish_date: article.publish_date,
+      author_name: authorsData?.name || null,
       region: regionsData && regionsData.length > 0 ? regionsData[0] : null
     } : null;
 
