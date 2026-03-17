@@ -270,9 +270,9 @@ export default function CEODetail() {
                 {/* Quick Info Card */}
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                    <h2 className="text-sm font-medium text-muted-foreground">
                       Company Info
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-start gap-3">
@@ -367,11 +367,11 @@ export default function CEODetail() {
                 {/* FAQ Section for AI Search */}
                 <Card className="mt-8">
                   <CardHeader>
-                    <CardTitle>Frequently Asked Questions</CardTitle>
+                    <h2 className="font-display text-xl font-bold leading-none tracking-tight">Frequently Asked Questions</h2>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div>
-                      <h3 className="font-medium mb-2">Who is the CEO of {executive.company_name}?</h3>
+                      <h3 className="font-medium mb-2">Who is the {executive.title} of {executive.company_name}?</h3>
                       <p className="text-muted-foreground text-sm">
                         {executive.name} is the {executive.title} of {executive.company_name}.
                       </p>

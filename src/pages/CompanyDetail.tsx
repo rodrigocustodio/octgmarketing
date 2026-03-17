@@ -301,12 +301,19 @@ export default function CompanyDetail() {
                   {company.name}
                 </h1>
                 <div className="flex flex-wrap items-center gap-3 mb-4">
-                  <Link to={`/directory/category/${company.industry_role}`}>
-                    <Badge className="gap-1 hover:bg-primary/80">
-                      {getCategoryIcon(company.industry_role || "")}
+                  {company.industry_role ? (
+                    <Link to={`/directory/category/${company.industry_role}`}>
+                      <Badge className="gap-1 hover:bg-primary/80">
+                        {getCategoryIcon(company.industry_role)}
+                        {categoryLabel}
+                      </Badge>
+                    </Link>
+                  ) : (
+                    <Badge className="gap-1">
+                      {getCategoryIcon("")}
                       {categoryLabel}
                     </Badge>
-                  </Link>
+                  )}
                   {company.country && (
                     <Badge variant="outline" className="gap-1">
                       <MapPin className="h-3 w-3" />

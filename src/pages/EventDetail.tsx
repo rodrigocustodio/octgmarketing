@@ -196,10 +196,10 @@ const EventDetail = () => {
                 {videoEmbed && (
                   <Card>
                     <CardHeader>
-                <CardTitle className="flex items-center gap-2">
+                <h2 className="font-display text-xl font-bold leading-none tracking-tight flex items-center gap-2">
                   <Play className="h-5 w-5" />
                   About the Event and History
-                </CardTitle>
+                </h2>
                     </CardHeader>
                     <CardContent>
                       {/* Use Bunny's recommended responsive CSS pattern */}
@@ -242,7 +242,7 @@ const EventDetail = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>About This Event</CardTitle>
+                    <h2 className="font-display text-xl font-bold leading-none tracking-tight">About This Event</h2>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
@@ -269,10 +269,10 @@ const EventDetail = () => {
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <h2 className="font-display text-xl font-bold leading-none tracking-tight flex items-center gap-2">
                       <Calendar className="h-5 w-5" />
                       Event Details
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
@@ -317,10 +317,10 @@ const EventDetail = () => {
                 {event.website && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                        <h2 className="font-display text-xl font-bold leading-none tracking-tight flex items-center gap-2">
                         <Share2 className="h-5 w-5" />
                         Quick Links
-                      </CardTitle>
+                      </h2>
                     </CardHeader>
                     <CardContent>
                       <Button variant="outline" className="w-full" asChild>
@@ -343,10 +343,10 @@ const EventDetail = () => {
                 {event.gallery_images && event.gallery_images.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                      <h2 className="font-display text-xl font-bold leading-none tracking-tight flex items-center gap-2">
                         <Images className="h-5 w-5" />
                         Highlights & Moments
-                      </CardTitle>
+                      </h2>
                     </CardHeader>
                     <CardContent>
                       <EventGalleryLightbox images={event.gallery_images} />
