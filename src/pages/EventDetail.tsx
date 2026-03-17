@@ -269,10 +269,10 @@ const EventDetail = () => {
               <div className="space-y-6">
                 <Card>
                   <CardHeader>
-                    <CardTitle className="flex items-center gap-2">
+                    <h2 className="font-display text-xl font-bold leading-none tracking-tight flex items-center gap-2">
                       <Calendar className="h-5 w-5" />
                       Event Details
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
