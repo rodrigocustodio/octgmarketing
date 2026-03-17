@@ -7,6 +7,7 @@ import { Key, Zap, Clock } from "lucide-react";
 const Settings = () => {
   return (
     <AdminLayout>
+      <Helmet><title>Settings | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         {/* Header */}
         <div>

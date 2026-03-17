@@ -705,6 +705,7 @@ const Companies = () => {
 
   return (
     <AdminLayout>
+      <Helmet><title>Companies | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
