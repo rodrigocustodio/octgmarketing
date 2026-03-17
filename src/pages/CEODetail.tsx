@@ -270,9 +270,9 @@ export default function CEODetail() {
                 {/* Quick Info Card */}
                 <Card>
                   <CardHeader className="pb-3">
-                    <CardTitle className="text-sm font-medium text-muted-foreground">
+                    <h2 className="text-sm font-medium text-muted-foreground">
                       Company Info
-                    </CardTitle>
+                    </h2>
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div className="flex items-start gap-3">
