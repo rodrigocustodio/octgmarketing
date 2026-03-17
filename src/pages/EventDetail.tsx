@@ -242,7 +242,7 @@ const EventDetail = () => {
 
                 <Card>
                   <CardHeader>
-                    <CardTitle>About This Event</CardTitle>
+                    <h2 className="font-display text-xl font-bold leading-none tracking-tight">About This Event</h2>
                   </CardHeader>
                   <CardContent>
                     <p className="text-muted-foreground leading-relaxed whitespace-pre-wrap">
