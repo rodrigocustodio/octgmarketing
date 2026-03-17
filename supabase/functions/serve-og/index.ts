@@ -39,6 +39,8 @@ function generateOgHtml(article: {
   subtitle: string | null;
   hero_image_url: string | null;
   slug: string;
+  publish_date: string | null;
+  author_name: string | null;
   region?: { name: string } | null;
 }, isCrawlerRequest: boolean): string {
   const siteUrl = Deno.env.get("SITE_URL") || "https://octgindex.com";
