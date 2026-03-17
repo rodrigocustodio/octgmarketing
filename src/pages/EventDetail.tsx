@@ -317,10 +317,10 @@ const EventDetail = () => {
                 {event.website && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                        <h2 className="font-display text-xl font-bold leading-none tracking-tight flex items-center gap-2">
                         <Share2 className="h-5 w-5" />
                         Quick Links
-                      </CardTitle>
+                      </h2>
                     </CardHeader>
                     <CardContent>
                       <Button variant="outline" className="w-full" asChild>
