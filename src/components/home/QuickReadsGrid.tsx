@@ -40,7 +40,7 @@ export function QuickReadsGrid({ articles }: QuickReadsGridProps) {
           </div>
           <h2 className="font-display text-2xl font-bold tracking-tight">Quick Reads</h2>
         </div>
-        <Link to="/articles">
+        <Link to="/news">
           <Button variant="ghost" size="sm">All Articles <ArrowRight className="ml-1 h-4 w-4" /></Button>
         </Link>
       </div>

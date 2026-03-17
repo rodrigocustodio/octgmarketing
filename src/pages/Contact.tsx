@@ -253,7 +253,10 @@ export default function Contact() {
           {/* Content */}
           <div className="relative z-10 container mx-auto px-4 sm:px-6 lg:px-8">
             <div className="max-w-xl">
-              <h2 className="text-3xl font-bold text-foreground mb-6">
+              <h1 className="text-3xl font-bold text-foreground mb-6">
+                Contact Us
+              </h1>
+              <h2 className="text-xl font-semibold text-foreground mb-4">
                 Why OCTG Index Exists
               </h2>
               <p className="text-muted-foreground text-lg leading-relaxed mb-4">

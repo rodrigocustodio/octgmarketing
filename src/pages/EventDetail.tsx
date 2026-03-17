@@ -343,10 +343,10 @@ const EventDetail = () => {
                 {event.gallery_images && event.gallery_images.length > 0 && (
                   <Card>
                     <CardHeader>
-                      <CardTitle className="flex items-center gap-2">
+                      <h2 className="font-display text-xl font-bold leading-none tracking-tight flex items-center gap-2">
                         <Images className="h-5 w-5" />
                         Highlights & Moments
-                      </CardTitle>
+                      </h2>
                     </CardHeader>
                     <CardContent>
                       <EventGalleryLightbox images={event.gallery_images} />

@@ -371,7 +371,7 @@ export default function CEODetail() {
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div>
-                      <h3 className="font-medium mb-2">Who is the CEO of {executive.company_name}?</h3>
+                      <h3 className="font-medium mb-2">Who is the {executive.title} of {executive.company_name}?</h3>
                       <p className="text-muted-foreground text-sm">
                         {executive.name} is the {executive.title} of {executive.company_name}.
                       </p>
