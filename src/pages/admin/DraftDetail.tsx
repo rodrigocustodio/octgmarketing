@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -475,6 +476,7 @@ const DraftDetail = () => {
 
   return (
     <AdminLayout>
+      <Helmet><title>Draft Detail | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center gap-4">

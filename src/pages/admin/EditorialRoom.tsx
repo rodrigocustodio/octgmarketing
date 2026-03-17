@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useEditorialStats } from "@/hooks/useEditorialStats";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
@@ -166,6 +167,7 @@ export default function EditorialRoom() {
 
   return (
     <AdminLayout>
+      <Helmet><title>Editorial Room | OCTG Admin</title></Helmet>
       <div className="space-y-6 max-w-full overflow-hidden">
         {/* Header */}
         <div>

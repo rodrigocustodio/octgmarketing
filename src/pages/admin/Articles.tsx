@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -247,6 +248,7 @@ const Articles = () => {
 
   return (
     <AdminLayout>
+      <Helmet><title>Articles | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>

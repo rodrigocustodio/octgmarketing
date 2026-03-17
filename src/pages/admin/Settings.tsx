@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,6 +7,7 @@ import { Key, Zap, Clock } from "lucide-react";
 const Settings = () => {
   return (
     <AdminLayout>
+      <Helmet><title>Settings | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         {/* Header */}
         <div>

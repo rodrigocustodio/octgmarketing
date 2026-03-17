@@ -1,4 +1,5 @@
 import { useState, useRef } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { ArrowLeft, Save, Upload, X, Loader2, Package, Images } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -160,6 +161,7 @@ export default function ProductEdit() {
 
   return (
     <AdminLayout>
+      <Helmet><title>Edit Product | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

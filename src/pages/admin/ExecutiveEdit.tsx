@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useParams, useNavigate } from "react-router-dom";
 import AdminLayout from "@/components/admin/AdminLayout";
 import {
@@ -254,6 +255,7 @@ export default function ExecutiveEdit() {
 
   return (
     <AdminLayout>
+      <Helmet><title>Edit Executive | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">

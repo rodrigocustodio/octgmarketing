@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Helmet } from "react-helmet-async";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
@@ -288,6 +289,7 @@ export default function CreateArticle() {
 
   return (
     <AdminLayout>
+      <Helmet><title>Create Article | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold">Create Article</h1>

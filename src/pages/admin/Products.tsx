@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Helmet } from "react-helmet-async";
 import { Link } from "react-router-dom";
 import { Package, Search, Edit, Image } from "lucide-react";
 import AdminLayout from "@/components/admin/AdminLayout";
@@ -37,6 +38,7 @@ export default function Products() {
 
   return (
     <AdminLayout>
+      <Helmet><title>Products | OCTG Admin</title></Helmet>
       <div className="space-y-6">
         <div className="flex items-center justify-between">
           <div>
