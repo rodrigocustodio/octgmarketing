@@ -367,7 +367,7 @@ export default function CEODetail() {
                 {/* FAQ Section for AI Search */}
                 <Card className="mt-8">
                   <CardHeader>
-                    <CardTitle>Frequently Asked Questions</CardTitle>
+                    <h2 className="font-display text-xl font-bold leading-none tracking-tight">Frequently Asked Questions</h2>
                   </CardHeader>
                   <CardContent className="space-y-6">
                     <div>
