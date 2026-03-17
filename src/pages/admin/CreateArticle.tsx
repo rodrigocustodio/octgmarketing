@@ -135,10 +135,12 @@ export default function CreateArticle() {
   const { data: events = [] } = useQuery({
     queryKey: ["events-for-select"],
     queryFn: async () => {
+      const today = new Date().toISOString().split("T")[0];
       const { data, error } = await supabase
         .from("events")
         .select("id, name, start_date")
-        .order("start_date", { ascending: false });
+        .gte("start_date", today)
+        .order("start_date", { ascending: true });
       if (error) throw error;
       return data;
     },

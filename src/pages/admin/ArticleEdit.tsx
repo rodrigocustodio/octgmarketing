@@ -176,10 +176,12 @@ const ArticleEdit = () => {
   const { data: events } = useQuery({
     queryKey: ["events-for-select"],
     queryFn: async () => {
+      const today = new Date().toISOString().split("T")[0];
       const { data, error } = await supabase
         .from("events")
         .select("id, name, start_date")
-        .order("start_date", { ascending: false });
+        .or(`start_date.gte.${today}${formData.event_id ? `,id.eq.${formData.event_id}` : ''}`)
+        .order("start_date", { ascending: true });
       if (error) throw error;
       return data;
     },
