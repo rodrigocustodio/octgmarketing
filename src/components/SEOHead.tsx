@@ -1,7 +1,7 @@
 import { Helmet } from "react-helmet-async";
 import { formatSEOTitle, formatSEODescription } from "@/lib/seo-utils";
 
-const DEFAULT_OG_IMAGE = "https://octgindex.com/og-default.png";
+const DEFAULT_OG_IMAGE = "https://tukia-cdn.b-cdn.net/octgindex/og-default.jpg";
 const SITE_NAME = "OCTG Index";
 const TWITTER_HANDLE = "@OCTGMarketing";
 const SITE_URL = "https://octgindex.com";
@@ -27,7 +27,6 @@ export function SEOHead({
   section,
   noindex = false,
 }: SEOHeadProps) {
-  // Format title and description to meet SEO requirements
   const formattedTitle = formatSEOTitle(title, SITE_NAME);
   const formattedDescription = formatSEODescription(description);
   
@@ -53,8 +52,12 @@ export function SEOHead({
       <meta property="og:title" content={formattedTitle} />
       <meta property="og:description" content={formattedDescription} />
       <meta property="og:image" content={ogImage} />
+      <meta property="og:image:url" content={ogImage} />
+      <meta property="og:image:secure_url" content={ogImage} />
+      <meta property="og:image:type" content="image/jpeg" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content={formattedTitle} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:type" content={type} />
       <meta property="og:site_name" content={SITE_NAME} />
