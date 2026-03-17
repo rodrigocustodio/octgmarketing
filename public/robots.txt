@@ -1,8 +1,14 @@
-Sitemap: https://octgindex.com/sitemap-index.xml
-Sitemap: https://octgindex.com/sitemap-news.xml
-Sitemap: https://octgindex.com/sitemap-events.xml
-Sitemap: https://octgindex.com/sitemap-directory.xml
-Sitemap: https://octgindex.com/sitemap-pages.xml
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
+
+User-agent: LinkedInBot
+Allow: /
 
 User-agent: Googlebot
 Allow: /
@@ -10,11 +16,11 @@ Allow: /
 User-agent: Bingbot
 Allow: /
 
-User-agent: Twitterbot
-Allow: /
-
-User-agent: facebookexternalhit
-Allow: /
-
 User-agent: *
 Allow: /
+
+Sitemap: https://octgindex.com/sitemap-index.xml
+Sitemap: https://octgindex.com/sitemap-news.xml
+Sitemap: https://octgindex.com/sitemap-events.xml
+Sitemap: https://octgindex.com/sitemap-directory.xml
+Sitemap: https://octgindex.com/sitemap-pages.xml
