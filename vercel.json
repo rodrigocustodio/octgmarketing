@@ -63,7 +63,7 @@
     {
       "source": "/sitemap-pages.xml",
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=pages"
-    },
+    }
   ],
   "headers": [
     {
