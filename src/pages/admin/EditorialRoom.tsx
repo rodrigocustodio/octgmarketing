@@ -1,3 +1,4 @@
+import { Helmet } from "react-helmet-async";
 import AdminLayout from "@/components/admin/AdminLayout";
 import { useEditorialStats } from "@/hooks/useEditorialStats";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
