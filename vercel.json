@@ -41,17 +41,6 @@
   ],
   "rewrites": [
     {
-      "source": "/article/:slug*",
-      "has": [
-        {
-          "type": "header",
-          "key": "user-agent",
-          "value": "(?i).*(facebookexternalhit|facebot|linkedinbot|twitterbot|whatsapp|telegrambot|slackbot|discordbot|pinterest|redditbot|googlebot|baiduspider|yandex|embedly|bingbot|applebot|rogerbot|showyoubot|outbrain|vkshare|ia_archiver|seznambot).*"
-        }
-      ],
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/article/:slug*"
-    },
-    {
       "source": "/sitemap.xml",
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=index"
     },
@@ -74,10 +63,6 @@
     {
       "source": "/sitemap-pages.xml",
       "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/generate-sitemap?type=pages"
-    },
-    {
-      "source": "/og/:path*",
-      "destination": "https://mlhngmnuxoetnlesnxgu.supabase.co/functions/v1/serve-og/:path*"
     }
   ],
   "headers": [
@@ -86,13 +71,6 @@
       "headers": [
         { "key": "Cache-Control", "value": "public, max-age=3600" },
         { "key": "Content-Type", "value": "application/xml; charset=utf-8" }
-      ]
-    },
-    {
-      "source": "/og/(.*)",
-      "headers": [
-        { "key": "Cache-Control", "value": "public, max-age=3600, s-maxage=3600" },
-        { "key": "X-Robots-Tag", "value": "noindex, nofollow" }
       ]
     },
     {
