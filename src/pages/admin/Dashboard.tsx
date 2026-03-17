@@ -102,6 +102,7 @@ const Dashboard = () => {
 
   return (
     <AdminLayout>
+      <Helmet><title>Dashboard | OCTG Admin</title></Helmet>
       <div className="space-y-8">
         {/* Page Header */}
         <div>

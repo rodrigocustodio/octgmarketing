@@ -22,6 +22,7 @@ import {
   BreadcrumbSeparator 
 } from "@/components/ui/breadcrumb";
 import { Calendar, Clock } from "lucide-react";
+import { Helmet } from "react-helmet-async";
 import { useArticleBySlug, useRelatedArticles } from "@/hooks/useArticles";
 import { markdownToHtml, splitMarkdownAtMiddle } from "@/lib/markdown";
 import { format } from "date-fns";

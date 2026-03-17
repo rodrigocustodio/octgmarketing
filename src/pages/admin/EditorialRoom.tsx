@@ -167,6 +167,7 @@ export default function EditorialRoom() {
 
   return (
     <AdminLayout>
+      <Helmet><title>Editorial Room | OCTG Admin</title></Helmet>
       <div className="space-y-6 max-w-full overflow-hidden">
         {/* Header */}
         <div>
