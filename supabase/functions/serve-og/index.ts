@@ -192,19 +192,24 @@ serve(async (req: Request): Promise<Response> => {
         subtitle,
         hero_image_url,
         slug,
+        publish_date,
+        authors(name),
         regions(name)
       `)
       .eq("slug", slug)
       .in("status", ["published", "featured"])
       .maybeSingle();
 
-    // Transform region data (regions comes as array from join, take first)
+    // Transform region and author data
     const regionsData = article?.regions as unknown as { name: string }[] | null;
+    const authorsData = article?.authors as unknown as { name: string } | null;
     const articleWithRegion = article ? {
       title: article.title,
       subtitle: article.subtitle,
       hero_image_url: article.hero_image_url,
       slug: article.slug,
+      publish_date: article.publish_date,
+      author_name: authorsData?.name || null,
       region: regionsData && regionsData.length > 0 ? regionsData[0] : null
     } : null;
 
