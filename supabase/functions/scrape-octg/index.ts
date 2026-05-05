@@ -400,22 +400,35 @@ serve(async (req) => {
 
     if (!isCronCall) {
       const token = authHeader?.replace('Bearer ', '');
-      if (token) {
-        const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
-        if (authError || !user) {
-          console.error('Auth error:', authError);
-          return new Response(JSON.stringify({ error: 'Unauthorized' }), {
-            status: 401,
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-          });
-        }
-        console.log(`Authenticated user: ${user.email}`);
-      } else {
+      if (!token) {
         return new Response(JSON.stringify({ error: 'No authorization provided' }), {
           status: 401,
           headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         });
       }
+      const { data: { user }, error: authError } = await supabaseAuth.auth.getUser(token);
+      if (authError || !user) {
+        console.error('Auth error:', authError);
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), {
+          status: 401,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      // Role check - only admin/editor may trigger paid scrape & inserts
+      const adminClient = createClient(supabaseUrl, supabaseServiceKey, { auth: { persistSession: false } });
+      const { data: roles } = await adminClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id);
+      const list = (roles ?? []).map((r: any) => r.role);
+      if (!list.includes('admin') && !list.includes('editor')) {
+        console.warn(`Forbidden scrape attempt by ${user.email}`);
+        return new Response(JSON.stringify({ error: 'Forbidden' }), {
+          status: 403,
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        });
+      }
+      console.log(`Authenticated user: ${user.email}`);
     } else {
       console.log('Cron job authenticated');
     }
