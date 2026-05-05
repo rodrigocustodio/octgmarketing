@@ -58,6 +58,7 @@ import AdminEvents from "./pages/admin/Events";
 import EventEdit from "./pages/admin/EventEdit";
 import Settings from "./pages/admin/Settings";
 import Automations from "./pages/admin/Automations";
+import CEOProposals from "./pages/admin/CEOProposals";
 
 const queryClient = new QueryClient();
 
