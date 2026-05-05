@@ -16,7 +16,8 @@ import {
   CalendarDays,
   Package,
   BarChart3,
-  ClipboardCheck
+  ClipboardCheck,
+  Zap
 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
@@ -86,6 +87,11 @@ const navItems = [
     title: "Events",
     href: "/admin/events",
     icon: CalendarDays,
+  },
+  {
+    title: "Automations",
+    href: "/admin/automations",
+    icon: Zap,
   },
   {
     title: "Settings",

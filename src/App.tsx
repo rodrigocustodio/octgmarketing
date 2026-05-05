@@ -57,6 +57,7 @@ import ProductEdit from "./pages/admin/ProductEdit";
 import AdminEvents from "./pages/admin/Events";
 import EventEdit from "./pages/admin/EventEdit";
 import Settings from "./pages/admin/Settings";
+import Automations from "./pages/admin/Automations";
 
 const queryClient = new QueryClient();
 
@@ -119,6 +120,7 @@ const App = () => (
                 <Route path="/admin/events" element={<ProtectedRoute><AdminEvents /></ProtectedRoute>} />
                 <Route path="/admin/events/:id" element={<ProtectedRoute><EventEdit /></ProtectedRoute>} />
                 <Route path="/admin/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                <Route path="/admin/automations" element={<ProtectedRoute requireAdmin><Automations /></ProtectedRoute>} />
                 
                 {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
                 <Route path="*" element={<NotFound />} />
