@@ -9,7 +9,7 @@ import { RefreshCw, TrendingUp, TrendingDown, Minus, Clock, AlertCircle, CheckCi
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 
-const REFRESH_INTERVAL_SECONDS = 25 * 60; // 25 minutes
+const REFRESH_INTERVAL_SECONDS = 15 * 60; // 15 minutes (matches server cron)
 const STORAGE_KEY = "priceTickerNextRefresh";
 
 // Helper functions for localStorage persistence
@@ -125,13 +125,15 @@ export function PriceTickerManager() {
     }
   }, [refetch, toast]);
 
-  // Countdown timer with auto-refresh
+  // Countdown timer — purely informational. The server cron job
+  // (auto-refresh-steel-prices-15min) is the source of truth and runs
+  // every 15 minutes regardless of whether this tab is open.
   useEffect(() => {
     const interval = setInterval(() => {
       setSecondsRemaining(prev => {
         if (prev <= 1) {
-          // Auto-trigger refresh when countdown ends
-          handleRefreshPrices();
+          // Server just refreshed — pull the latest prices into the UI
+          refetch();
           const newTimestamp = Date.now() + REFRESH_INTERVAL_SECONDS * 1000;
           setStoredNextRefresh(newTimestamp);
           return REFRESH_INTERVAL_SECONDS;
@@ -139,9 +141,9 @@ export function PriceTickerManager() {
         return prev - 1;
       });
     }, 1000);
-    
+
     return () => clearInterval(interval);
-  }, [handleRefreshPrices]);
+  }, [refetch]);
 
   // Format price with currency
   const formatPrice = (price: number, currency: string) => {
@@ -178,7 +180,7 @@ export function PriceTickerManager() {
               Price Ticker Management
             </CardTitle>
             <CardDescription>
-              Manage and refresh steel & OCTG price data
+              Prices refresh automatically every 15 minutes on the server — no clicks required.
             </CardDescription>
           </div>
           <div className="flex items-center gap-3">
@@ -186,7 +188,7 @@ export function PriceTickerManager() {
             <div className="flex items-center gap-2 text-sm font-mono bg-muted/80 px-3 py-1.5 rounded-md border">
               <Timer className="h-4 w-4 text-accent" />
               <span className="tabular-nums font-semibold">{formatCountdown(secondsRemaining)}</span>
-              <span className="text-xs text-muted-foreground hidden sm:inline">until refresh</span>
+              <span className="text-xs text-muted-foreground hidden sm:inline">next auto-refresh</span>
             </div>
             <Button 
               onClick={handleRefreshPrices} 
