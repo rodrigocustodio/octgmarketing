@@ -115,6 +115,7 @@ export type Database = {
           publish_date: string | null
           region_id: string | null
           slug: string
+          sources: Json | null
           status: Database["public"]["Enums"]["article_status"]
           subtitle: string | null
           title: string
@@ -130,6 +131,7 @@ export type Database = {
           publish_date?: string | null
           region_id?: string | null
           slug: string
+          sources?: Json | null
           status?: Database["public"]["Enums"]["article_status"]
           subtitle?: string | null
           title: string
@@ -145,6 +147,7 @@ export type Database = {
           publish_date?: string | null
           region_id?: string | null
           slug?: string
+          sources?: Json | null
           status?: Database["public"]["Enums"]["article_status"]
           subtitle?: string | null
           title?: string
@@ -270,6 +273,42 @@ export type Database = {
           specializations?: string[] | null
           title?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      automation_runs: {
+        Row: {
+          error: string | null
+          finished_at: string | null
+          id: string
+          items_processed: number | null
+          items_succeeded: number | null
+          job_name: string
+          payload: Json | null
+          started_at: string
+          status: string
+        }
+        Insert: {
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          items_processed?: number | null
+          items_succeeded?: number | null
+          job_name: string
+          payload?: Json | null
+          started_at?: string
+          status: string
+        }
+        Update: {
+          error?: string | null
+          finished_at?: string | null
+          id?: string
+          items_processed?: number | null
+          items_succeeded?: number | null
+          job_name?: string
+          payload?: Json | null
+          started_at?: string
+          status?: string
         }
         Relationships: []
       }
@@ -653,14 +692,19 @@ export type Database = {
           company_name: string
           created_at: string
           id: string
+          is_active: boolean | null
+          last_verified_at: string | null
           linkedin_url: string | null
           name: string
+          photo_phash: string | null
           photo_url: string | null
+          priority_tier: number | null
           region: string
           slug: string
           stock_symbol: string | null
           title: string
           updated_at: string
+          verification_status: string | null
         }
         Insert: {
           bio?: string | null
@@ -668,14 +712,19 @@ export type Database = {
           company_name: string
           created_at?: string
           id?: string
+          is_active?: boolean | null
+          last_verified_at?: string | null
           linkedin_url?: string | null
           name: string
+          photo_phash?: string | null
           photo_url?: string | null
+          priority_tier?: number | null
           region: string
           slug: string
           stock_symbol?: string | null
           title?: string
           updated_at?: string
+          verification_status?: string | null
         }
         Update: {
           bio?: string | null
@@ -683,14 +732,19 @@ export type Database = {
           company_name?: string
           created_at?: string
           id?: string
+          is_active?: boolean | null
+          last_verified_at?: string | null
           linkedin_url?: string | null
           name?: string
+          photo_phash?: string | null
           photo_url?: string | null
+          priority_tier?: number | null
           region?: string
           slug?: string
           stock_symbol?: string | null
           title?: string
           updated_at?: string
+          verification_status?: string | null
         }
         Relationships: [
           {
@@ -1049,6 +1103,7 @@ export type Database = {
           data_role: string | null
           id: string
           name: string
+          notes: string | null
           price: number
           pricing_type: string | null
           region: string | null
@@ -1066,6 +1121,7 @@ export type Database = {
           data_role?: string | null
           id?: string
           name: string
+          notes?: string | null
           price: number
           pricing_type?: string | null
           region?: string | null
@@ -1083,6 +1139,7 @@ export type Database = {
           data_role?: string | null
           id?: string
           name?: string
+          notes?: string | null
           price?: number
           pricing_type?: string | null
           region?: string | null
