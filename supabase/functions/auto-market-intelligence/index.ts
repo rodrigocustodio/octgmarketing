@@ -131,14 +131,17 @@ async function generateCommentary(state: string, prevState: string, hrc: number,
 serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // Cron auth (allow either CRON_SECRET header OR a valid admin JWT for "Run now")
+  // Cron auth: accept x-cron-secret matching CRON_SECRET, OR Authorization Bearer matching service role key
   const cronHeader = req.headers.get("x-cron-secret");
-  const isCron = CRON_SECRET && cronHeader === CRON_SECRET;
+  const auth = req.headers.get("Authorization") ?? "";
+  const bearer = auth.startsWith("Bearer ") ? auth.slice(7) : "";
+  const isCron =
+    (CRON_SECRET && cronHeader === CRON_SECRET) ||
+    (SERVICE_KEY && bearer === SERVICE_KEY);
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 
   if (!isCron) {
-    const auth = req.headers.get("Authorization");
-    if (!auth?.startsWith("Bearer ")) {
+    if (!auth.startsWith("Bearer ")) {
       return new Response(JSON.stringify({ error: "Unauthorized" }), {
         status: 401,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
