@@ -177,10 +177,27 @@ async function processOne(supabase: any, exec: Executive, runId: string): Promis
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
-  // cron secret check (allows manual UI trigger via service-role; cron passes header)
+  // cron secret check (allows manual UI trigger via admin/editor JWT)
   const cronHdr = req.headers.get("x-cron-secret");
-  const isCron = CRON_SECRET && cronHdr === CRON_SECRET;
-  // Manual trigger from admin UI is allowed (RLS on automation_runs handles auditing).
+  const isCron = !!CRON_SECRET && cronHdr === CRON_SECRET;
+
+  if (!isCron) {
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const authClient = createClient(SUPABASE_URL, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
+    const { data: u, error: ue } = await authClient.auth.getUser(authHeader.replace("Bearer ", ""));
+    if (ue || !u.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const adm = createClient(SUPABASE_URL, SERVICE_KEY);
+    const { data: rr } = await adm.from("user_roles").select("role").eq("user_id", u.user.id);
+    const roles = (rr ?? []).map((r: any) => r.role);
+    if (!roles.includes("admin") && !roles.includes("editor")) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+  }
 
   const supabase = createClient(SUPABASE_URL, SERVICE_KEY);
 

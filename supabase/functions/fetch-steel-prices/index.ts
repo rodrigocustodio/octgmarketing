@@ -143,6 +143,29 @@ serve(async (req) => {
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
     const massiveApiKey = Deno.env.get('MASSIVE_API_KEY');
+
+    // Auth: allow CRON_SECRET header OR admin/editor JWT
+    const cronSecret = Deno.env.get('CRON_SECRET');
+    const cronHdr = req.headers.get('x-cron-secret');
+    const isCron = !!cronSecret && cronHdr === cronSecret;
+    if (!isCron) {
+      const authHeader = req.headers.get('Authorization');
+      if (!authHeader?.startsWith('Bearer ')) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const authClient = createClient(supabaseUrl, Deno.env.get('SUPABASE_ANON_KEY')!, { global: { headers: { Authorization: authHeader } } });
+      const { data: userData, error: userErr } = await authClient.auth.getUser(authHeader.replace('Bearer ', ''));
+      if (userErr || !userData.user) {
+        return new Response(JSON.stringify({ error: 'Unauthorized' }), { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+      const adminClient = createClient(supabaseUrl, supabaseServiceKey);
+      const { data: roles } = await adminClient.from('user_roles').select('role').eq('user_id', userData.user.id);
+      const list = (roles ?? []).map((r: any) => r.role);
+      if (!list.includes('admin') && !list.includes('editor')) {
+        return new Response(JSON.stringify({ error: 'Forbidden' }), { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } });
+      }
+    }
+
     const supabase = createClient(supabaseUrl, supabaseServiceKey);
     const results: any[] = [];
     

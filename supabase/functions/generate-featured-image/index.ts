@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 const openaiApiKey = Deno.env.get("OPENAI_API_KEY");
 const BUNNY_STORAGE_ZONE = "tukia-assets";
@@ -18,6 +19,25 @@ serve(async (req) => {
   }
 
   try {
+    // Auth: admin/editor required
+    const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
+    const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const authClient = createClient(supabaseUrl, Deno.env.get("SUPABASE_ANON_KEY")!, { global: { headers: { Authorization: authHeader } } });
+    const { data: u, error: ue } = await authClient.auth.getUser(authHeader.replace("Bearer ", ""));
+    if (ue || !u.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), { status: 401, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+    const adm = createClient(supabaseUrl, serviceKey);
+    const { data: rr } = await adm.from("user_roles").select("role").eq("user_id", u.user.id);
+    const roles = (rr ?? []).map((r: any) => r.role);
+    if (!roles.includes("admin") && !roles.includes("editor")) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), { status: 403, headers: { ...corsHeaders, "Content-Type": "application/json" } });
+    }
+
     const { title, excerpt, body, draftId } = await req.json();
 
     if (!title || !body) {
