@@ -57,6 +57,7 @@ import ProductEdit from "./pages/admin/ProductEdit";
 import AdminEvents from "./pages/admin/Events";
 import EventEdit from "./pages/admin/EventEdit";
 import Settings from "./pages/admin/Settings";
+import Automations from "./pages/admin/Automations";
 
 const queryClient = new QueryClient();
 
