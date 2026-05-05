@@ -24,6 +24,40 @@ Deno.serve(async (req) => {
   }
 
   try {
+    // Auth: allow cron-secret OR admin/editor JWT
+    const cronSecret = Deno.env.get("CRON_SECRET");
+    const isCron = !!cronSecret && req.headers.get("x-cron-secret") === cronSecret;
+
+    if (!isCron) {
+      const authHeader = req.headers.get("Authorization");
+      if (!authHeader?.startsWith("Bearer ")) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const token = authHeader.replace("Bearer ", "");
+      const adm = createClient(
+        Deno.env.get("SUPABASE_URL")!,
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!,
+      );
+      const { data: u, error: uErr } = await adm.auth.getUser(token);
+      if (uErr || !u?.user) {
+        return new Response(JSON.stringify({ error: "Unauthorized" }), {
+          status: 401,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+      const { data: rr } = await adm.from("user_roles").select("role").eq("user_id", u.user.id);
+      const roles = (rr ?? []).map((r: any) => r.role);
+      if (!roles.includes("admin") && !roles.includes("editor")) {
+        return new Response(JSON.stringify({ error: "Forbidden" }), {
+          status: 403,
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+        });
+      }
+    }
+
     const { urls, articleSlug, eventSlug, companySlug } = await req.json();
 
     // Build URL list from various inputs
