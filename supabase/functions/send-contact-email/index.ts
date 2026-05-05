@@ -206,10 +206,10 @@ serve(async (req) => {
                 <!-- Main Content -->
                 <tr>
                   <td style="background: #ffffff; padding: 48px 40px;">
-                    <h2 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 600; color: #0f172a;">Thank you for reaching out, ${name}!</h2>
+                    <h2 style="margin: 0 0 24px 0; font-size: 24px; font-weight: 600; color: #0f172a;">Thank you for reaching out, ${eName}!</h2>
                     
                     <p style="margin: 0 0 24px 0; font-size: 16px; line-height: 1.7; color: #475569;">
-                      We've received your inquiry regarding <span style="color: #d4a574; font-weight: 600;">${reasonLabel}</span>. Our team is reviewing your message and will respond within 1-2 business days.
+                      We've received your inquiry regarding <span style="color: #d4a574; font-weight: 600;">${eReasonLabel}</span>. Our team is reviewing your message and will respond within 1-2 business days.
                     </p>
                     
                     <!-- Message Box -->
@@ -217,7 +217,7 @@ serve(async (req) => {
                       <tr>
                         <td style="background: linear-gradient(135deg, #faf5f0 0%, #f5ebe0 100%); border-left: 4px solid #d4a574; border-radius: 0 12px 12px 0; padding: 24px;">
                           <p style="margin: 0 0 12px 0; font-size: 12px; font-weight: 600; color: #92400e; text-transform: uppercase; letter-spacing: 1px;">Your Message</p>
-                          <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #1e293b; white-space: pre-wrap;">${message}</p>
+                          <p style="margin: 0; font-size: 15px; line-height: 1.7; color: #1e293b; white-space: pre-wrap;">${eMessage}</p>
                         </td>
                       </tr>
                     </table>
@@ -259,7 +259,7 @@ serve(async (req) => {
                             © ${new Date().getFullYear()} OCTG Index. All rights reserved.
                           </p>
                           <p style="margin: 8px 0 0 0; font-size: 11px; color: #475569;">
-                            This email was sent to ${email} in response to your contact request.
+                            This email was sent to ${eEmail} in response to your contact request.
                           </p>
                         </td>
                       </tr>
@@ -291,36 +291,36 @@ serve(async (req) => {
         <table style="width: 100%; border-collapse: collapse; margin: 20px 0;">
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold; width: 140px;">Name:</td>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${name}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${eName}</td>
           </tr>
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Email:</td>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;"><a href="mailto:${email}">${email}</a></td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;"><a href="mailto:${eEmail}">${eEmail}</a></td>
           </tr>
           ${company ? `
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Company:</td>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${company}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${eCompany}</td>
           </tr>
           ` : ""}
           ${jobTitle ? `
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Job Title:</td>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${jobTitle}</td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;">${eJobTitle}</td>
           </tr>
           ` : ""}
           <tr>
             <td style="padding: 10px; border-bottom: 1px solid #e5e7eb; font-weight: bold;">Reason:</td>
-            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;"><strong>${reasonLabel}</strong></td>
+            <td style="padding: 10px; border-bottom: 1px solid #e5e7eb;"><strong>${eReasonLabel}</strong></td>
           </tr>
         </table>
         
         <h3 style="color: #1a1a2e; margin: 30px 0 15px 0;">Message:</h3>
-        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; white-space: pre-wrap;">${message}</div>
+        <div style="background: #f9fafb; padding: 20px; border-radius: 8px; white-space: pre-wrap;">${eMessage}</div>
         
         <p style="margin: 30px 0 0 0; font-size: 12px; color: #6b7280;">
           Submitted at: ${new Date().toISOString()}<br>
-          Reply directly to this email to respond to ${name}.
+          Reply directly to this email to respond to ${eName}.
         </p>
       </body>
       </html>
