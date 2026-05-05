@@ -98,3 +98,6 @@ verify_jwt = false
 
 [functions.auto-article-pipeline]
 verify_jwt = false
+
+[functions.auto-ceo-refresh]
+verify_jwt = false

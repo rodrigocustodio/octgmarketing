@@ -30,6 +30,12 @@ const JOBS: Job[] = [
     description: "3-agent pipeline (Researcher → Editor → Publisher) producing one draft article per run from a rotating topic backlog.",
     schedule: "4×/day (02:15, 08:15, 14:15, 20:15 UTC) — drafts only",
   },
+  {
+    name: "auto-ceo-refresh",
+    function: "auto-ceo-refresh",
+    description: "3-agent CEO directory verification (Perplexity researcher → Gemini editor → diff publisher). Writes proposals for admin review; never auto-mutates the directory.",
+    schedule: "Mon & Thu 06:00 UTC — Tier-1 (8) + Tier-2 rotation (4)",
+  },
 ];
 
 interface Run {

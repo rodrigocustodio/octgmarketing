@@ -685,6 +685,57 @@ export type Database = {
           },
         ]
       }
+      executive_change_proposals: {
+        Row: {
+          change_type: string
+          confidence: number | null
+          created_at: string
+          current_data: Json
+          diff: Json
+          executive_id: string
+          id: string
+          proposed_data: Json
+          reasoning: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          run_id: string | null
+          sources: Json | null
+          status: string
+        }
+        Insert: {
+          change_type: string
+          confidence?: number | null
+          created_at?: string
+          current_data?: Json
+          diff?: Json
+          executive_id: string
+          id?: string
+          proposed_data?: Json
+          reasoning?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          run_id?: string | null
+          sources?: Json | null
+          status?: string
+        }
+        Update: {
+          change_type?: string
+          confidence?: number | null
+          created_at?: string
+          current_data?: Json
+          diff?: Json
+          executive_id?: string
+          id?: string
+          proposed_data?: Json
+          reasoning?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          run_id?: string | null
+          sources?: Json | null
+          status?: string
+        }
+        Relationships: []
+      }
       executives: {
         Row: {
           bio: string | null

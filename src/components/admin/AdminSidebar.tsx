@@ -94,6 +94,11 @@ const navItems = [
     icon: Zap,
   },
   {
+    title: "CEO Proposals",
+    href: "/admin/ceo-proposals",
+    icon: Zap,
+  },
+  {
     title: "Settings",
     href: "/admin/settings",
     icon: Settings,
