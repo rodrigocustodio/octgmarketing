@@ -9,7 +9,7 @@ import { RefreshCw, TrendingUp, TrendingDown, Minus, Clock, AlertCircle, CheckCi
 import { useToast } from "@/hooks/use-toast";
 import { formatDistanceToNow } from "date-fns";
 
-const REFRESH_INTERVAL_SECONDS = 25 * 60; // 25 minutes
+const REFRESH_INTERVAL_SECONDS = 15 * 60; // 15 minutes (matches server cron)
 const STORAGE_KEY = "priceTickerNextRefresh";
 
 // Helper functions for localStorage persistence
