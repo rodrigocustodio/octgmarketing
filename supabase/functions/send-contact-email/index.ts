@@ -108,6 +108,31 @@ serve(async (req) => {
       );
     }
 
+    // Server-side length validation (defense in depth — bypasses client Zod)
+    const lengthChecks: Array<[string, unknown, number]> = [
+      ["name", name, 200],
+      ["email", email, 255],
+      ["company", company, 200],
+      ["jobTitle", jobTitle, 200],
+      ["contactReason", contactReason, 100],
+      ["message", message, 5000],
+    ];
+    for (const [field, value, max] of lengthChecks) {
+      if (typeof value === "string" && value.length > max) {
+        return new Response(
+          JSON.stringify({ error: `${field} exceeds maximum length of ${max} characters` }),
+          { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+        );
+      }
+    }
+    // Basic email shape check
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      return new Response(
+        JSON.stringify({ error: "Invalid email format" }),
+        { status: 400, headers: { ...corsHeaders, "Content-Type": "application/json" } }
+      );
+    }
+
     // Save to database
     const supabaseUrl = Deno.env.get("SUPABASE_URL")!;
     const supabaseServiceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
