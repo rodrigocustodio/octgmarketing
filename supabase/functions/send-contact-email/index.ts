@@ -154,6 +154,20 @@ serve(async (req) => {
 
     const reasonLabel = reasonLabels[contactReason] || contactReason;
 
+    // HTML-escape all user-supplied values before embedding into email templates.
+    const escapeHtml = (s: string): string =>
+      s.replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    const eName = escapeHtml(name);
+    const eEmail = escapeHtml(email);
+    const eCompany = company ? escapeHtml(company) : "";
+    const eJobTitle = jobTitle ? escapeHtml(jobTitle) : "";
+    const eMessage = escapeHtml(message);
+    const eReasonLabel = escapeHtml(reasonLabel);
+
     // Send confirmation email to user
     const userEmailHtml = `
       <!DOCTYPE html>
