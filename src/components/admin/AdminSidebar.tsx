@@ -89,6 +89,11 @@ const navItems = [
     icon: CalendarDays,
   },
   {
+    title: "Automations",
+    href: "/admin/automations",
+    icon: Zap,
+  },
+  {
     title: "Settings",
     href: "/admin/settings",
     icon: Settings,
