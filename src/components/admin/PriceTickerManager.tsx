@@ -180,7 +180,7 @@ export function PriceTickerManager() {
               Price Ticker Management
             </CardTitle>
             <CardDescription>
-              Manage and refresh steel & OCTG price data
+              Prices refresh automatically every 15 minutes on the server — no clicks required.
             </CardDescription>
           </div>
           <div className="flex items-center gap-3">
