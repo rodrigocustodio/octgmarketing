@@ -24,6 +24,12 @@ const JOBS: Job[] = [
     description: "Refreshes equity prices, CME futures, EIA crude, and the OCTG Cost Pressure Index.",
     schedule: "Every 30 min (US market hours), hourly otherwise",
   },
+  {
+    name: "auto-article-pipeline",
+    function: "auto-article-pipeline",
+    description: "3-agent pipeline (Researcher → Editor → Publisher) producing one draft article per run from a rotating topic backlog.",
+    schedule: "4×/day (02:15, 08:15, 14:15, 20:15 UTC) — drafts only",
+  },
 ];
 
 interface Run {
