@@ -20,13 +20,41 @@ interface MigrationResult {
   error?: string;
 }
 
+const MAX_IMAGE_BYTES = 25 * 1024 * 1024; // 25 MB
+
+function assertSafeUrl(rawUrl: string): URL {
+  let u: URL;
+  try {
+    u = new URL(rawUrl);
+  } catch {
+    throw new Error(`Invalid URL: ${rawUrl}`);
+  }
+  if (u.protocol !== "https:" && u.protocol !== "http:") {
+    throw new Error(`Blocked protocol: ${u.protocol}`);
+  }
+  const host = u.hostname.toLowerCase();
+  const blockedHostPatterns = [
+    /^localhost$/, /^127\./, /^10\./, /^192\.168\./,
+    /^172\.(1[6-9]|2[0-9]|3[0-1])\./, /^169\.254\./,
+    /^0\.0\.0\.0$/, /^::1$/, /^fc00:/, /^fe80:/,
+  ];
+  if (blockedHostPatterns.some((re) => re.test(host))) {
+    throw new Error(`Blocked host: ${host}`);
+  }
+  return u;
+}
+
 async function uploadToBunny(imageUrl: string, filePath: string): Promise<string> {
   console.log(`[migrate-to-bunny] Downloading image from: ${imageUrl}`);
+
+  // SSRF guard: validate URL scheme + block private/loopback/link-local/metadata hosts
+  assertSafeUrl(imageUrl);
 
   const imageResponse = await fetch(imageUrl, {
     headers: {
       "User-Agent": "Mozilla/5.0 (compatible; OCTGIndex/1.0)",
     },
+    redirect: "follow",
   });
 
   if (!imageResponse.ok) {
@@ -34,7 +62,13 @@ async function uploadToBunny(imageUrl: string, filePath: string): Promise<string
   }
 
   const contentType = imageResponse.headers.get("content-type") || "image/jpeg";
+  if (!contentType.startsWith("image/")) {
+    throw new Error(`Refusing non-image content-type: ${contentType}`);
+  }
   const imageBuffer = await imageResponse.arrayBuffer();
+  if (imageBuffer.byteLength > MAX_IMAGE_BYTES) {
+    throw new Error(`Image exceeds size cap (${imageBuffer.byteLength} bytes)`);
+  }
 
   console.log(`[migrate-to-bunny] Downloaded ${imageBuffer.byteLength} bytes, uploading to: ${filePath}`);
 
