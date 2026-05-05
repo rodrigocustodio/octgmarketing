@@ -125,13 +125,15 @@ export function PriceTickerManager() {
     }
   }, [refetch, toast]);
 
-  // Countdown timer with auto-refresh
+  // Countdown timer — purely informational. The server cron job
+  // (auto-refresh-steel-prices-15min) is the source of truth and runs
+  // every 15 minutes regardless of whether this tab is open.
   useEffect(() => {
     const interval = setInterval(() => {
       setSecondsRemaining(prev => {
         if (prev <= 1) {
-          // Auto-trigger refresh when countdown ends
-          handleRefreshPrices();
+          // Server just refreshed — pull the latest prices into the UI
+          refetch();
           const newTimestamp = Date.now() + REFRESH_INTERVAL_SECONDS * 1000;
           setStoredNextRefresh(newTimestamp);
           return REFRESH_INTERVAL_SECONDS;
@@ -139,9 +141,9 @@ export function PriceTickerManager() {
         return prev - 1;
       });
     }, 1000);
-    
+
     return () => clearInterval(interval);
-  }, [handleRefreshPrices]);
+  }, [refetch]);
 
   // Format price with currency
   const formatPrice = (price: number, currency: string) => {
