@@ -101,3 +101,6 @@ verify_jwt = false
 
 [functions.auto-ceo-refresh]
 verify_jwt = false
+
+[functions.auto-energy-events]
+verify_jwt = false

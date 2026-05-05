@@ -36,6 +36,12 @@ const JOBS: Job[] = [
     description: "3-agent CEO directory verification (Perplexity researcher → Gemini editor → diff publisher). Writes proposals for admin review; never auto-mutates the directory.",
     schedule: "Mon & Thu 06:00 UTC — Tier-1 (8) + Tier-2 rotation (4)",
   },
+  {
+    name: "auto-energy-events",
+    function: "auto-energy-events",
+    description: "Monthly discovery of upcoming global energy conferences (Perplexity → Gemini → events table). Dedupes by slug + month.",
+    schedule: "1st of each month, 05:00 UTC",
+  },
 ];
 
 interface Run {
