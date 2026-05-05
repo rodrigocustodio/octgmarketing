@@ -160,9 +160,9 @@ serve(async (req) => {
 
     const { companyName } = await req.json();
 
-    if (!companyName) {
+    if (!companyName || typeof companyName !== 'string' || companyName.length > 200) {
       return new Response(
-        JSON.stringify({ success: false, error: 'Company name is required' }),
+        JSON.stringify({ success: false, error: 'Valid company name (max 200 chars) is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
