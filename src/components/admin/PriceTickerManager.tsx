@@ -188,7 +188,7 @@ export function PriceTickerManager() {
             <div className="flex items-center gap-2 text-sm font-mono bg-muted/80 px-3 py-1.5 rounded-md border">
               <Timer className="h-4 w-4 text-accent" />
               <span className="tabular-nums font-semibold">{formatCountdown(secondsRemaining)}</span>
-              <span className="text-xs text-muted-foreground hidden sm:inline">until refresh</span>
+              <span className="text-xs text-muted-foreground hidden sm:inline">next auto-refresh</span>
             </div>
             <Button 
               onClick={handleRefreshPrices} 
