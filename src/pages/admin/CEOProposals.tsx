@@ -147,7 +147,7 @@ export default function CEOProposals() {
       if (filter === "pending") q = q.eq("status", "pending");
       const { data, error } = await q;
       if (error) throw error;
-      return data as Proposal[];
+      return (data ?? []) as unknown as Proposal[];
     },
     refetchInterval: 30000,
   });
