@@ -19,6 +19,7 @@ import {
 import { User, Building2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import globeCeoLeaders from "@/assets/globe-ceo-leaders.jpg";
+import { optimizeImageUrl } from "@/lib/utils";
 
 const REGIONS = [
   { value: "all", label: "All Regions" },
@@ -238,8 +239,17 @@ export default function CEODirectory() {
                       <div className="aspect-[4/3] bg-muted relative overflow-hidden">
                         {executive.photo_url ? (
                           <img
-                            src={executive.photo_url}
+                            src={optimizeImageUrl(executive.photo_url, { width: 400, quality: 75 }) || executive.photo_url}
+                            srcSet={`
+                              ${optimizeImageUrl(executive.photo_url, { width: 300, quality: 70 }) || executive.photo_url} 300w,
+                              ${optimizeImageUrl(executive.photo_url, { width: 500, quality: 75 }) || executive.photo_url} 500w
+                            `}
+                            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
                             alt={`${executive.name}, ${executive.title} at ${executive.company_name}`}
+                            width={400}
+                            height={300}
+                            loading="lazy"
+                            decoding="async"
                             className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
                           />
                         ) : (
