@@ -210,11 +210,10 @@ const Index = () => {
           <div className="absolute inset-0 bg-gradient-to-t from-black from-20% via-black/80 via-50% to-black/30 sm:bg-gradient-to-r sm:from-black sm:from-0% sm:via-black/85 sm:via-45% sm:to-transparent sm:to-85% z-10" />
           {/* Right half image - sharp and visible with focal point on people */}
           <img
-            src={optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 85 }) || heroImage}
+            src={optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 82 }) || heroImage}
             srcSet={`
               ${optimizeImageUrl(featuredArticle?.hero_image_url, { width: 768, quality: 80 }) || heroImage} 768w,
-              ${optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 85 }) || heroImage} 1200w,
-              ${optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1920, quality: 85 }) || heroImage} 1920w
+              ${optimizeImageUrl(featuredArticle?.hero_image_url, { width: 1200, quality: 82 }) || heroImage} 1200w
             `}
             sizes="100vw"
             alt={featuredArticle?.title || "OCTG Index - Global Energy Industry News"}
@@ -290,13 +289,10 @@ const Index = () => {
           <section className="container py-12">
             <div className="grid md:grid-cols-3 gap-6">
               {secondaryArticles.map((article, index) => {
-                const placeholderImages = [
-                  "https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=800&q=80",
-                  "https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?w=800&q=80",
-                  "https://images.unsplash.com/photo-1518709766631-a6a7f45921c3?w=800&q=80",
-                ];
-                const imageUrl = article.hero_image_url || placeholderImages[index % placeholderImages.length];
-                
+                const imageUrl = article.hero_image_url
+                  ? optimizeImageUrl(article.hero_image_url, { width: 600, quality: 80 }) || article.hero_image_url
+                  : undefined;
+
                 return (
                   <div key={article.id} className={`animate-fade-in-up animation-delay-${(index + 1) * 100}`}>
                     <ArticleCard
