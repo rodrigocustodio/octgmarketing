@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { Header } from "@/components/layout/Header";
@@ -8,6 +8,7 @@ import { ArticleCard } from "@/components/articles/ArticleCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { usePublishedArticles } from "@/hooks/useArticles";
+import { Button } from "@/components/ui/button";
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -20,21 +21,26 @@ import { Newspaper } from "lucide-react";
 import { format } from "date-fns";
 import { optimizeImageUrl } from "@/lib/utils";
 
-export default function News() {
-  const { data: articles, isLoading } = usePublishedArticles(50);
+const PAGE_SIZE = 18;
 
-  // Group articles by month
+export default function News() {
+  const { data: articles, isLoading } = usePublishedArticles(60);
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+
+  // Group only the visible slice by month
   const articlesByMonth = useMemo(() => {
     if (!articles) return {};
-    return articles.reduce((acc, article) => {
-      const monthKey = article.publish_date 
+    return articles.slice(0, visibleCount).reduce((acc, article) => {
+      const monthKey = article.publish_date
         ? format(new Date(article.publish_date), "MMMM yyyy")
         : "Undated";
       if (!acc[monthKey]) acc[monthKey] = [];
       acc[monthKey].push(article);
       return acc;
     }, {} as Record<string, typeof articles>);
-  }, [articles]);
+  }, [articles, visibleCount]);
+
+  const hasMore = (articles?.length || 0) > visibleCount;
 
   // Schema.org structured data
   const breadcrumbSchema = {
