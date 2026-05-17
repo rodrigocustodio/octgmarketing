@@ -6,7 +6,7 @@ import octgMarketingTeam from "/images/octg-marketing-team.jpg";
 export function OctgMarketingPromo() {
   return (
     <div>
-      <span className="block text-[11px] uppercase tracking-wider text-muted-foreground/70 mb-1.5">
+      <span className="block text-[11px] uppercase tracking-wider text-muted-foreground mb-1.5">
         Partner
       </span>
       <Card className="overflow-hidden border-border/50 bg-card">

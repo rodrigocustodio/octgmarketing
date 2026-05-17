@@ -56,7 +56,7 @@ export function QuickReadsGrid({ articles }: QuickReadsGridProps) {
                       {article.region.name}
                     </Badge>
                   )}
-                  <span className="text-[10px] text-muted-foreground/70">
+                  <span className="text-[10px] text-muted-foreground">
                     {formatDate(article.publish_date)}
                   </span>
                 </div>

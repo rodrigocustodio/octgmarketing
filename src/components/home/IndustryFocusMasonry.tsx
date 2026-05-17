@@ -113,7 +113,7 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
               to={`/article/${article.slug}`} 
               className="group flex gap-4 py-5 first:pt-0 last:pb-0 border-b border-border/50 last:border-0"
             >
-              <span className="text-4xl font-light text-muted-foreground/50 leading-none w-10 flex-shrink-0">
+              <span className="text-4xl font-light text-muted-foreground leading-none w-10 flex-shrink-0">
                 {String(index + 1).padStart(2, '0')}
               </span>
               <div className="flex-1 min-w-0 space-y-2">
@@ -125,7 +125,7 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
                     {article.subtitle}
                   </p>
                 )}
-                <div className="flex items-center gap-2 text-xs text-muted-foreground/70">
+                <div className="flex items-center gap-2 text-xs text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
                     {getReadingTime(article.title)}

@@ -34,7 +34,7 @@ export function EventArticlesCard({ eventId, eventName }: EventArticlesCardProps
               to={`/article/${article.slug}`}
               className="group flex items-start gap-3"
             >
-              <span className="text-lg font-bold text-muted-foreground/50 tabular-nums">
+              <span className="text-lg font-bold text-muted-foreground/70 tabular-nums">
                 {String(index + 1).padStart(2, "0")}
               </span>
               <div className="flex-1 min-w-0">
