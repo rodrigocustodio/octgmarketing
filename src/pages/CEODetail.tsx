@@ -140,7 +140,6 @@ export default function CEODetail() {
       name: executive.company_name,
       ...(executive.stock_symbol && { tickerSymbol: executive.stock_symbol })
     },
-    image: executive.photo_url || undefined,
     description: executive.bio?.slice(0, 200),
     knowsAbout: ["OCTG", "Oil Country Tubular Goods", "Oil and Gas Industry", "Corporate Leadership", "Steel Manufacturing"],
     ...(executive.linkedin_url && { sameAs: [executive.linkedin_url] }),
@@ -215,7 +214,6 @@ export default function CEODetail() {
         title={generateCEOTitle(executive.name, executive.title, executive.company_name)}
         description={generateCEODescription(executive.name, executive.title, executive.company_name, executive.bio)}
         canonical={`https://octgindex.com/ceo/${executive.slug}`}
-        image={executive.photo_url || undefined}
       />
 
       <Helmet>
@@ -249,25 +247,7 @@ export default function CEODetail() {
             <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
               {/* Left Column - Photo & Quick Info */}
               <div className="space-y-6">
-                {/* Photo */}
-                <div className="aspect-[3/4] bg-muted rounded-lg overflow-hidden">
-                  {executive.photo_url ? (
-                    <img
-                      src={optimizeImageUrl(executive.photo_url, { width: 400, quality: 85 })}
-                      alt={`${executive.name}, ${executive.title} at ${executive.company_name}`}
-                      width={400}
-                      height={533}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                      <User className="w-24 h-24 text-muted-foreground/30" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Quick Info Card */}
+                {/* Quick Info Card (photo intentionally removed for performance) */}
                 <Card>
                   <CardHeader className="pb-3">
                     <h2 className="text-sm font-medium text-muted-foreground">
