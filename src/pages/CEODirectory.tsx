@@ -19,6 +19,7 @@ import {
 import { User, Building2 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import globeCeoLeaders from "@/assets/globe-ceo-leaders.jpg";
+import { optimizeImageUrl } from "@/lib/utils";
 
 const REGIONS = [
   { value: "all", label: "All Regions" },
