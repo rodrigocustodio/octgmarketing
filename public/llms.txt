@@ -1,0 +1,25 @@
+# OCTG Index
+
+> Global market intelligence for the oil country tubular goods (OCTG) industry: daily news, pricing data, 200+ company profiles, CEO directory, and 60+ industry events.
+
+OCTG Index is an editorial market-intelligence publication covering seamless and welded steel pipe (casing, tubing, line pipe, drill pipe) used in upstream oil & gas. Content is produced by human journalists and updated daily. Positioning is market intelligence, not transactional pricing.
+
+## Pages
+
+- [Home](/): Daily OCTG news, market intelligence, and featured analysis.
+- [News](/news): Latest OCTG industry news and editorial coverage.
+- [Topics](/topics): Browse coverage by topic (drilling, supply chain, trade policy, M&A).
+- [Pricing Index](/pricing-index): OCTG and steel price tracking and commentary.
+- [Company Directory](/directory): 200+ OCTG manufacturer and service profiles.
+- [CEO Directory](/ceo-directory): Executive leadership across the OCTG sector.
+- [OCTG Product Directory](/octg-directory): Reference for OCTG product categories and grades.
+- [Events](/events): 60+ upcoming oil & gas industry events worldwide.
+- [About](/about): About OCTG Index and our editorial mission.
+- [Editorial Policy](/editorial-policy): Sourcing standards, ethics, and corrections.
+- [Contact](/contact): Get in touch with the editorial team.
+
+## Optional
+
+- [Privacy Policy](/privacy)
+- [Terms & Conditions](/terms)
+- [Newsletter Terms](/newsletter-terms)
