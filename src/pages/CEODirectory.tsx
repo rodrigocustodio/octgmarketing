@@ -259,7 +259,7 @@ export default function CEODirectory() {
                             {executive.region}
                           </Badge>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
+                        <ChevronRight className="w-4 h-4 text-muted-foreground/70 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
                       </CardContent>
                     </Card>
                   </Link>

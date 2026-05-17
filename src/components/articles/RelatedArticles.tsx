@@ -31,7 +31,7 @@ const RelatedArticles = ({ articles, currentRegion }: RelatedArticlesProps) => {
           >
             <div className="flex gap-4">
               {/* Number indicator */}
-              <span className="text-2xl font-bold text-muted-foreground/40 leading-none pt-0.5">
+              <span className="text-2xl font-bold text-muted-foreground/70 leading-none pt-0.5">
                 {String(index + 1).padStart(2, '0')}
               </span>
               
