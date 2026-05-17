@@ -21,10 +21,10 @@ export function ArticleCard({ title, subtitle, imageUrl, region, topic, date, sl
         {imageUrl && (
           <div className="aspect-video overflow-hidden">
             <img
-              src={optimizeImageUrl(imageUrl, { width: 800, quality: 80 })}
+              src={optimizeImageUrl(imageUrl, { width: 600, quality: 80 })}
               srcSet={`
-                ${optimizeImageUrl(imageUrl, { width: 400, quality: 75 })} 400w,
-                ${optimizeImageUrl(imageUrl, { width: 800, quality: 80 })} 800w
+                ${optimizeImageUrl(imageUrl, { width: 600, quality: 80 })} 400w,
+                ${optimizeImageUrl(imageUrl, { width: 600, quality: 80 })} 800w
               `}
               sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
               alt={title}

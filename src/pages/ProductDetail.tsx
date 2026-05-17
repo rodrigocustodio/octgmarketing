@@ -297,7 +297,7 @@ export default function ProductDetail() {
         {/* Background Image with Gradient Overlay */}
         <div className="absolute inset-0">
           <img 
-            src={optimizeImageUrl(product.hero_image_url, { width: 1200, quality: 85 }) || bannerCasing} 
+            src={optimizeImageUrl(product.hero_image_url, { width: 1200, quality: 82 }) || bannerCasing} 
             alt="" 
             width={1200}
             height={600}

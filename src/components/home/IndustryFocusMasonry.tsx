@@ -63,7 +63,7 @@ export function IndustryFocusMasonry({ articles }: IndustryFocusMasonryProps) {
             <Card variant="article" className="overflow-hidden">
               <div className="relative aspect-[16/10]">
                 <img 
-                  src={optimizeImageUrl(featured.hero_image_url, { width: 1000, quality: 85 }) || heroImage} 
+                  src={optimizeImageUrl(featured.hero_image_url, { width: 1200, quality: 82 }) || heroImage} 
                   alt={featured.title}
                   width={1000}
                   height={625}

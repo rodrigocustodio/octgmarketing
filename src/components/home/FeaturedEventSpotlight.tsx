@@ -89,7 +89,7 @@ export function FeaturedEventSpotlight() {
             // First gallery image or featured image
             <div className="relative w-full rounded-xl overflow-hidden" style={{ paddingTop: '56.25%' }}>
               <img 
-                src={optimizeImageUrl(fallbackImage, { width: 1200, quality: 85 })}
+                src={optimizeImageUrl(fallbackImage, { width: 1200, quality: 82 })}
                 alt={event.name}
                 className="absolute top-0 left-0 w-full h-full object-cover"
                 loading="lazy"
