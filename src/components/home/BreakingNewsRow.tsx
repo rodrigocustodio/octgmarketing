@@ -49,7 +49,7 @@ export function BreakingNewsRow({ articles }: BreakingNewsRowProps) {
                   {article.hero_image_url && (
                     <div className="w-24 h-20 flex-shrink-0 overflow-hidden rounded-l-lg">
                       <img 
-                        src={optimizeImageUrl(article.hero_image_url, { width: 200, quality: 75 })} 
+                        src={optimizeImageUrl(article.hero_image_url, { width: 200, quality: 80 })} 
                         alt={article.title}
                         width={96}
                         height={80}

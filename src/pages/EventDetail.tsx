@@ -146,7 +146,7 @@ const EventDetail = () => {
           {/* Hero with background image - always use ADIPEC as default */}
           <section className="relative py-10 md:py-14 overflow-hidden">
             <img
-              src={optimizeImageUrl(event.image_url, { width: 1200, quality: 85 }) || '/images/events-hero-default.jpg'}
+              src={optimizeImageUrl(event.image_url, { width: 1200, quality: 82 }) || '/images/events-hero-default.jpg'}
               alt=""
               width={1200}
               height={600}
@@ -230,7 +230,7 @@ const EventDetail = () => {
                 {!videoEmbed && event.image_url && (
                   <div className="rounded-xl overflow-hidden">
                     <img 
-                      src={optimizeImageUrl(event.image_url, { width: 800, quality: 85 })} 
+                      src={optimizeImageUrl(event.image_url, { width: 1200, quality: 82 })} 
                       alt={event.name}
                       width={800}
                       height={224}

@@ -285,7 +285,7 @@ const Article = () => {
               {hasHeroImage && (
                 <div className="w-full md:w-[45%] lg:w-1/2 overflow-hidden rounded-lg shrink-0 order-first md:order-last">
                   <img
-                    src={optimizeImageUrl(article.hero_image_url, { width: 960, quality: 85 })}
+                    src={optimizeImageUrl(article.hero_image_url, { width: 1200, quality: 82 })}
                     alt={article.title}
                     className="w-full h-full max-h-[260px] md:max-h-none object-cover object-center"
                   />

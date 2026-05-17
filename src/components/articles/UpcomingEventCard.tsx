@@ -33,7 +33,7 @@ export function UpcomingEventCard() {
       {event.image_url && (
         <div className="relative h-40 overflow-hidden">
           <img
-            src={optimizeImageUrl(event.image_url, { width: 400, quality: 80 })}
+            src={optimizeImageUrl(event.image_url, { width: 600, quality: 80 })}
             alt={event.name}
             className="w-full h-full object-cover"
           />

@@ -16,10 +16,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { User, Building2 } from "lucide-react";
+import { Building2, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import globeCeoLeaders from "@/assets/globe-ceo-leaders.jpg";
-import { optimizeImageUrl } from "@/lib/utils";
 
 const REGIONS = [
   { value: "all", label: "All Regions" },
@@ -218,69 +217,49 @@ export default function CEODirectory() {
         <main className="flex-1 py-12">
           <div className="container mx-auto px-4">
             {isLoading ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
-                {Array.from({ length: 8 }).map((_, i) => (
-                  <Card key={i} className="overflow-hidden">
-                    <Skeleton className="aspect-[4/3] w-full" />
-                    <CardContent className="p-4 space-y-2">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+                {Array.from({ length: 9 }).map((_, i) => (
+                  <Card key={i}>
+                    <CardContent className="p-5 space-y-2">
                       <Skeleton className="h-5 w-3/4" />
                       <Skeleton className="h-4 w-1/2" />
-                      <Skeleton className="h-4 w-full" />
+                      <Skeleton className="h-4 w-2/3" />
                     </CardContent>
                   </Card>
                 ))}
               </div>
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
                 {executives?.map((executive) => (
-                  <Link key={executive.id} to={`/ceo/${executive.slug}`}>
-                    <Card className="group overflow-hidden hover:border-primary/50 transition-all duration-300 h-full">
-                      {/* Photo or Placeholder */}
-                      <div className="aspect-[4/3] bg-muted relative overflow-hidden">
-                        {executive.photo_url ? (
-                          <img
-                            src={optimizeImageUrl(executive.photo_url, { width: 400, quality: 75 }) || executive.photo_url}
-                            srcSet={`
-                              ${optimizeImageUrl(executive.photo_url, { width: 300, quality: 70 }) || executive.photo_url} 300w,
-                              ${optimizeImageUrl(executive.photo_url, { width: 500, quality: 75 }) || executive.photo_url} 500w
-                            `}
-                            sizes="(max-width: 768px) 50vw, (max-width: 1280px) 33vw, 20vw"
-                            alt={`${executive.name}, ${executive.title} at ${executive.company_name}`}
-                            width={400}
-                            height={300}
-                            loading="lazy"
-                            decoding="async"
-                            className="w-full h-full object-cover object-top group-hover:scale-105 transition-transform duration-500"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                            <User className="w-16 h-16 text-muted-foreground/30" />
+                  <Link key={executive.id} to={`/ceo/${executive.slug}`} className="group">
+                    <Card className="h-full hover:border-primary/50 hover:bg-muted/30 transition-all duration-200">
+                      <CardContent className="p-5 flex items-start gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-1">
+                            <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
+                              {executive.name}
+                            </h3>
+                            {executive.stock_symbol && (
+                              <span className="text-[11px] font-mono text-accent shrink-0">
+                                {executive.stock_symbol}
+                              </span>
+                            )}
                           </div>
-                        )}
-                        <Badge
-                          variant="outline"
-                          className="absolute top-2 right-2 bg-gray-800/80 text-gray-300 border-gray-600/50 text-[10px] px-1.5 py-0.5"
-                        >
-                          {executive.region}
-                        </Badge>
-                      </div>
-
-                      <CardContent className="p-4">
-                        <h3 className="font-semibold text-foreground group-hover:text-primary transition-colors line-clamp-1">
-                          {executive.name}
-                        </h3>
-                        <p className="text-sm text-muted-foreground line-clamp-1 mt-1">
-                          {executive.title}
-                        </p>
-                        <div className="flex items-center gap-2 mt-3 text-xs text-muted-foreground">
-                          <Building2 className="w-3.5 h-3.5" />
-                          <span className="line-clamp-1">{executive.company_name}</span>
+                          <p className="text-sm text-muted-foreground line-clamp-1 mb-2">
+                            {executive.title}
+                          </p>
+                          <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                            <Building2 className="w-3.5 h-3.5 shrink-0" />
+                            <span className="line-clamp-1">{executive.company_name}</span>
+                          </div>
+                          <Badge
+                            variant="outline"
+                            className="mt-3 text-[10px] px-1.5 py-0.5"
+                          >
+                            {executive.region}
+                          </Badge>
                         </div>
-                        {executive.stock_symbol && (
-                          <div className="mt-1 text-xs font-mono text-accent">
-                            {executive.stock_symbol}
-                          </div>
-                        )}
+                        <ChevronRight className="w-4 h-4 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all shrink-0 mt-1" />
                       </CardContent>
                     </Card>
                   </Link>

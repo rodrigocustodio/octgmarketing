@@ -73,7 +73,7 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
               <Card className="h-full overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300">
                 <div className="relative h-full min-h-[400px] lg:min-h-[480px]">
                   <img 
-                    src={optimizeImageUrl(featuredArticle.hero_image_url, { width: 800, quality: 85 }) || placeholderImages[0]}
+                    src={optimizeImageUrl(featuredArticle.hero_image_url, { width: 1200, quality: 82 }) || placeholderImages[0]}
                     alt={featuredArticle.title}
                     width={800}
                     height={480}
@@ -117,7 +117,7 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
                     {/* Thumbnail */}
                     <div className="relative w-32 sm:w-40 flex-shrink-0 overflow-hidden">
                       <img 
-                        src={optimizeImageUrl(article.hero_image_url, { width: 320, quality: 75 }) || placeholderImages[(index + 1) % placeholderImages.length]}
+                        src={optimizeImageUrl(article.hero_image_url, { width: 200, quality: 80 }) || placeholderImages[(index + 1) % placeholderImages.length]}
                         alt={article.title}
                         width={160}
                         height={120}
@@ -160,7 +160,7 @@ export function AnalysisReportsSection({ articles }: AnalysisReportsSectionProps
                     {/* Small Thumbnail */}
                     <div className="relative w-16 h-16 sm:w-20 sm:h-20 flex-shrink-0 rounded-lg overflow-hidden">
                       <img 
-                        src={optimizeImageUrl(article.hero_image_url, { width: 160, quality: 75 }) || placeholderImages[(index + 3) % placeholderImages.length]}
+                        src={optimizeImageUrl(article.hero_image_url, { width: 200, quality: 80 }) || placeholderImages[(index + 3) % placeholderImages.length]}
                         alt={article.title}
                         width={80}
                         height={80}

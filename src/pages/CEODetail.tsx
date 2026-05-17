@@ -18,7 +18,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
-  User,
   Building2,
   MapPin,
   ArrowLeft,
@@ -26,7 +25,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { generateCEOTitle, generateCEODescription } from "@/lib/seo-utils";
-import { optimizeImageUrl } from "@/lib/utils";
 
 const regionColors: Record<string, string> = {
   Americas: "bg-blue-500/20 text-blue-400 border-blue-500/30",
@@ -92,7 +90,7 @@ export default function CEODetail() {
           <div className="container mx-auto px-4 max-w-4xl">
             <Skeleton className="h-8 w-48 mb-8" />
             <div className="grid md:grid-cols-3 gap-8">
-              <Skeleton className="aspect-[3/4] w-full" />
+              <Skeleton className="h-48 w-full rounded-lg" />
               <div className="md:col-span-2 space-y-4">
                 <Skeleton className="h-10 w-3/4" />
                 <Skeleton className="h-6 w-1/2" />
@@ -140,7 +138,6 @@ export default function CEODetail() {
       name: executive.company_name,
       ...(executive.stock_symbol && { tickerSymbol: executive.stock_symbol })
     },
-    image: executive.photo_url || undefined,
     description: executive.bio?.slice(0, 200),
     knowsAbout: ["OCTG", "Oil Country Tubular Goods", "Oil and Gas Industry", "Corporate Leadership", "Steel Manufacturing"],
     ...(executive.linkedin_url && { sameAs: [executive.linkedin_url] }),
@@ -215,7 +212,6 @@ export default function CEODetail() {
         title={generateCEOTitle(executive.name, executive.title, executive.company_name)}
         description={generateCEODescription(executive.name, executive.title, executive.company_name, executive.bio)}
         canonical={`https://octgindex.com/ceo/${executive.slug}`}
-        image={executive.photo_url || undefined}
       />
 
       <Helmet>
@@ -249,25 +245,7 @@ export default function CEODetail() {
             <div className="grid md:grid-cols-3 gap-8 lg:gap-12">
               {/* Left Column - Photo & Quick Info */}
               <div className="space-y-6">
-                {/* Photo */}
-                <div className="aspect-[3/4] bg-muted rounded-lg overflow-hidden">
-                  {executive.photo_url ? (
-                    <img
-                      src={optimizeImageUrl(executive.photo_url, { width: 400, quality: 85 })}
-                      alt={`${executive.name}, ${executive.title} at ${executive.company_name}`}
-                      width={400}
-                      height={533}
-                      loading="lazy"
-                      className="w-full h-full object-cover"
-                    />
-                  ) : (
-                    <div className="w-full h-full flex items-center justify-center bg-gradient-to-br from-muted to-muted/50">
-                      <User className="w-24 h-24 text-muted-foreground/30" />
-                    </div>
-                  )}
-                </div>
-
-                {/* Quick Info Card */}
+                {/* Quick Info Card (photo intentionally removed for performance) */}
                 <Card>
                   <CardHeader className="pb-3">
                     <h2 className="text-sm font-medium text-muted-foreground">
