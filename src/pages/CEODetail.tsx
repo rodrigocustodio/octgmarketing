@@ -18,7 +18,6 @@ import {
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
 import {
-  User,
   Building2,
   MapPin,
   ArrowLeft,
@@ -26,7 +25,6 @@ import {
   ExternalLink,
 } from "lucide-react";
 import { generateCEOTitle, generateCEODescription } from "@/lib/seo-utils";
-import { optimizeImageUrl } from "@/lib/utils";
 
 const regionColors: Record<string, string> = {
   Americas: "bg-blue-500/20 text-blue-400 border-blue-500/30",
@@ -92,7 +90,7 @@ export default function CEODetail() {
           <div className="container mx-auto px-4 max-w-4xl">
             <Skeleton className="h-8 w-48 mb-8" />
             <div className="grid md:grid-cols-3 gap-8">
-              <Skeleton className="aspect-[3/4] w-full" />
+              <Skeleton className="h-48 w-full rounded-lg" />
               <div className="md:col-span-2 space-y-4">
                 <Skeleton className="h-10 w-3/4" />
                 <Skeleton className="h-6 w-1/2" />
