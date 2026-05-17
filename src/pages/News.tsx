@@ -182,7 +182,7 @@ export default function News() {
                           key={article.id}
                           title={article.title}
                           subtitle={article.subtitle || undefined}
-                          imageUrl={optimizeImageUrl(article.hero_image_url, { width: 600 }) || undefined}
+                          imageUrl={optimizeImageUrl(article.hero_image_url, { width: 600, quality: 80 }) || undefined}
                           region={article.region?.name}
                           date={article.publish_date ? format(new Date(article.publish_date), "MMM d, yyyy") : undefined}
                           slug={article.slug}
@@ -191,6 +191,18 @@ export default function News() {
                     </div>
                   </div>
                 ))}
+
+                {hasMore && (
+                  <div className="flex justify-center pt-4">
+                    <Button
+                      variant="outline"
+                      size="lg"
+                      onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}
+                    >
+                      Load more articles
+                    </Button>
+                  </div>
+                )}
               </div>
             )}
           </section>
