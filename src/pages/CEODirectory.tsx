@@ -16,10 +16,9 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb";
-import { User, Building2 } from "lucide-react";
+import { Building2, ChevronRight } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import globeCeoLeaders from "@/assets/globe-ceo-leaders.jpg";
-import { optimizeImageUrl } from "@/lib/utils";
 
 const REGIONS = [
   { value: "all", label: "All Regions" },
