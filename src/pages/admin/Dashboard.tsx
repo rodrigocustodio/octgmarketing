@@ -5,7 +5,7 @@ import AdminLayout from "@/components/admin/AdminLayout";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Newspaper, FileEdit, CheckCircle, AlertCircle, Loader2 } from "lucide-react";
 import { Link } from "react-router-dom";
-import { PriceTickerManager } from "@/components/admin/PriceTickerManager";
+
 
 interface Stats {
   newSources: number;
