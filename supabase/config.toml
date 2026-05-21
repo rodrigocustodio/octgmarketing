@@ -57,11 +57,9 @@ verify_jwt = false
 [functions.generate-executive-bio]
 verify_jwt = false
 
-[functions.fetch-steel-prices]
-verify_jwt = false
-
 [functions.cleanup-storage]
 verify_jwt = false
+
 
 [functions.generate-topic-suggestions]
 verify_jwt = false
