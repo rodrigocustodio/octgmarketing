@@ -20,7 +20,7 @@ import { QuickReadsGrid } from "@/components/home/QuickReadsGrid";
 import { AnalysisReportsSection } from "@/components/home/AnalysisReportsSection";
 import { UpcomingEventsSection } from "@/components/home/UpcomingEventsSection";
 import { FeaturedEventSpotlight } from "@/components/home/FeaturedEventSpotlight";
-import { MarketIntelligenceStrip } from "@/components/home/MarketIntelligenceStrip";
+import { MarketPulseStrip } from "@/components/home/MarketPulseStrip";
 function formatArticleDate(dateString: string | null): string {
   if (!dateString) return "";
   try {
