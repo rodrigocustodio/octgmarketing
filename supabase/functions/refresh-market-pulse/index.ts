@@ -146,7 +146,9 @@ async function generateEditorial(
     const d = await res.json();
     const content = d.choices?.[0]?.message?.content;
     if (!content) return null;
-    const parsed = JSON.parse(content);
+    // Strip code fences if model wrapped output
+    const cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+    const parsed = JSON.parse(cleaned);
     const pressure: Pressure =
       parsed.pressure === "tightening" || parsed.pressure === "softening"
         ? parsed.pressure
