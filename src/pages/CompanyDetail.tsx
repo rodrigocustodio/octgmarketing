@@ -481,37 +481,59 @@ export default function CompanyDetail() {
                 <CardHeader>
                   <CardTitle>Contact</CardTitle>
                 </CardHeader>
-                <CardContent className="space-y-4">
-                  {company.phone && (
-                    <a
-                      href={`tel:${company.phone}`}
-                      className="flex items-center gap-3 text-sm hover:text-accent transition-colors"
-                    >
-                      <Phone className="h-4 w-4 text-muted-foreground" />
-                      <span>{company.phone}</span>
-                    </a>
-                  )}
+                <CardContent className="space-y-3">
                   {company.website && (
-                    <a
-                      href={company.website}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex items-center gap-3 text-sm hover:text-accent transition-colors"
+                    <Button
+                      asChild
+                      variant="hero"
+                      className="w-full h-14 justify-between px-5"
                     >
-                      <Globe className="h-4 w-4 text-muted-foreground" />
-                      <span className="truncate">{company.website.replace(/^https?:\/\//, "")}</span>
-                      <ExternalLink className="h-3 w-3 shrink-0" />
-                    </a>
+                      <a
+                        href={company.website}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                      >
+                        <span className="flex items-center gap-3 min-w-0">
+                          <Globe className="h-5 w-5 shrink-0" />
+                          <span className="flex flex-col items-start min-w-0">
+                            <span className="text-sm font-bold leading-tight">Visit Website</span>
+                            <span className="text-xs font-normal opacity-90 truncate max-w-[180px]">
+                              {company.website.replace(/^https?:\/\//, "").replace(/\/$/, "")}
+                            </span>
+                          </span>
+                        </span>
+                        <ExternalLink className="h-4 w-4 shrink-0" />
+                      </a>
+                    </Button>
                   )}
-                  {company.email && (
-                    <a
-                      href={`mailto:${company.email}`}
-                      className="flex items-center gap-3 text-sm hover:text-accent transition-colors"
-                    >
-                      <Mail className="h-4 w-4 text-muted-foreground" />
-                      <span>{company.email}</span>
-                    </a>
+
+                  {(company.phone || company.email) && (
+                    <div className={`grid gap-2 ${company.phone && company.email ? "sm:grid-cols-2" : "grid-cols-1"}`}>
+                      {company.phone && (
+                        <Button asChild variant="outline" className="h-auto py-3 justify-start">
+                          <a href={`tel:${company.phone}`} className="flex items-center gap-3">
+                            <Phone className="h-4 w-4 text-accent shrink-0" />
+                            <span className="flex flex-col items-start min-w-0">
+                              <span className="text-xs text-muted-foreground leading-tight">Call</span>
+                              <span className="text-sm font-medium truncate">{company.phone}</span>
+                            </span>
+                          </a>
+                        </Button>
+                      )}
+                      {company.email && (
+                        <Button asChild variant="outline" className="h-auto py-3 justify-start">
+                          <a href={`mailto:${company.email}`} className="flex items-center gap-3 min-w-0">
+                            <Mail className="h-4 w-4 text-accent shrink-0" />
+                            <span className="flex flex-col items-start min-w-0">
+                              <span className="text-xs text-muted-foreground leading-tight">Email</span>
+                              <span className="text-sm font-medium truncate max-w-[160px]">{company.email}</span>
+                            </span>
+                          </a>
+                        </Button>
+                      )}
+                    </div>
                   )}
+
                   {!company.website && !company.phone && !company.email && (
                     <p className="text-sm text-muted-foreground">No contact information available.</p>
                   )}
