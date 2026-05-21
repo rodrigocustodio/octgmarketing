@@ -3,7 +3,13 @@ project_id = "mlhngmnuxoetnlesnxgu"
 [functions.find-company-website]
 verify_jwt = false
 
+[functions.update-company-websites]
+verify_jwt = false
+
 [functions.scrape-octg]
+verify_jwt = false
+
+[functions.refresh-market-pulse]
 verify_jwt = false
 
 [functions.generate-drafts]
