@@ -94,8 +94,6 @@ verify_jwt = false
 [functions.auto-internal-links]
 verify_jwt = false
 
-[functions.auto-market-intelligence]
-verify_jwt = false
 
 [functions.auto-article-pipeline]
 verify_jwt = false
