@@ -282,8 +282,8 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Market Intelligence Strip - Commodities + Cost Pressure Index */}
-        <MarketIntelligenceStrip />
+        {/* Editorial Market Pulse - Weekly directional snapshot */}
+        <MarketPulseStrip />
         {/* Secondary Articles - 3 Cards */}
         {secondaryArticles.length > 0 && (
           <section className="container py-12">
