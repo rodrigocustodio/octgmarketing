@@ -132,17 +132,17 @@ async function generateEditorial(
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          model: "google/gemini-2.5-flash-lite",
+          model: "google/gemini-2.5-flash",
           messages: [
             {
               role: "system",
               content:
-                "You are the OCTG Index newsroom desk. Wire-service tone. Neutral, no hype, no superlatives. Output strict JSON only.",
+                'You are the OCTG Index newsroom desk. Wire-service tone. Neutral, no hype, no superlatives. Respond with ONLY a single valid minified JSON object — no markdown fences, no comments, no trailing commas.',
             },
             {
               role: "user",
               content:
-                `Inputs for this week:\n- ${rigText}\n- Newsroom coverage (last 7d, ${totalArticles} stories): ${focusText}\n\nReturn JSON with three keys:\n  "pressure": one of "tightening" | "neutral" | "softening" (your editorial read on OCTG supply/cost direction)\n  "rationale": one sentence (max 18 words) explaining the pressure call\n  "editorial": exactly two sentences (max 50 words total) synthesizing rig direction + coverage themes for an OCTG audience. End with no byline.`,
+                `Inputs for this week:\n- ${rigText}\n- Newsroom coverage (last 7d, ${totalArticles} stories): ${focusText}\n\nReturn exactly this JSON shape:\n{"pressure":"tightening|neutral|softening","rationale":"one sentence max 18 words explaining the pressure call","editorial":"exactly two sentences max 50 words total synthesizing rig direction and coverage themes for an OCTG audience"}`,
             },
           ],
           response_format: { type: "json_object" },
@@ -153,8 +153,11 @@ async function generateEditorial(
     const d = await res.json();
     const content = d.choices?.[0]?.message?.content;
     if (!content) return null;
-    // Strip code fences if model wrapped output
-    const cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+    console.log("ai raw content:", content.slice(0, 400));
+    // Strip code fences and trailing commas if model wrapped output
+    let cleaned = content.replace(/^```(?:json)?\s*/i, "").replace(/\s*```\s*$/i, "").trim();
+    // Remove trailing commas before } or ]
+    cleaned = cleaned.replace(/,(\s*[}\]])/g, "$1");
     const parsed = JSON.parse(cleaned);
     const pressure: Pressure =
       parsed.pressure === "tightening" || parsed.pressure === "softening"
