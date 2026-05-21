@@ -32,7 +32,7 @@ export function useMarketPulse() {
         .maybeSingle();
 
       if (error) throw error;
-      return data as MarketPulse | null;
+      return data as unknown as MarketPulse | null;
     },
     staleTime: 60 * 60 * 1000, // 1 hour — data only updates weekly
     refetchOnWindowFocus: false,
