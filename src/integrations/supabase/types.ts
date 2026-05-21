@@ -807,6 +807,45 @@ export type Database = {
           },
         ]
       }
+      market_pulse: {
+        Row: {
+          cost_pressure: Database["public"]["Enums"]["cost_pressure_level"]
+          cost_pressure_rationale: string | null
+          created_at: string
+          editorial_read: string | null
+          id: string
+          newsroom_focus: Json
+          rig_count_as_of: string | null
+          rig_count_us: number | null
+          rig_count_us_delta: number | null
+          updated_at: string
+        }
+        Insert: {
+          cost_pressure?: Database["public"]["Enums"]["cost_pressure_level"]
+          cost_pressure_rationale?: string | null
+          created_at?: string
+          editorial_read?: string | null
+          id?: string
+          newsroom_focus?: Json
+          rig_count_as_of?: string | null
+          rig_count_us?: number | null
+          rig_count_us_delta?: number | null
+          updated_at?: string
+        }
+        Update: {
+          cost_pressure?: Database["public"]["Enums"]["cost_pressure_level"]
+          cost_pressure_rationale?: string | null
+          created_at?: string
+          editorial_read?: string | null
+          id?: string
+          newsroom_focus?: Json
+          rig_count_as_of?: string | null
+          rig_count_us?: number | null
+          rig_count_us_delta?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       newsletter_subscribers: {
         Row: {
           email: string
@@ -1323,6 +1362,7 @@ export type Database = {
         | "expert_contribution"
         | "data_access"
         | "consulting"
+      cost_pressure_level: "tightening" | "neutral" | "softening"
       draft_article_status: "pending_review" | "approved" | "rejected"
       source_article_status: "new" | "processed" | "failed"
     }
@@ -1476,6 +1516,7 @@ export const Constants = {
         "data_access",
         "consulting",
       ],
+      cost_pressure_level: ["tightening", "neutral", "softening"],
       draft_article_status: ["pending_review", "approved", "rejected"],
       source_article_status: ["new", "processed", "failed"],
     },
