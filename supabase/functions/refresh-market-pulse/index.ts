@@ -40,12 +40,19 @@ async function scrapeRigCount(): Promise<
       return null;
     }
     const d = await res.json();
-    const j = d?.data?.json ?? d?.json;
-    if (!j?.us_total) return null;
+    console.log("firecrawl response keys:", Object.keys(d ?? {}), "data keys:", Object.keys(d?.data ?? {}));
+    const j = d?.data?.json ?? d?.json ?? d?.data ?? d;
+    const usTotal = j?.us_total ?? j?.usTotal ?? j?.us?.total ?? j?.united_states_total;
+    const usDelta = j?.us_change_week_over_week ?? j?.us_change ?? j?.usChange ?? j?.us?.change ?? 0;
+    const reportDate = j?.report_date ?? j?.reportDate ?? j?.date ?? new Date().toISOString().slice(0, 10);
+    if (!usTotal) {
+      console.error("rig count: no us_total in payload", JSON.stringify(j).slice(0, 500));
+      return null;
+    }
     return {
-      count: Number(j.us_total),
-      delta: Number(j.us_change_week_over_week ?? 0),
-      asOf: String(j.report_date ?? new Date().toISOString().slice(0, 10)),
+      count: Number(usTotal),
+      delta: Number(usDelta),
+      asOf: String(reportDate),
     };
   } catch (e) {
     console.error("rig count scrape failed:", (e as Error).message);
