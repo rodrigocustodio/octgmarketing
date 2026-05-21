@@ -19,10 +19,10 @@ interface Job {
 
 const JOBS: Job[] = [
   {
-    name: "auto-market-intelligence",
-    function: "auto-market-intelligence",
-    description: "Refreshes equity prices, CME futures, EIA crude, and the OCTG Cost Pressure Index.",
-    schedule: "Every 30 min (US market hours), hourly otherwise",
+    name: "refresh-market-pulse",
+    function: "refresh-market-pulse",
+    description: "Weekly Editorial Market Pulse refresh: scrapes Baker Hughes US rig count, tallies newsroom topic focus, and generates the editorial read via Lovable AI.",
+    schedule: "Fridays 14:00 UTC",
   },
   {
     name: "auto-article-pipeline",
