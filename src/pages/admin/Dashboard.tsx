@@ -142,8 +142,8 @@ const Dashboard = () => {
           ))}
         </div>
 
-        {/* Price Ticker Management */}
-        <PriceTickerManager />
+
+
 
         {/* Quick Actions */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
