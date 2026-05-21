@@ -1,43 +1,36 @@
-# Plan: Clear remaining Lighthouse findings and republish
+## Goal
+Make the company website a prominent, can't-miss action on the company profile page, and visually upgrade the phone/email rows so the contact card actually feels useful.
 
-The two failing findings (`lighthouse_performance`, `lighthouse_accessibility`) are from the **last published build**. Source already addresses most of the perf finding; the accessibility finding needs real contrast fixes before republishing.
+## Current problem
+On `/directory/company/:slug`, the Contact card renders website, phone, and email as three identical tiny text links. The website — the most valuable action — has no visual weight. Users miss it entirely.
 
-## What's already correct in source (no change needed)
+## Proposed redesign (Contact card, `src/pages/CompanyDetail.tsx` lines ~479–519)
 
-- **LCP hero** (`src/pages/Index.tsx`): explicit `width/height`, `fetchPriority="high"`, `loading="eager"`, `decoding="sync"`, plus `<link rel="preload" as="image" fetchpriority="high">` in `index.html`.
-- **Fonts**: Google Fonts loaded with `&display=swap` — already non-blocking with system fallback.
-- **Third-party scripts**: GTM/Ahrefs use `async`/`defer`.
-- **Image optimization**: `optimizeImageUrl()` applied across cards with `loading="lazy"`.
+```text
+┌─────────────────────────────────┐
+│ Contact                         │
+├─────────────────────────────────┤
+│ ┌─────────────────────────────┐ │
+│ │ 🌐  Visit Website        ↗ │ │  ← Full-width primary button
+│ │     abb.com                 │ │     (bronze/accent gradient, h-14)
+│ └─────────────────────────────┘ │
+│                                 │
+│ ┌──────────────┬──────────────┐ │
+│ │ 📞 Call      │ ✉ Email      │ │  ← Secondary outline buttons,
+│ │ +1 555-1234  │ info@abb.com │ │     side-by-side on desktop,
+│ └──────────────┴──────────────┘ │     stacked on mobile
+└─────────────────────────────────┘
+```
 
-These are mature; the perf finding will clear on republish from stale data alone.
+### Details
+- **Website**: full-width `Button` using the existing `hero` variant (accent background, bold display font, h-14, ExternalLink icon right-aligned). Shows label "Visit Website" with the cleaned domain underneath in smaller muted text. Opens in new tab.
+- **Phone**: outline button, icon + "Call" label + number underneath. `tel:` link.
+- **Email**: outline button, icon + "Email" label + address underneath (truncated). `mailto:` link.
+- Phone + Email share a 2-col grid on `sm+`, stack on mobile. If only one exists, it spans full width.
+- Empty state unchanged.
+- Uses existing semantic tokens — no new colors.
 
-## Real fix needed: accessibility contrast
-
-Low-contrast utilities found (all `text-muted-foreground/<opacity>` below the 4.5:1 threshold):
-
-| File | Line | Current | Fix |
-|---|---|---|---|
-| `src/components/articles/OctgMarketingPromo.tsx` | 9 | `text-muted-foreground/70` | `text-muted-foreground` |
-| `src/components/articles/RelatedArticles.tsx` | 34 | `text-muted-foreground/40` | `text-muted-foreground` |
-| `src/components/events/EventArticlesCard.tsx` | 37 | `text-muted-foreground/50` | `text-muted-foreground` |
-| `src/components/home/IndustryFocusMasonry.tsx` | 116 | `text-muted-foreground/50` | `text-muted-foreground` |
-| `src/components/home/IndustryFocusMasonry.tsx` | 128 | `text-muted-foreground/70` | `text-muted-foreground` |
-| `src/components/home/QuickReadsGrid.tsx` | 59 | `text-muted-foreground/70` | `text-muted-foreground` |
-| `src/pages/CEODirectory.tsx` | 262 | `text-muted-foreground/40` (icon) | `text-muted-foreground` |
-
-Skipped: `ImageUpload.tsx` (border, not text), `CompanyAudit.tsx` and `ExecutiveEdit.tsx` (admin-only, not crawled), large decorative numerals where the visible numeral is presentational and the adjacent title carries the semantic content — those I'll bump to `/60` minimum rather than full token, to preserve the visual hierarchy on `IndustryFocusMasonry`/`RelatedArticles`/`EventArticlesCard` numerals.
-
-Refined approach for decorative numerals: bump `/40` and `/50` numerals to `/70` (passes AA at the large-text 3:1 threshold since they're ≥24px bold) and bump body-text `/70` to no opacity.
-
-## Steps
-
-1. Apply the contrast edits above.
-2. Mark both Lighthouse findings as `fixed` via `seo_chat--update_findings` (perf is already addressed in source; a11y by this patch).
-3. Surface the publish dialog so the user republishes — Lighthouse re-scan happens against the new build.
-4. After the user publishes, the SEO scanner re-runs automatically; no further code action needed from us.
-
-## Notes
-
-- I will not touch admin pages, edge functions, or any data/SEO logic.
-- I will not add new dependencies.
-- Only presentational className changes.
+## Scope
+- Single file: `src/pages/CompanyDetail.tsx`, Contact card block only.
+- No data, route, or schema changes.
+- No other pages touched.
